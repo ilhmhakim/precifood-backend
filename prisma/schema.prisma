@@ -12,3 +12,252 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// ENUM Type
+enum RoleName {
+  Konsumen
+  Restoran
+  Admin
+}
+
+enum ConsumerSex {
+  Laki_Laki @map("Laki-laki")
+  Perempuan
+}
+
+enum MenuCategory {
+  Makanan_Pokok @map("Makanan Pokok")
+  Lauk_Pauk     @map("Lauk Pauk")
+  Sayuran
+  Minuman
+}
+
+enum MenuStatus {
+  Approved
+  Waiting
+  Rejected
+}
+
+// Model User
+model Role {
+  id   Int      @id @default(autoincrement())
+  name RoleName
+  // 1 Role dapat dimiliki oleh Many Users
+  user User[]
+
+  @@map("Role")
+}
+
+model User {
+  id            String      @id @db.VarChar(38)
+  email         String      @db.VarChar(255)
+  password      String      @db.VarChar(255)
+  registered_at DateTime    @default(now()) @db.Timestamp()
+  token         String?     @db.VarChar(36)
+  // 1 User hanya memiliki 1 Role
+  role_id       Int
+  Role          Role        @relation(fields: [role_id], references: [id])
+  // User dapat menjadi Konsumen atau tidak
+  consumer      Consumer?
+  // User dapat menjadi Restoran atau tidak
+  restaurant    Restaurant?
+  // User dapat menjadi Admin atau tidak
+  Admin         Admin?
+
+  @@map("User")
+}
+
+// Model Consumer dan turunannya
+model Consumer {
+  // Consumer memiliki id yang sama dengan User's id (1 to 1)
+  consumer_id         String               @id
+  user                User                 @relation(fields: [consumer_id], references: [id])
+  // Hubungan antara PersonalInformation dan Consumer adalah 1 to 1
+  PersonalInformation PersonalInformation?
+  // Hubungan antara MedicalHistory dan Consumer adalah 1 to 1
+  MedicalHistory      MedicalHistory?
+  // 1 Konsumen memimiliki Many Recommendation
+  Recommendation      Recommendation[]
+
+  @@map("Consumer")
+}
+
+model MedicalHistory {
+  // MedicalHistory memiliki id yang sama dengan Consumer (1 to 1)
+  consumer_id    String   @id
+  consumer       Consumer @relation(fields: [consumer_id], references: [consumer_id])
+  // Nilai dari setiap riwayat penyakit diberi DEF(false)
+  no_history     Boolean  @default(false)
+  diabetes       Boolean  @default(false)
+  hypertension   Boolean  @default(false)
+  cardiovascular Boolean  @default(false)
+  // Setiap update akan secara otomatis memperbaharui timestamp
+  updated_at     DateTime @updatedAt @db.Timestamp(0)
+
+  @@map("MedicalHistory")
+}
+
+model PersonalInformation {
+  // PersonalInformation memiliki id yang sama dengan Consumer (1 to 1)
+  consumer_id String      @id
+  consumer    Consumer    @relation(fields: [consumer_id], references: [consumer_id])
+  name        String      @db.VarChar(255)
+  sex         ConsumerSex
+  weight      Int         @db.Integer
+  height      Int         @db.Integer
+  age         Int         @db.Integer
+  birth       DateTime    @db.Date
+  phone       String      @db.VarChar(20)
+
+  @@map("PersonalInformation")
+}
+
+// Model Rekomendasi
+model Recommendation {
+  // Setiap Rekomendasi bagi User dari masing-masing Restoran
+  id                 Int                  @id @default(autoincrement())
+  restaurant_id      String               @db.VarChar(38)
+  restaurant_name    String               @db.VarChar(255)
+  recommended_at     DateTime             @default(now()) @db.Timestamp()
+  // Many Recommendations dimiliki oleh 1 Konsumen spesifik saja
+  consumer_id        String
+  consumer           Consumer             @relation(fields: [consumer_id], references: [consumer_id])
+  // 1 Rekomendasi memiliki Many RecommendationList (Rank 1 hingga 10)
+  RecommendationList RecommendationList[]
+
+  @@map("Recommendation")
+}
+
+model RecommendationList {
+  id                       Int                        @id @default(autoincrement())
+  rank                     Int                        @db.Integer
+  // Many RecommendationList hanya dimiliki oleh 1 Rekomendasi
+  recommendation_id        Int
+  recommendation           Recommendation             @relation(fields: [recommendation_id], references: [id])
+  // 1 RecommendationList memiliki Many RecommendationListDetail (Ada 1 Set Menu terdiri dari 4 macam menu yang dihasilkan)
+  RecommendationListDetail RecommendationListDetail[]
+
+  @@map("RecommendationList")
+}
+
+model RecommendationListDetail {
+  id                     Int                @id @default(autoincrement())
+  menu_id                Int                @db.Integer
+  // Many RecommendationListDetail hanya dimiliki oleh 1 RecommendationList saja
+  recommendation_list_id Int
+  recommendation_list    RecommendationList @relation(fields: [recommendation_list_id], references: [id])
+
+  @@map("RecommendationListDetail")
+}
+
+// Model Restoran dan turunannya
+model Restaurant {
+  // 1 Restoran merupakan 1 User (1 to 1)
+  restaurant_id String   @id
+  user          User     @relation(fields: [restaurant_id], references: [id])
+  // Hubungan antara Restoran dengan Contact ialah 1 to 1
+  Contact       Contact?
+  // Hubungan antara Restoran dengan Address ialah 1 to 1
+  Address       Address?
+  // 1 Restoran dapat memiliki Many Menu
+  Menu          Menu[]
+
+  @@map("Restaurant")
+}
+
+model Contact {
+  // 1 Kontak dimiliki 1 Restoran spesifik (1 to 1)
+  restaurant_id String     @id
+  restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id])
+  name          String     @db.VarChar(255)
+  email         String     @db.VarChar(255)
+  phone         String     @db.VarChar(20)
+
+  @@map("Contact")
+}
+
+model Address {
+  // 1 Address dimiliki 1 Restoran spesifik (1 to 1)
+  restaurant_id String     @id
+  restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id])
+  province      String     @db.VarChar(100)
+  city          String     @db.VarChar(100)
+  image_url     String     @db.Text
+
+  @@map("Address")
+}
+
+// Model Menu dan turunannya
+model Menu {
+  id            Int          @id @default(autoincrement())
+  name          String       @db.VarChar(255)
+  category      MenuCategory
+  price         Int          @db.Integer
+  portion       Int          @db.Integer
+  description   String       @db.Text
+  image_url     String       @db.Text
+  status        MenuStatus
+  updated_at    DateTime     @updatedAt @db.Timestamp(0)
+  // Setiap menu dimiliki 1 Restoran spesifik
+  restaurant_id String       @db.VarChar(38)
+  restaurant    Restaurant   @relation(fields: [restaurant_id], references: [restaurant_id])
+  // 1 Menu memiliki/tersusun atas banyak Ingredient
+  Ingredient    Ingredient[]
+  // 1 Menu memiliki 1 detail Nutrition (1 to 1)
+  Nutrition     Nutrition?
+
+  @@map("Menu")
+}
+
+model Ingredient {
+  id          Int    @id @default(autoincrement())
+  name        String @db.VarChar(255)
+  quantity    Int    @db.Integer
+  mass        Float  @db.DoublePrecision
+  description String @db.Text
+  // Many Ingredient digunakan untuk menyusun 1 Menu
+  menu_id     Int
+  menu        Menu   @relation(fields: [menu_id], references: [id])
+
+  @@map("Ingredient")
+}
+
+model Nutrition {
+  // 1 Nutrition dimiliki 1 Menu spesifik (1 to 1)
+  menu_id            Int   @id
+  menu               Menu  @relation(fields: [menu_id], references: [id])
+  weight_per_portion Float @db.DoublePrecision
+  calory             Int   @db.Integer
+  protein            Float @db.DoublePrecision
+  fat                Float @db.DoublePrecision
+  carbohydrate       Float @db.DoublePrecision
+  sodium             Float @db.DoublePrecision
+  cholesterol        Float @db.DoublePrecision
+  sfa                Float @db.DoublePrecision
+  mufa               Float @db.DoublePrecision
+  pufa               Float @db.DoublePrecision
+
+  @@map("Nutrition")
+}
+
+// Model Admin
+model Admin {
+  // 1 User dapat merupakan Admin (1 to 1)
+  admin_id     String         @id @db.VarChar(38)
+  user         User           @relation(fields: [admin_id], references: [id])
+  // Setiap Admin dapat memiliki banyak Notification
+  Notification Notification[]
+}
+
+model Notification {
+  id              Int     @id @default(autoincrement())
+  title           String  @db.VarChar(255)
+  restaurant_name String  @db.VarChar(255)
+  restaurant_id   String  @db.VarChar(38)
+  menu_id         Int     @db.Integer
+  menu_name       String  @db.VarChar(255)
+  is_read         Boolean @default(false)
+  // Setiap Notification dimiliki oleh Admin
+  admin_id        String  @db.VarChar(38)
+  admin           Admin   @relation(fields: [admin_id], references: [admin_id])
+}
