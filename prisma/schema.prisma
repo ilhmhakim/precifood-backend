@@ -70,7 +70,7 @@ model User {
 // Model Consumer dan turunannya
 model Consumer {
   // Consumer memiliki id yang sama dengan User's id (1 to 1)
-  consumer_id         String               @id
+  consumer_id         String               @id @db.VarChar(38)
   user                User                 @relation(fields: [consumer_id], references: [id])
   // Hubungan antara PersonalInformation dan Consumer adalah 1 to 1
   PersonalInformation PersonalInformation?
@@ -84,7 +84,7 @@ model Consumer {
 
 model MedicalHistory {
   // MedicalHistory memiliki id yang sama dengan Consumer (1 to 1)
-  consumer_id    String   @id
+  consumer_id    String   @id @db.VarChar(38)
   consumer       Consumer @relation(fields: [consumer_id], references: [consumer_id])
   // Nilai dari setiap riwayat penyakit diberi DEF(false)
   no_history     Boolean  @default(false)
@@ -99,7 +99,7 @@ model MedicalHistory {
 
 model PersonalInformation {
   // PersonalInformation memiliki id yang sama dengan Consumer (1 to 1)
-  consumer_id String      @id
+  consumer_id String      @id @db.VarChar(38)
   consumer    Consumer    @relation(fields: [consumer_id], references: [consumer_id])
   name        String      @db.VarChar(255)
   sex         ConsumerSex
@@ -120,7 +120,7 @@ model Recommendation {
   restaurant_name    String               @db.VarChar(255)
   recommended_at     DateTime             @default(now()) @db.Timestamp()
   // Many Recommendations dimiliki oleh 1 Konsumen spesifik saja
-  consumer_id        String
+  consumer_id        String               @db.VarChar(38)
   consumer           Consumer             @relation(fields: [consumer_id], references: [consumer_id])
   // 1 Rekomendasi memiliki Many RecommendationList (Rank 1 hingga 10)
   RecommendationList RecommendationList[]
@@ -132,7 +132,7 @@ model RecommendationList {
   id                       Int                        @id @default(autoincrement())
   rank                     Int                        @db.Integer
   // Many RecommendationList hanya dimiliki oleh 1 Rekomendasi
-  recommendation_id        Int
+  recommendation_id        Int                        @db.Integer
   recommendation           Recommendation             @relation(fields: [recommendation_id], references: [id])
   // 1 RecommendationList memiliki Many RecommendationListDetail (Ada 1 Set Menu terdiri dari 4 macam menu yang dihasilkan)
   RecommendationListDetail RecommendationListDetail[]
@@ -144,7 +144,7 @@ model RecommendationListDetail {
   id                     Int                @id @default(autoincrement())
   menu_id                Int                @db.Integer
   // Many RecommendationListDetail hanya dimiliki oleh 1 RecommendationList saja
-  recommendation_list_id Int
+  recommendation_list_id Int                @db.Integer
   recommendation_list    RecommendationList @relation(fields: [recommendation_list_id], references: [id])
 
   @@map("RecommendationListDetail")
@@ -153,7 +153,7 @@ model RecommendationListDetail {
 // Model Restoran dan turunannya
 model Restaurant {
   // 1 Restoran merupakan 1 User (1 to 1)
-  restaurant_id String   @id
+  restaurant_id String   @id @db.VarChar(38)
   user          User     @relation(fields: [restaurant_id], references: [id])
   // Hubungan antara Restoran dengan Contact ialah 1 to 1
   Contact       Contact?
@@ -167,7 +167,7 @@ model Restaurant {
 
 model Contact {
   // 1 Kontak dimiliki 1 Restoran spesifik (1 to 1)
-  restaurant_id String     @id
+  restaurant_id String     @id @db.VarChar(38)
   restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id])
   name          String     @db.VarChar(255)
   email         String     @db.VarChar(255)
@@ -178,7 +178,7 @@ model Contact {
 
 model Address {
   // 1 Address dimiliki 1 Restoran spesifik (1 to 1)
-  restaurant_id String     @id
+  restaurant_id String     @id @db.VarChar(38)
   restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id])
   province      String     @db.VarChar(100)
   city          String     @db.VarChar(100)
@@ -216,7 +216,7 @@ model Ingredient {
   mass        Float  @db.DoublePrecision
   description String @db.Text
   // Many Ingredient digunakan untuk menyusun 1 Menu
-  menu_id     Int
+  menu_id     Int    @db.Integer
   menu        Menu   @relation(fields: [menu_id], references: [id])
 
   @@map("Ingredient")
@@ -224,7 +224,7 @@ model Ingredient {
 
 model Nutrition {
   // 1 Nutrition dimiliki 1 Menu spesifik (1 to 1)
-  menu_id            Int   @id
+  menu_id            Int   @id @db.Integer
   menu               Menu  @relation(fields: [menu_id], references: [id])
   weight_per_portion Float @db.DoublePrecision
   calory             Int   @db.Integer
