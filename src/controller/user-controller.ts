@@ -7,8 +7,8 @@ export class UserController {
         try {
             const request: CreateConsumerRequest = req.body as CreateConsumerRequest;
             const response = await UserService.registerConsumer(request);
-            res.status(200).json({
-                data: response
+            res.status(201).json({
+                message: "Sign up berhasil"
             })
         } catch (e) {
             next(e);

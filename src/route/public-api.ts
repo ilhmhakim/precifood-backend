@@ -2,4 +2,4 @@ import express from "express";
 import {UserController} from "../controller/user-controller";
 
 export const publicRouter = express.Router();
-publicRouter.post("/api/users", UserController.registerConsumer);
+publicRouter.post("/api/signup/consumer", UserController.registerConsumer);
