@@ -20,11 +20,6 @@ enum RoleName {
   Admin
 }
 
-enum ConsumerSex {
-  Laki_Laki @map("Laki-laki")
-  Perempuan
-}
-
 enum MenuCategory {
   Makanan_Pokok @map("Makanan Pokok")
   Lauk_Pauk     @map("Lauk Pauk")
@@ -60,7 +55,7 @@ model User {
 model Consumer {
   // Consumer memiliki id yang sama dengan User's id (1 to 1)
   consumer_id         String               @id @db.VarChar(38)
-  user                User                 @relation(fields: [consumer_id], references: [id])
+  user                User                 @relation(fields: [consumer_id], references: [id], onDelete: Cascade)
   // Hubungan antara PersonalInformation dan Consumer adalah 1 to 1
   PersonalInformation PersonalInformation?
   // Hubungan antara MedicalHistory dan Consumer adalah 1 to 1
@@ -74,7 +69,7 @@ model Consumer {
 model MedicalHistory {
   // MedicalHistory memiliki id yang sama dengan Consumer (1 to 1)
   consumer_id    String   @id @db.VarChar(38)
-  consumer       Consumer @relation(fields: [consumer_id], references: [consumer_id])
+  consumer       Consumer @relation(fields: [consumer_id], references: [consumer_id], onDelete: Cascade)
   // Nilai dari setiap riwayat penyakit diberi DEF(false)
   no_history     Boolean  @default(false)
   diabetes       Boolean  @default(false)
@@ -88,15 +83,15 @@ model MedicalHistory {
 
 model PersonalInformation {
   // PersonalInformation memiliki id yang sama dengan Consumer (1 to 1)
-  consumer_id String      @id @db.VarChar(38)
-  consumer    Consumer    @relation(fields: [consumer_id], references: [consumer_id])
-  name        String      @db.VarChar(255)
-  sex         ConsumerSex
-  weight      Int         @db.Integer
-  height      Int         @db.Integer
-  age         Int         @db.Integer
-  birth       DateTime    @db.Date
-  phone       String      @db.VarChar(20)
+  consumer_id String   @id @db.VarChar(38)
+  consumer    Consumer @relation(fields: [consumer_id], references: [consumer_id], onDelete: Cascade)
+  name        String   @db.VarChar(255)
+  sex         String   @db.VarChar(10)
+  weight      Int      @db.Integer
+  height      Int      @db.Integer
+  age         Int      @db.Integer
+  birth       DateTime @db.Date
+  phone       String   @db.VarChar(20)
 
   @@map("PersonalInformation")
 }
@@ -110,7 +105,7 @@ model Recommendation {
   recommended_at     DateTime             @default(now()) @db.Timestamp()
   // Many Recommendations dimiliki oleh 1 Konsumen spesifik saja
   consumer_id        String               @db.VarChar(38)
-  consumer           Consumer             @relation(fields: [consumer_id], references: [consumer_id])
+  consumer           Consumer             @relation(fields: [consumer_id], references: [consumer_id], onDelete: Cascade)
   // 1 Rekomendasi memiliki Many RecommendationList (Rank 1 hingga 10)
   RecommendationList RecommendationList[]
 
@@ -122,7 +117,7 @@ model RecommendationList {
   rank                     Int                        @db.Integer
   // Many RecommendationList hanya dimiliki oleh 1 Rekomendasi
   recommendation_id        Int                        @db.Integer
-  recommendation           Recommendation             @relation(fields: [recommendation_id], references: [id])
+  recommendation           Recommendation             @relation(fields: [recommendation_id], references: [id], onDelete: Cascade)
   // 1 RecommendationList memiliki Many RecommendationListDetail (Ada 1 Set Menu terdiri dari 4 macam menu yang dihasilkan)
   RecommendationListDetail RecommendationListDetail[]
 
@@ -134,7 +129,7 @@ model RecommendationListDetail {
   menu_id                Int                @db.Integer
   // Many RecommendationListDetail hanya dimiliki oleh 1 RecommendationList saja
   recommendation_list_id Int                @db.Integer
-  recommendation_list    RecommendationList @relation(fields: [recommendation_list_id], references: [id])
+  recommendation_list    RecommendationList @relation(fields: [recommendation_list_id], references: [id], onDelete: Cascade)
 
   @@map("RecommendationListDetail")
 }
@@ -143,7 +138,7 @@ model RecommendationListDetail {
 model Restaurant {
   // 1 Restoran merupakan 1 User (1 to 1)
   restaurant_id String   @id @db.VarChar(38)
-  user          User     @relation(fields: [restaurant_id], references: [id])
+  user          User     @relation(fields: [restaurant_id], references: [id], onDelete: Cascade)
   // Hubungan antara Restoran dengan Contact ialah 1 to 1
   Contact       Contact?
   // Hubungan antara Restoran dengan Address ialah 1 to 1
@@ -157,7 +152,7 @@ model Restaurant {
 model Contact {
   // 1 Kontak dimiliki 1 Restoran spesifik (1 to 1)
   restaurant_id String     @id @db.VarChar(38)
-  restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id])
+  restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: Cascade)
   name          String     @db.VarChar(255)
   email         String     @db.VarChar(255)
   phone         String     @db.VarChar(20)
@@ -168,7 +163,7 @@ model Contact {
 model Address {
   // 1 Address dimiliki 1 Restoran spesifik (1 to 1)
   restaurant_id String     @id @db.VarChar(38)
-  restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id])
+  restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: Cascade)
   province      String     @db.VarChar(100)
   city          String     @db.VarChar(100)
   image_url     String     @db.Text
@@ -189,7 +184,7 @@ model Menu {
   updated_at    DateTime     @updatedAt @db.Timestamp(0)
   // Setiap menu dimiliki 1 Restoran spesifik
   restaurant_id String       @db.VarChar(38)
-  restaurant    Restaurant   @relation(fields: [restaurant_id], references: [restaurant_id])
+  restaurant    Restaurant   @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: Cascade)
   // 1 Menu memiliki/tersusun atas banyak Ingredient
   Ingredient    Ingredient[]
   // 1 Menu memiliki 1 detail Nutrition (1 to 1)
@@ -206,7 +201,7 @@ model Ingredient {
   description String @db.Text
   // Many Ingredient digunakan untuk menyusun 1 Menu
   menu_id     Int    @db.Integer
-  menu        Menu   @relation(fields: [menu_id], references: [id])
+  menu        Menu   @relation(fields: [menu_id], references: [id], onDelete: Cascade)
 
   @@map("Ingredient")
 }
@@ -214,7 +209,7 @@ model Ingredient {
 model Nutrition {
   // 1 Nutrition dimiliki 1 Menu spesifik (1 to 1)
   menu_id            Int   @id @db.Integer
-  menu               Menu  @relation(fields: [menu_id], references: [id])
+  menu               Menu  @relation(fields: [menu_id], references: [id], onDelete: Cascade)
   weight_per_portion Float @db.DoublePrecision
   calory             Int   @db.Integer
   protein            Float @db.DoublePrecision
@@ -233,7 +228,7 @@ model Nutrition {
 model Admin {
   // 1 User dapat merupakan Admin (1 to 1)
   admin_id     String         @id @db.VarChar(38)
-  user         User           @relation(fields: [admin_id], references: [id])
+  user         User           @relation(fields: [admin_id], references: [id], onDelete: Cascade)
   // Setiap Admin dapat memiliki banyak Notification
   Notification Notification[]
 }
@@ -248,5 +243,5 @@ model Notification {
   is_read         Boolean @default(false)
   // Setiap Notification dimiliki oleh Admin
   admin_id        String  @db.VarChar(38)
-  admin           Admin   @relation(fields: [admin_id], references: [admin_id])
+  admin           Admin   @relation(fields: [admin_id], references: [admin_id], onDelete: Cascade)
 }
