@@ -62,6 +62,8 @@ model Consumer {
   MedicalHistory      MedicalHistory?
   // 1 Konsumen memimiliki Many Recommendation
   Recommendation      Recommendation[]
+  // 1 Konsumen memiliki Many Recommendation
+  Order               Order[]
 
   @@map("Consumer")
 }
@@ -94,6 +96,32 @@ model PersonalInformation {
   phone       String   @db.VarChar(20)
 
   @@map("PersonalInformation")
+}
+
+// Model Order
+model Order {
+  id              Int           @id @default(autoincrement())
+  consumer_id     String        @db.VarChar(38)
+  consumer        Consumer      @relation(fields: [consumer_id], references: [consumer_id], onDelete: Cascade)
+  restaurant_id   String        @db.VarChar(38)
+  restaurant_name String        @db.VarChar(255)
+  total_price     Int           @db.Integer
+  ordered_at      DateTime      @default(now()) @db.Timestamp()
+  OrderDetail     OrderDetail[]
+
+  @@map("Order")
+}
+
+model OrderDetail {
+  id            Int    @id @default(autoincrement())
+  order_id      Int    @db.Integer
+  order         Order  @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  menu_id       Int    @db.Integer
+  menu_name     String @db.VarChar(255)
+  menu_category String @db.VarChar(50)
+  menu_price    Int    @db.Integer
+
+  @@map("OrderDetail")
 }
 
 // Model Rekomendasi
@@ -162,11 +190,12 @@ model Contact {
 
 model Address {
   // 1 Address dimiliki 1 Restoran spesifik (1 to 1)
-  restaurant_id String     @id @db.VarChar(38)
-  restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: Cascade)
-  province      String     @db.VarChar(100)
-  city          String     @db.VarChar(100)
-  image_url     String     @db.Text
+  restaurant_id  String     @id @db.VarChar(38)
+  restaurant     Restaurant @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: Cascade)
+  province       String     @db.VarChar(100)
+  city           String     @db.VarChar(100)
+  address_detail String     @default("Test") @db.Text
+  image_url      String     @db.Text
 
   @@map("Address")
 }
