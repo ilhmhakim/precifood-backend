@@ -6,11 +6,12 @@ import {ResponseError} from "../error/response-error";
 import bcrypt from "bcrypt";
 import {UserPayload} from "../type/user";
 import {issueToken} from "../middleware/auth-middleware";
+import {AuthValidation} from "../validation/auth-validation";
 
 export class AuthService {
 
     static async login(request: LoginRequest): Promise<UserResponse> {
-        const loginRequest = Validation.validate(UserValidation.LOGIN, request);
+        const loginRequest = Validation.validate(AuthValidation.LOGIN, request);
 
         let user = await prismaClient.user.findUnique({
             where: {
