@@ -1,10 +1,9 @@
 import {z, ZodType} from "zod";
-import {ConsumerSex} from "../type/user";
 
 export class UserValidation {
     static readonly REGISTERCONSUMER: ZodType = z.object({
         name: z.string().min(1).max(255),
-        email: z.string().min(1).max(255),
+        email: z.string().email(),
         sex: z.string().min(1).max(10),
         birth: z.string().min(1),
         phone: z.string().min(1).max(20),
@@ -16,5 +15,18 @@ export class UserValidation {
         cardiovascular: z.boolean(),
         password: z.string().min(8),
         password_confirmation: z.string().min(8)
+    });
+
+    static readonly REGISTERRESTAURANT: ZodType = z.object({
+        name: z.string().min(1).max(255),
+        email: z.string().email(),
+        phone: z.string().min(1).max(20),
+        province: z.string().min(1).max(100),
+        city: z.string().min(1).max(100),
+        address: z.string().min(1),
+        image: z.string().min(1),
+        password: z.string().min(8),
+        password_confirmation: z.string().min(8)
+
     });
 }
