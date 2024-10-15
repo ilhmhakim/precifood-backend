@@ -12,14 +12,13 @@ describe('POST /api/auth/login', () => {
         const response = await supertest(web)
             .post("/api/auth/login")
             .send({
-                "email": "test 2",
+                "email": "test1@gmail.com",
                 "password": "@bc12345",
             });
 
-        const safeResponse = { ...response.body, data: { ...response.body.data, token: '[REDACTED]' } };
-        logger.debug(safeResponse);
+        logger.debug(response.body);
         expect(response.status).toBe(200);
-        expect(response.body.data.email).toBe("test 2");
+        expect(response.body.data.email).toBe("test1@gmail.com");
         expect(response.body.data.id).toBeDefined();
         expect(response.body.data.role).toBe("Konsumen");
         expect(response.body.data.token).toBeDefined();
