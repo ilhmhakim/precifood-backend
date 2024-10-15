@@ -204,12 +204,12 @@ model Address {
 model Menu {
   id            Int          @id @default(autoincrement())
   name          String       @db.VarChar(255)
-  category      MenuCategory
+  category      String       @db.VarChar(50)
   price         Int          @db.Integer
   portion       Int          @db.Integer
   description   String       @db.Text
   image_url     String       @db.Text
-  status        MenuStatus
+  status        String       @default("Waiting") @db.VarChar(50)
   updated_at    DateTime     @updatedAt @db.Timestamp(0)
   // Setiap menu dimiliki 1 Restoran spesifik
   restaurant_id String       @db.VarChar(38)
@@ -237,18 +237,18 @@ model Ingredient {
 
 model Nutrition {
   // 1 Nutrition dimiliki 1 Menu spesifik (1 to 1)
-  menu_id            Int   @id @db.Integer
-  menu               Menu  @relation(fields: [menu_id], references: [id], onDelete: Cascade)
-  weight_per_portion Float @db.DoublePrecision
-  calory             Int   @db.Integer
-  protein            Float @db.DoublePrecision
-  fat                Float @db.DoublePrecision
-  carbohydrate       Float @db.DoublePrecision
-  sodium             Float @db.DoublePrecision
-  cholesterol        Float @db.DoublePrecision
-  sfa                Float @db.DoublePrecision
-  mufa               Float @db.DoublePrecision
-  pufa               Float @db.DoublePrecision
+  menu_id            Int    @id @db.Integer
+  menu               Menu   @relation(fields: [menu_id], references: [id], onDelete: Cascade)
+  weight_per_portion Float? @db.DoublePrecision
+  calory             Int?   @db.Integer
+  protein            Float? @db.DoublePrecision
+  fat                Float? @db.DoublePrecision
+  carbohydrate       Float? @db.DoublePrecision
+  sodium             Float? @db.DoublePrecision
+  cholesterol        Float? @db.DoublePrecision
+  sfa                Float? @db.DoublePrecision
+  mufa               Float? @db.DoublePrecision
+  pufa               Float? @db.DoublePrecision
 
   @@map("Nutrition")
 }
@@ -256,10 +256,10 @@ model Nutrition {
 // Model Admin
 model Admin {
   // 1 User dapat merupakan Admin (1 to 1)
-  admin_id     String         @id @db.VarChar(38)
-  user         User           @relation(fields: [admin_id], references: [id], onDelete: Cascade)
+  admin_id String @id @db.VarChar(38)
+  user     User   @relation(fields: [admin_id], references: [id], onDelete: Cascade)
   // Setiap Admin dapat memiliki banyak Notification
-  Notification Notification[]
+  // Notification Notification[]
 }
 
 model Notification {
@@ -271,6 +271,6 @@ model Notification {
   menu_name       String  @db.VarChar(255)
   is_read         Boolean @default(false)
   // Setiap Notification dimiliki oleh Admin
-  admin_id        String  @db.VarChar(38)
-  admin           Admin   @relation(fields: [admin_id], references: [admin_id], onDelete: Cascade)
+  // admin_id        String  @db.VarChar(38)
+  //   admin           Admin   @relation(fields: [admin_id], references: [admin_id], onDelete: Cascade)
 }
