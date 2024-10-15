@@ -1,10 +1,17 @@
-import {CreateConsumerRequest, toUserResponse, UserResponse} from "../model/user-model";
+import {
+    ConsumerProfile, ConsumerProfileResponse,
+    CreateConsumerRequest,
+    CreateRestaurantRequest, RestaurantProfile, toConsumerProfileResponse,
+    toUserResponse, UserProfileRequest,
+    UserResponse
+} from "../model/user-model";
 import {Validation} from "../validation/validation";
 import {UserValidation} from "../validation/user-validation";
 import {prismaClient} from "../application/database";
 import {ResponseError} from "../error/response-error";
 import bcrypt from "bcrypt";
 import {v7 as uuid7} from "uuid";
+import {Consumer, User} from "@prisma/client";
 
 
 export class UserService {
@@ -22,8 +29,8 @@ export class UserService {
             throw new ResponseError(400, "Email is already taken");
         }
 
-        if (registerConsumerRequest.password != registerConsumerRequest.password) {
-            throw new ResponseError(400, "Password and Password Confirmation is already taken");
+        if (registerConsumerRequest.password != registerConsumerRequest.password_confirmation) {
+            throw new ResponseError(400, "Password and Password Confirmation are not the same");
         }
 
         registerConsumerRequest.password = await bcrypt.hash(registerConsumerRequest.password, 10);
@@ -61,7 +68,6 @@ export class UserService {
                         PersonalInformation: {
                             create: {
                                 name: registerConsumerRequest.name,
-                                // @ts-ignore
                                 sex: registerConsumerRequest.sex,
                                 weight: registerConsumerRequest.weight,
                                 height: registerConsumerRequest.height,
@@ -87,4 +93,87 @@ export class UserService {
 
         return toUserResponse(user);
     }
+
+    static async getProfileUser(request: UserProfileRequest): Promise<ConsumerProfileResponse> {
+        const requestId = String(request);
+
+        const user = await prismaClient.user.findFirst({
+            where: {
+                id: requestId,
+            }
+        });
+
+        if (!user) {
+            throw new ResponseError(401, "User not found");
+        }
+
+        const personalInformation = await prismaClient.personalInformation.findFirst({
+            where: {
+                consumer_id: requestId,
+            }
+        });
+
+        const medicalHistory = await prismaClient.medicalHistory.findFirst({
+            where: {
+                consumer_id: requestId,
+            }
+        });
+
+        return toConsumerProfileResponse(user, personalInformation!, medicalHistory!);
+    }
+
+    static async registerRestaurant(request: CreateRestaurantRequest) : Promise<UserResponse> {
+        const registerRestaurantRequest = Validation.validate(UserValidation.REGISTERRESTAURANT, request);
+
+        const totalUserWithSameEmail = await prismaClient.user.count({
+            where: {
+                email: registerRestaurantRequest.email
+            }
+        });
+
+        if (totalUserWithSameEmail != 0) {
+            throw new ResponseError(400, "Email is already taken");
+        }
+
+        if (registerRestaurantRequest.password != registerRestaurantRequest.password_confirmation) {
+            throw new ResponseError(400, "Password and Password Confirmation are not the same");
+        }
+
+        registerRestaurantRequest.password = await bcrypt.hash(registerRestaurantRequest.password, 10);
+
+        const restaurant_id = String(`R-${uuid7()}`);
+
+        const user = await prismaClient.user.create({
+            data: {
+                id: restaurant_id, // ID yang sama digunakan untuk User dan Restaurant
+                email: registerRestaurantRequest.email,
+                password: registerRestaurantRequest.password,
+                role: "Restoran", // Sesuai dengan role yang sudah ditentukan
+                restaurant: {
+                    create: {
+                        // Buat data untuk Contact
+                        Contact: {
+                            create: {
+                                name: registerRestaurantRequest.name,
+                                email: registerRestaurantRequest.email,
+                                phone: registerRestaurantRequest.phone,
+                            }
+                        },
+
+                        // Buat data untuk Address
+                        Address: {
+                            create: {
+                                province: registerRestaurantRequest.province,
+                                city: registerRestaurantRequest.city,
+                                image_url: registerRestaurantRequest.image,
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        return toUserResponse(user);
+    }
+
 }
