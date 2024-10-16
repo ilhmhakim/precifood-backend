@@ -1,5 +1,11 @@
 import {Request, Response, NextFunction} from "express";
-import {CreateMenuNutritionRequest, CreateMenuRequest, DeleteMenuRequest, UpdateMenuRequest} from "../model/menu-model";
+import {
+    CreateMenuNutritionRequest,
+    CreateMenuRequest,
+    DeleteMenuRequest, UpdateMenuApprovalRequest,
+    UpdateMenuNutritionRequest,
+    UpdateMenuRequest
+} from "../model/menu-model";
 import {MenuService} from "../service/menu-service";
 import {logger} from "../application/logging";
 
@@ -38,7 +44,7 @@ export class MenuController {
             const response = await MenuService.deleteMenu(request);
             res.status(200).json({
                 message: "Menu berhasil dihapus",
-            })
+            });
         } catch (e) {
             next(e);
         }
@@ -52,7 +58,35 @@ export class MenuController {
             res.status(201).json({
                 message: "Nutrisi menu berhasil ditambahkan",
                 data: response
-            })
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async updateMenuNutrition(req: Request, res: Response, next: NextFunction) {
+        try {
+            const request: UpdateMenuNutritionRequest = req.body as UpdateMenuNutritionRequest;
+            request.menu_id = Number(req.params.menuId);
+            const response = await MenuService.updateMenuNutrition(request);
+            res.status(201).json({
+                message: "Nutrisi menu berhasil diupdate",
+                data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async updateMenuApproval(req: Request, res: Response, next: NextFunction) {
+        try {
+            const request: UpdateMenuApprovalRequest = req.body as UpdateMenuApprovalRequest;
+            request.menu_id = Number(req.params.menuId);
+            const response = await MenuService.updateMenuApproval(request);
+            res.status(201).json({
+                message: "Status menu berhasil diupdate",
+                data: response
+            });
         } catch (e) {
             next(e);
         }

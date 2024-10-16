@@ -4,6 +4,7 @@ export type MenuResponse = {
     id: number;
     name: string;
     price: number;
+    status: string;
     portion: number;
     category: string;
     description: string;
@@ -102,7 +103,6 @@ export type UpdateMenuNutritionRequest = {
 }
 
 export type UpdateMenuApprovalRequest = {
-    restaurant_id: string;
     menu_id: number;
     status: string;
 }
@@ -111,6 +111,7 @@ export function toMenuResponse(menu: Menu): MenuResponse {
     return {
         id: menu.id,
         name: menu.name,
+        status: menu.status,
         price: menu.price,
         portion: menu.portion,
         category: menu.category,
@@ -123,6 +124,7 @@ export function toMenuDetailResponse(menu: Menu, nutrition: Nutrition): MenuResp
     return {
         id: menu.id,
         name: menu.name,
+        status: menu.status,
         price: menu.price,
         portion: menu.portion,
         category: menu.category,

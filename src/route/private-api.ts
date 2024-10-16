@@ -11,7 +11,9 @@ export const privateRouter = express.Router();
 
 
 // Menu Module
-privateRouter.post("/api/menu", MenuController.createMenu)
-privateRouter.put("/api/menu/:menuId(\\d+)", MenuController.updateMenu)
-privateRouter.delete("/api/menu/:menuId(\\d+)", MenuController.deleteMenu)
-privateRouter.post("/api/menu/:menuId(\\d+)/nutrition", MenuController.createMenuNutrition)
+privateRouter.post("/api/menu", MenuController.createMenu);
+privateRouter.put("/api/menu/:menuId(\\d+)", MenuController.updateMenu);
+privateRouter.delete("/api/menu/:menuId(\\d+)", MenuController.deleteMenu);
+privateRouter.post("/api/menu/:menuId(\\d+)/nutrition", MenuController.createMenuNutrition);
+privateRouter.put("/api/menu/:menuId(\\d+)/nutrition", MenuController.updateMenuNutrition);
+privateRouter.patch("/api/menu/:menuId(\\d+)/status", MenuController.updateMenuApproval);

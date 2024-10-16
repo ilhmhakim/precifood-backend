@@ -54,4 +54,9 @@ export class MenuValidation {
         mufa: z.number().positive(),
         pufa: z.number().positive()
     });
+
+    static readonly UPDATEMENUAPPROVAL = z.object({
+        menu_id: z.number().positive(),
+        status: z.string().min(1)
+    });
 }

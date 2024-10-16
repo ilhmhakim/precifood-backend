@@ -101,3 +101,45 @@ describe('POST /api/menu/:menuId/nutrition', () => {
     });
 });
 
+describe('PUT /api/menu/:menuId/nutrition', () => {
+
+    // Kasus berhasil
+    it('should accept sign up new consumer', async () => {
+        const response = await supertest(web)
+            .put(`/api/menu/${4}/nutrition`)
+            .send({
+                weight_per_portion: 60,
+                calory: 50,
+                protein: 50,
+                fat: 50,
+                carbohydrate: 50,
+                sodium: 50,
+                cholesterol: 50,
+                sfa: 50,
+                mufa: 50,
+                pufa: 50
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(201);
+        expect(response.body.message).toBeDefined();
+        expect(response.body.data).toBeDefined();
+        expect(response.body.data.nutrition).toBeDefined();
+    });
+});
+
+describe('PATCH /api/menu/:menuId/nutrition', () => {
+    // Kasus berhasil
+    it('should accept sign up new consumer', async () => {
+        const response = await supertest(web)
+            .patch(`/api/menu/${4}/status`)
+            .send({
+                "status": "Approved"
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(201);
+        expect(response.body.message).toBeDefined();
+        expect(response.body.data.status).toBe("Approved");
+    });
+});

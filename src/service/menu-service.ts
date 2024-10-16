@@ -4,7 +4,7 @@ import {
     CreateMenuRequest,
     DeleteMenuRequest, MenuNutritionResponse,
     MenuResponse, toMenuDetailResponse,
-    toMenuResponse, UpdateMenuNutritionRequest,
+    toMenuResponse, UpdateMenuApprovalRequest, UpdateMenuNutritionRequest,
     UpdateMenuRequest
 } from "../model/menu-model";
 import {Menu, MenuStatus} from "@prisma/client";
@@ -109,6 +109,53 @@ export class MenuService {
     }
 
     static async updateMenuNutrition(request: UpdateMenuNutritionRequest): Promise<MenuResponse> {
-        const updateMenuNutritionRequest: UpdateMenuNutritionRequest = Validation.validate(MenuValidation.UPDATE)
+        const updateMenuNutritionRequest: UpdateMenuNutritionRequest = Validation.validate(MenuValidation.UPDATEMENUNUTRITION, request);
+
+        const menu = await prismaClient.menu.findFirst({
+            where: {
+                id: updateMenuNutritionRequest.menu_id
+            }
+        });
+
+        const nutrition = await prismaClient.nutrition.update({
+            where: {
+                menu_id: updateMenuNutritionRequest.menu_id
+            },
+            data: {
+                weight_per_portion: updateMenuNutritionRequest.weight_per_portion,
+                calory: updateMenuNutritionRequest.calory,
+                protein: updateMenuNutritionRequest.protein,
+                fat: updateMenuNutritionRequest.fat,
+                carbohydrate: updateMenuNutritionRequest.carbohydrate,
+                sodium: updateMenuNutritionRequest.sodium,
+                cholesterol: updateMenuNutritionRequest.cholesterol,
+                sfa: updateMenuNutritionRequest.sfa,
+                mufa: updateMenuNutritionRequest.mufa,
+                pufa: updateMenuNutritionRequest.pufa
+            }
+        });
+
+        return toMenuDetailResponse(menu!, nutrition);
+    }
+
+    static async updateMenuApproval(request: UpdateMenuApprovalRequest): Promise<MenuResponse> {
+        const updateMenuApprovalRequest: UpdateMenuApprovalRequest = Validation.validate(MenuValidation.UPDATEMENUAPPROVAL, request);
+
+        await prismaClient.menu.update({
+            where: {
+                id: updateMenuApprovalRequest.menu_id,
+            },
+            data: {
+                status: updateMenuApprovalRequest.status
+            }
+        });
+
+        const menu = await prismaClient.menu.findFirst({
+            where: {
+                id: updateMenuApprovalRequest.menu_id
+            }
+        });
+
+        return toMenuResponse(menu!);
     }
 }
