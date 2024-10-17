@@ -1,0 +1,33 @@
+import { Request, Response, NextFunction } from 'express';
+import {NotificationService} from "../service/notification-service";
+import {UpdateNotificationReadRequest} from "../model/notification-model";
+
+export class NotificationController {
+    static async getNotification(req: Request, res: Response, next: NextFunction) {
+        try {
+            const response = await NotificationService.getNotification();
+            return res.status(200).json({
+                data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+
+    static async updateNotificationRead(req: Request, res: Response, next: NextFunction) {
+        try {
+            const request: UpdateNotificationReadRequest = req.body as UpdateNotificationReadRequest;
+            request.id = Number(req.params.notificationId);
+
+            await NotificationService.updateNotificationRead(request);
+
+            return res.status(201).json({
+                message: "Notification telah dibaca",
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+}
