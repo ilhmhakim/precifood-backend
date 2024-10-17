@@ -237,18 +237,18 @@ model Ingredient {
 
 model Nutrition {
   // 1 Nutrition dimiliki 1 Menu spesifik (1 to 1)
-  menu_id            Int    @id @db.Integer
-  menu               Menu   @relation(fields: [menu_id], references: [id], onDelete: Cascade)
-  weight_per_portion Float? @db.DoublePrecision
-  calory             Int?   @db.Integer
-  protein            Float? @db.DoublePrecision
-  fat                Float? @db.DoublePrecision
-  carbohydrate       Float? @db.DoublePrecision
-  sodium             Float? @db.DoublePrecision
-  cholesterol        Float? @db.DoublePrecision
-  sfa                Float? @db.DoublePrecision
-  mufa               Float? @db.DoublePrecision
-  pufa               Float? @db.DoublePrecision
+  menu_id            Int   @id @db.Integer
+  menu               Menu  @relation(fields: [menu_id], references: [id], onDelete: Cascade)
+  weight_per_portion Float @db.DoublePrecision
+  calory             Int   @db.Integer
+  protein            Float @db.DoublePrecision
+  fat                Float @db.DoublePrecision
+  carbohydrate       Float @db.DoublePrecision
+  sodium             Float @db.DoublePrecision
+  cholesterol        Float @db.DoublePrecision
+  sfa                Float @db.DoublePrecision
+  mufa               Float @db.DoublePrecision
+  pufa               Float @db.DoublePrecision
 
   @@map("Nutrition")
 }
