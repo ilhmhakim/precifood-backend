@@ -1,4 +1,4 @@
-import {LoginRequest, toUserResponse, UserResponse} from "../model/user-model";
+import {LoginUserRequest, toUserResponse, UserResponse} from "../model/user-model";
 import {Validation} from "../validation/validation";
 import {UserValidation} from "../validation/user-validation";
 import {prismaClient} from "../application/database";
@@ -10,7 +10,7 @@ import {AuthValidation} from "../validation/auth-validation";
 
 export class AuthService {
 
-    static async login(request: LoginRequest): Promise<UserResponse> {
+    static async login(request: LoginUserRequest): Promise<UserResponse> {
         const loginRequest = Validation.validate(AuthValidation.LOGIN, request);
 
         let user = await prismaClient.user.findUnique({

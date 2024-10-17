@@ -3,6 +3,7 @@ import { Response, NextFunction } from "express";
 import { jwtSecret } from "../config/jwt";
 import { UserPayload, UserRequest } from "../type/user";
 
+// Fungsi authorizeMiddleware
 export const authorizeMiddleware = function (roles: string[] = []) {
     if (!Array.isArray(roles)) roles = [roles];
 
@@ -16,8 +17,8 @@ export const authorizeMiddleware = function (roles: string[] = []) {
         try {
             const token = req.headers["authorization"] as string;
 
-            if (!token) return sendError("Token tidak tersedia", 401); // Token does not exist
-            if (!token.startsWith("Bearer ")) return sendError("Error: Token format invalid"); // Wrong format
+            if (!token) return sendError("Token tidak tersedia", 401);
+            if (!token.startsWith("Bearer ")) return sendError("Error: Token format invalid");
 
             const tokenString = token.split(" ")[1];
             jwt.verify(tokenString, jwtSecret.secret!, (err, decodedToken) => {
@@ -49,14 +50,10 @@ export const authorizeMiddleware = function (roles: string[] = []) {
 };
 
 
+
 export const issueToken = function (user: UserPayload) {
     const token = jwt.sign({ ...user, iss: "Node-Auth" }, jwtSecret.secret!, jwtSecret.options);
     return token;
 };
 
-export const Roles = {
-    Consumer: ["Konsumen"],
-    Restaurant: ["Restoran"],
-    Admin: ["Admin"],
-    All: ["Konsumen", "Restoran", "Admin"],
-};
+
