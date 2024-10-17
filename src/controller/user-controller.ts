@@ -1,5 +1,10 @@
-import {Request, Response, NextFunction} from "express";
-import {CreateConsumerRequest, CreateRestaurantRequest} from "../model/user-model";
+import {Request, Response, NextFunction, request} from "express";
+import {
+    CreateAdminRequest,
+    CreateConsumerRequest,
+    CreateRestaurantRequest,
+    GetUserProfileRequest
+} from "../model/user-model";
 import {UserService} from "../service/user-service";
 import {UserRequest} from "../type/user";
 
@@ -9,7 +14,8 @@ export class UserController {
             const request: CreateConsumerRequest = req.body as CreateConsumerRequest;
             const response = await UserService.registerConsumer(request);
             res.status(201).json({
-                message: "Konsumen berhasil sign up"
+                message: "Konsumen berhasil sign up",
+                data: response
             });
         } catch (e) {
             next(e);
@@ -44,14 +50,58 @@ export class UserController {
         }
     }
 
-    static async getProfile(req: UserRequest, res: Response, next: NextFunction) {
+    static async registerAdmin(req: Request, res: Response, next: NextFunction) {
         try {
-            const requestId = String(req.user.id);
-
-            const response = await UserService.getProfileUser(req.user);
-            res.status(200).json({
+            const request: CreateAdminRequest = req.body as CreateAdminRequest;
+            const response = await UserService.registerAdmin(request);
+            res.status(201).json({
+                message: "Admin berhasil sign up",
                 data: response
-            })
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async getProfileConsumer(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            if (req.user.role == "Konsumen") {
+                const response = await UserService.getProfileConsumer(req.user!);
+                res.status(200).json({
+                    data: response
+                });
+            }
+
+            if (req.user.role == "Admin") {
+                const request: GetUserProfileRequest = req.body as GetUserProfileRequest;
+                request.id = String(req.params.consumerId);
+                const response = await UserService.getProfileConsumer(request);
+                res.status(200).json({
+                    data: response
+                });
+            }
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async getProfileRestaurant(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            if (req.user.role == "Restoran") {
+                const response = await UserService.getProfileRestaurant(req.user!);
+                res.status(200).json({
+                    data: response
+                });
+            }
+
+            if (req.user.role == "Admin") {
+                const request: GetUserProfileRequest = req.body as GetUserProfileRequest;
+                request.id = String(req.params.restaurantId);
+                const response = await UserService.getProfileRestaurant(request);
+                res.status(200).json({
+                    data: response
+                });
+            }
         } catch (e) {
             next(e);
         }

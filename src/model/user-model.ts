@@ -1,6 +1,4 @@
 import {User, Consumer, Restaurant, PersonalInformation, MedicalHistory, Contact, Address} from "@prisma/client";
-import {add} from "winston";
-
 
 // Model User
 export type UserResponse = {
@@ -39,6 +37,12 @@ export type CreateRestaurantRequest = {
     password_confirmation: string;
 }
 
+export type CreateAdminRequest = {
+    email: string;
+    password: string;
+    password_confirmation: string;
+}
+
 // Login Request
 export type LoginUserRequest = {
     email: string;
@@ -46,11 +50,7 @@ export type LoginUserRequest = {
 }
 
 // Get
-export type GetConsumerRequest = {
-    consumer_id: string;
-}
-
-export type UserProfileRequest = {
+export type GetUserProfileRequest = {
     id: string;
 }
 
@@ -59,8 +59,8 @@ export type ConsumerProfileResponse = {
         id: string;
         email: string;
         registered_at: Date;
-    };
-    personal_information: {
+    },
+    personal_information?: {
         name: string;
         sex: string;
         birth: Date;
@@ -68,13 +68,13 @@ export type ConsumerProfileResponse = {
         height: number;
         weight: number;
         age: number;
-    };
+    },
     medical_history: {
         no_history: boolean;
         diabetes: boolean;
         hypertension: boolean;
         cardiovascular: boolean;
-    };
+    }
 }
 
 export type RestaurantProfileResponse = {
@@ -82,57 +82,69 @@ export type RestaurantProfileResponse = {
         id: string;
         email: string;
         registered_at: string;
-    };
+    },
     contact: {
         name: string;
         email: string;
         phone: string;
-    };
+    },
     address: {
         province: string;
         city: string;
         address_detail: string;
-        image: string;
+        image_url: string;
     }
 }
 
+export type AdminProfileResponse = {
+    user: {
+        id: string;
+        email: string;
+        registered_at: string;
+    }
+}
 
 export type ConsumerInfoResponse = {
     personal_information: {
         height: number;
         weight: number;
-    };
+    },
     medical_history: {
         no_history: boolean;
         diabetes: boolean;
         hypertension: boolean;
         cardiovascular: boolean;
-    };
+    }
 }
-
 
 
 // Update
-export type UpdateConsumerProfileRequest = {
-    name: string;
-    sex: string;
-    birth: string;
-    phone: string;
-    height: number;
-    weight: number;
-    no_history: boolean;
-    diabetes: boolean;
-    hypertension: boolean;
-    cardiovascular: boolean;
+export type UpdateConsumerRequest = {
+    name?: string;
+    sex?: string;
+    birth?: Date;
+    phone?: string;
+    height?: number;
+    weight?: number;
+    no_history?: boolean;
+    diabetes?: boolean;
+    hypertension?: boolean;
+    cardiovascular?: boolean;
 }
 
-export type UpdateRestaurantProfileRequest = {
+export type UpdateRestaurantRequest = {
+    name?: string;
+    email?: string;
+    phone?: string;
+    province?: string;
+    address?: string;
+    image?: File;
+}
+
+export type AllUsersResponse = {
+    id: string;
     name: string;
     email: string;
-    phone: string;
-    province: string;
-    address: string;
-    image: File;
 }
 
 export function toUserResponse(user: User): UserResponse {
@@ -140,6 +152,21 @@ export function toUserResponse(user: User): UserResponse {
         id: user.id,
         email: user.email,
         role: user.role,
+    }
+}
+
+export function toConsumerInfo(personalInformation: PersonalInformation, medicalHistory: MedicalHistory): ConsumerInfoResponse {
+    return {
+        personal_information: {
+            height: personalInformation.height,
+            weight: personalInformation.weight
+        },
+        medical_history: {
+            no_history: medicalHistory.no_history,
+            diabetes: medicalHistory.diabetes,
+            hypertension: medicalHistory.hypertension,
+            cardiovascular: medicalHistory.cardiovascular
+        }
     }
 }
 
@@ -183,9 +210,28 @@ export function toRestaurantProfile(user: User, contact: Contact, address: Addre
         address: {
             province: address.province,
             city: address.city,
-            address_detail: address.address_detail
+            address_detail: address.address_detail,
+            image_url: address.image_url,
         }
     }
 }
+
+export function toAllConsumers(user: User, personalInformation: PersonalInformation): AllUsersResponse {
+    return {
+        id: user.id,
+        name: personalInformation.name,
+        email: user.email
+    }
+}
+
+export function toAllRestaurant(user: User, contact: Contact): AllUsersResponse {
+    return {
+        id: user.id,
+        name: contact.name,
+        email: user.email
+    }
+}
+
+
 
 

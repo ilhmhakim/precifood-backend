@@ -1,8 +1,13 @@
 import {
-    ConsumerProfile, ConsumerProfileResponse,
+    ConsumerProfileResponse,
+    CreateAdminRequest,
     CreateConsumerRequest,
-    CreateRestaurantRequest, RestaurantProfile, toConsumerProfileResponse,
-    toUserResponse, UserProfileRequest,
+    CreateRestaurantRequest,
+    GetUserProfileRequest,
+    RestaurantProfileResponse,
+    toConsumerProfileResponse,
+    toRestaurantProfile,
+    toUserResponse,
     UserResponse
 } from "../model/user-model";
 import {Validation} from "../validation/validation";
@@ -94,34 +99,6 @@ export class UserService {
         return toUserResponse(user);
     }
 
-    static async getProfileUser(request: UserProfileRequest): Promise<ConsumerProfileResponse> {
-        const requestId = String(request);
-
-        const user = await prismaClient.user.findFirst({
-            where: {
-                id: requestId,
-            }
-        });
-
-        if (!user) {
-            throw new ResponseError(401, "User not found");
-        }
-
-        const personalInformation = await prismaClient.personalInformation.findFirst({
-            where: {
-                consumer_id: requestId,
-            }
-        });
-
-        const medicalHistory = await prismaClient.medicalHistory.findFirst({
-            where: {
-                consumer_id: requestId,
-            }
-        });
-
-        return toConsumerProfileResponse(user, personalInformation!, medicalHistory!);
-    }
-
     static async registerRestaurant(request: CreateRestaurantRequest) : Promise<UserResponse> {
         const registerRestaurantRequest = Validation.validate(UserValidation.REGISTERRESTAURANT, request);
 
@@ -174,6 +151,95 @@ export class UserService {
         });
 
         return toUserResponse(user);
+    }
+
+    // Registrasi admin
+    static async registerAdmin(request: CreateAdminRequest) : Promise<UserResponse> {
+        const registerAdminRequest = Validation.validate(UserValidation.REGISTERADMIN, request);
+
+        const totalUserWithSameEmail = await prismaClient.user.count({
+            where: {
+                email: registerAdminRequest.email
+            }
+        });
+
+        if (totalUserWithSameEmail != 0) {
+            throw new ResponseError(400, "Email is already taken");
+        }
+
+        if (registerAdminRequest.password != registerAdminRequest.password_confirmation) {
+            throw new ResponseError(400, "Password and Password Confirmation are not the same");
+        }
+
+        registerAdminRequest.password = await bcrypt.hash(registerAdminRequest.password, 10);
+
+        const admin_id = String(`A-${uuid7()}`);
+
+        const user = await prismaClient.user.create({
+           data: {
+               id: admin_id, // ID yang sama digunakan untuk User dan Restaurant
+               email: registerAdminRequest.email,
+               password: registerAdminRequest.password,
+               role: "Admin"
+           }
+        });
+
+        return toUserResponse(user);
+    }
+
+    // Mendapatkan detail spesifik user
+    static async getProfileConsumer(request: GetUserProfileRequest): Promise<ConsumerProfileResponse> {
+        const requestId = Validation.validate(UserValidation.GETUSERPROFILE, request);
+        const user = await prismaClient.user.findFirst({
+            where: {
+                id: requestId.id,
+            },
+            include: {
+                consumer: {
+                    include: {
+                        PersonalInformation: true,
+                        MedicalHistory: true,
+                    },
+                },
+            },
+        });
+
+        if (!user || !user.consumer) {
+            throw new ResponseError(404, "Konsumen tidak ditemukan");
+        }
+
+        const { PersonalInformation, MedicalHistory } = user.consumer;
+
+        return toConsumerProfileResponse(user, PersonalInformation!, MedicalHistory!);
+    }
+
+    static async getProfileRestaurant(request: GetUserProfileRequest): Promise<RestaurantProfileResponse> {
+        const requestId = Validation.validate(UserValidation.GETUSERPROFILE, request);
+        const user = await prismaClient.user.findFirst({
+            where: {
+                id: requestId.id,
+            },
+            include: {
+                restaurant: {
+                    include: {
+                        Contact: true,
+                        Address: true,
+                    }
+                }
+            }
+        });
+
+        if (!user || !user.restaurant) {
+            throw new ResponseError(404, "Restoran tidak ditemukan");
+        }
+
+        const { Contact, Address } = user.restaurant;
+
+        return toRestaurantProfile(user, Contact!, Address!);
+    }
+
+    static async getInfoConsumer(request: GetUserProfileRequest): Promise<ConsumerProfileResponse> {
+
     }
 
 }

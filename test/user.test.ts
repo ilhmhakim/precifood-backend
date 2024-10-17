@@ -7,16 +7,12 @@ import path from 'path';
 
 
 describe('POST /api/signup/consumer', () => {
-    afterEach(async () => {
-        await UserTest.delete();
-    })
-
     // Kasus berhasil
     it('should accept sign up new consumer', async () => {
         const response = await supertest(web)
             .post("/api/signup/consumer")
             .send({
-                "name": "John Doe",
+                "name": "Ilham Hakim",
                 "email": "test@gmail.com",
                 "sex": "Laki-laki",
                 "birth": "1975-09-22",
@@ -27,8 +23,8 @@ describe('POST /api/signup/consumer', () => {
                 "diabetes": false,
                 "hypertension": false,
                 "cardiovascular": false,
-                "password": "@bc12345",
-                "password_confirmation": "@bc12345"
+                "password": "abc12345",
+                "password_confirmation": "abc12345"
             });
 
         logger.debug(response.body);
@@ -92,7 +88,7 @@ describe('POST /api/signup/consumer', () => {
             .post("/api/signup/consumer")
             .send({
                 "name": "John Doe",
-                "email": "test",
+                "email": "testconsumer@gmail.com",
                 "sex": "Laki-laki",
                 "birth": "1975-09-22",
                 "phone": "085812340000",
@@ -121,7 +117,7 @@ describe('POST /api/signup/restaurant', () => {
             .post('/api/signup/restaurant')
             .send({
                 "name": "Restoran Karimata",
-                "email": "restorankarimata@gmail.com",
+                "email": "testrestaurant@gmail.com",
                 "phone": "085231004040",
                 "province": "Jawa Barat",
                 "city": "Bogor",
@@ -136,18 +132,41 @@ describe('POST /api/signup/restaurant', () => {
         });
 });
 
+describe('POST /api/signup/admin', () => {
+    // Kasus berhasil
+    it('should sign up admin successfully', async () => {
+        const response = await supertest(web)
+            .post('/api/signup/admin')
+            .send({
+                "email": "testadmin@gmail.com",
+                "password": "@bc12345",
+                "password_confirmation": "@bc12345"
+            });
+        logger.debug(response.body);
+        expect(response.status).toBe(201);
+        expect(response.body.message).toBeDefined();
+    });
+});
+
+
 describe('GET /api/users/consumer/profile', () => {
     // Kasus berhasil
     it('should return profile of a consumer when authenticated', async () => {
         const response = await supertest(web)
             .get('/api/users/consumer/profile')
-            .set('Authorization', `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjg2ZWMtMTIzZC03NTVkLWFiNjQtZTBlNGI5YWQ0ODdjIiwiZW1haWwiOiJ0ZXN0MUBnbWFpbC5jb20iLCJyb2xlIjoiS29uc3VtZW4iLCJpc3MiOiJOb2RlLUF1dGgiLCJpYXQiOjE3Mjg4ODY2MzAsImV4cCI6MTcyODkwMTAzMH0.lAEuDeaoxRN7inVEosv7Rc_XLrHUzuM6SlvzLcrt_-o`); // Set header Authorization dengan token yang valid
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjg2ZWMtMTIzZC03NTVkLWFiNjQtZTBlNGI5YWQ0ODdjIiwiZW1haWwiOiJ0ZXN0MUBnbWFpbC5jb20iLCJyb2xlIjoiS29uc3VtZW4iLCJpc3MiOiJOb2RlLUF1dGgiLCJpYXQiOjE3MjkxMzg3NzEsImV4cCI6MTcyOTE1MzE3MX0.nkWWRioB6aWFURShKTAJf4wRraHOSMND3-fn_m_NEnA'); // Set header Authorization dengan token yang valid
 
+        // Log response body jika diperlukan
         logger.debug(response.body);
-        expect(response.status).toBe(200); // Sesuaikan status kode jika berbeda
+
+        // Sesuaikan dengan status respons yang diharapkan dari API
+        expect(response.status).toBe(200);
+
+        // Pastikan respons body memiliki struktur yang sesuai
         expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
         expect(response.body.data.user).toBeDefined();
-        expect(response.body.data.personal_information).toBeDefined(); // Sesuaikan dengan respons yang diharapkan
+        expect(response.body.data.personal_information).toBeDefined();
         expect(response.body.data.medical_history).toBeDefined();
     });
 });

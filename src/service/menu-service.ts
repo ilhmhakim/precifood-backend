@@ -7,7 +7,7 @@ import {
     toMenuResponse, UpdateMenuApprovalRequest, UpdateMenuNutritionRequest,
     UpdateMenuRequest
 } from "../model/menu-model";
-import {Menu, MenuStatus} from "@prisma/client";
+import {Menu} from "@prisma/client";
 import {Validation} from "../validation/validation";
 import {MenuValidation} from "../validation/menu-validation";
 import {prismaClient} from "../application/database";
@@ -36,9 +36,11 @@ export class MenuService {
             }
         });
 
-       await prismaClient.notification.create({
+
+        await prismaClient.notification.create({
             data: {
                 title: "Menu baru ditambahkan!",
+                // @ts-ignore
                 restaurant_name: String(restaurantInformation.name),
                 restaurant_id: createMenuRequest.restaurant_id,
                 menu_id: menu.id,
@@ -139,7 +141,7 @@ export class MenuService {
     }
 
     static async updateMenuApproval(request: UpdateMenuApprovalRequest): Promise<MenuResponse> {
-        const updateMenuApprovalRequest: UpdateMenuApprovalRequest = Validation.validate(MenuValidation.UPDATEMENUAPPROVAL, request);
+        const updateMenuApprovalRequest = Validation.validate(MenuValidation.UPDATEMENUAPPROVAL, request);
 
         await prismaClient.menu.update({
             where: {
@@ -155,7 +157,8 @@ export class MenuService {
                 id: updateMenuApprovalRequest.menu_id
             }
         });
-
         return toMenuResponse(menu!);
     }
+
+
 }
