@@ -49,7 +49,7 @@ export const authorizeMiddleware = function (roles: string[] = []) {
     };
 };
 
-
+//test
 
 export const issueToken = function (user: UserPayload) {
     const token = jwt.sign({ ...user, iss: "Node-Auth" }, jwtSecret.secret!, jwtSecret.options);
