@@ -31,8 +31,8 @@ export type CreateRestaurantRequest = {
     phone: string;
     province: string;
     city: string;
-    address: string;
-    image: string;
+    address_detail: string;
+    image_url: string;
     password: string;
     password_confirmation: string;
 }
@@ -54,8 +54,10 @@ export type GetUserProfileRequest = {
     id: string;
 }
 
+
+
 export type ConsumerProfileResponse = {
-    user: {
+    user?: {
         id: string;
         email: string;
         registered_at: Date;
@@ -120,6 +122,7 @@ export type ConsumerInfoResponse = {
 
 // Update
 export type UpdateConsumerRequest = {
+    id: string;
     name?: string;
     sex?: string;
     birth?: Date;
@@ -132,13 +135,16 @@ export type UpdateConsumerRequest = {
     cardiovascular?: boolean;
 }
 
+
 export type UpdateRestaurantRequest = {
+    id: string;
     name?: string;
     email?: string;
     phone?: string;
     province?: string;
-    address?: string;
-    image?: File;
+    city?: string;
+    address_detail?: string;
+    image_url?: string;
 }
 
 export type AllUsersResponse = {

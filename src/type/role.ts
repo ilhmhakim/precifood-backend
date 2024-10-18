@@ -2,7 +2,7 @@ export const Roles = {
     Consumer: ["Konsumen"],
     Restaurant: ["Restoran"],
     Admin: ["Admin"],
-    AdminAndConsumer: ["Admin", "Konsumen"],
+    AdminAndConsumer: ["Konsumen", "Admin"],
     AdminAndRestaurant: ["Admin", "Restoran"],
     All: ["Konsumen", "Restoran", "Admin"],
 };

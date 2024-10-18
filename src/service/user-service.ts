@@ -1,13 +1,15 @@
 import {
+    AllUsersResponse,
+    ConsumerInfoResponse,
     ConsumerProfileResponse,
     CreateAdminRequest,
     CreateConsumerRequest,
     CreateRestaurantRequest,
     GetUserProfileRequest,
-    RestaurantProfileResponse,
+    RestaurantProfileResponse, toAllConsumers, toAllRestaurant, toConsumerInfo,
     toConsumerProfileResponse,
     toRestaurantProfile,
-    toUserResponse,
+    toUserResponse, UpdateConsumerRequest, UpdateRestaurantRequest,
     UserResponse
 } from "../model/user-model";
 import {Validation} from "../validation/validation";
@@ -20,6 +22,22 @@ import {Consumer, User} from "@prisma/client";
 
 
 export class UserService {
+
+    static async calculateAge(birthDate: Date): Promise<number> {
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+
+        // Check if the birthdate has occurred this year
+        const isBirthdayPassed =
+            today.getMonth() > birthDate.getMonth() ||
+            (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+
+        if (!isBirthdayPassed) {
+            age--; // Birthday has not occurred yet this year, adjust the age
+        }
+
+        return age;
+    }
 
     static async registerConsumer(request: CreateConsumerRequest): Promise<UserResponse> {
         const registerConsumerRequest = Validation.validate(UserValidation.REGISTERCONSUMER, request);
@@ -40,24 +58,8 @@ export class UserService {
 
         registerConsumerRequest.password = await bcrypt.hash(registerConsumerRequest.password, 10);
 
-        const calculateAge = (birthDate: Date): number => {
-            const today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-
-            // Check if the birthdate has occurred this year
-            const isBirthdayPassed =
-                today.getMonth() > birthDate.getMonth() ||
-                (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
-
-            if (!isBirthdayPassed) {
-                age--; // Birthday has not occurred yet this year, adjust the age
-            }
-
-            return age;
-        };
-
         const birth = new Date(registerConsumerRequest.birth);
-        const age = Number(calculateAge(birth));
+        const age = Number(this.calculateAge(birth));
 
         const consumer_id = String(`C-${uuid7()}`);
 
@@ -142,7 +144,8 @@ export class UserService {
                             create: {
                                 province: registerRestaurantRequest.province,
                                 city: registerRestaurantRequest.city,
-                                image_url: registerRestaurantRequest.image,
+                                address_detail: registerRestaurantRequest.address_detail,
+                                image_url: registerRestaurantRequest.image_url,
                             }
                         }
                     }
@@ -238,8 +241,221 @@ export class UserService {
         return toRestaurantProfile(user, Contact!, Address!);
     }
 
-    static async getInfoConsumer(request: GetUserProfileRequest): Promise<ConsumerProfileResponse> {
+    static async getInfoConsumer(request: GetUserProfileRequest): Promise<ConsumerInfoResponse> {
+        const requestId = Validation.validate(UserValidation.GETUSERPROFILE, request);
+        const user = await prismaClient.user.findFirst({
+            where: {
+                id: requestId.id,
+            },
+            include: {
+                consumer: {
+                    include: {
+                        PersonalInformation: true,
+                        MedicalHistory: true,
+                    },
+                },
+            },
+        });
 
+        if (!user || !user.consumer) {
+            throw new ResponseError(404, "Konsumen tidak ditemukan");
+        }
+
+        const { PersonalInformation, MedicalHistory } = user.consumer;
+
+        return toConsumerInfo(PersonalInformation!, MedicalHistory!);
     }
 
+    static async getAllUserConsumer(): Promise<Array<AllUsersResponse>> {
+        const users = await prismaClient.user.findMany({
+            where: {
+                consumer: {
+                    isNot: null, // Mengambil hanya pengguna yang memiliki consumer
+                },
+            },
+            include: {
+                consumer: {
+                    include: {
+                        PersonalInformation: true, // Mengambil PersonalInformation dari consumer
+                    },
+                },
+            },
+        });
+
+        if (!users || users.length === 0) {
+            throw new ResponseError(404, "Tidak ada akun konsumen");
+        }
+
+        // Mapping data dengan fungsi toAllConsumers
+        return users.map((user) => {
+            const personalInformation = user.consumer?.PersonalInformation;
+            if (personalInformation) {
+                return toAllConsumers(user, personalInformation); // Memetakan ke AllUsersResponse menggunakan toAllConsumers
+            } else {
+                throw new ResponseError(404, `PersonalInformation tidak ditemukan untuk user ${user.id}`);
+            }
+        });
+    }
+
+    static async getAllUserRestaurant(): Promise<Array<AllUsersResponse>> {
+        const users = await prismaClient.user.findMany({
+            where: {
+                restaurant: {
+                    isNot: null, // Mengambil hanya pengguna yang memiliki consumer
+                },
+            },
+            include: {
+                restaurant: {
+                    include: {
+                        Contact: true,
+                    },
+                },
+            },
+        });
+
+        if (!users || users.length === 0) {
+            throw new ResponseError(404, "Tidak ditemukan akun restoran");
+        }
+
+        // Mapping data ke dalam bentuk yang diinginkan
+        return users.map((user) => {
+            const contact = user.restaurant?.Contact;
+            if (contact) {
+                return toAllRestaurant(user, contact); // Memetakan ke AllUsersResponse menggunakan toAllConsumers
+            } else {
+                throw new ResponseError(404, `Kontak tidak ditemukan untuk user ${user.id}`);
+            }
+        });
+    }
+
+    static async updateConsumer(request: UpdateConsumerRequest): Promise<ConsumerProfileResponse> {
+        const requestUpdateConsumer: UpdateConsumerRequest = Validation.validate(UserValidation.UPDATECONSUMER, request);
+
+        // Validasi logika: jika salah satu bernilai true, yang lainnya harus false
+        const { no_history, diabetes, hypertension, cardiovascular } = requestUpdateConsumer;
+
+        if (no_history === true) {
+            requestUpdateConsumer.diabetes = false;
+            requestUpdateConsumer.hypertension = false;
+            requestUpdateConsumer.cardiovascular = false;
+        } else if (diabetes === true) {
+            requestUpdateConsumer.no_history = false;
+            requestUpdateConsumer.hypertension = false;
+            requestUpdateConsumer.cardiovascular = false;
+        } else if (hypertension === true) {
+            requestUpdateConsumer.no_history = false;
+            requestUpdateConsumer.diabetes = false;
+            requestUpdateConsumer.cardiovascular = false;
+        } else if (cardiovascular === true) {
+            requestUpdateConsumer.no_history = false;
+            requestUpdateConsumer.diabetes = false;
+            requestUpdateConsumer.hypertension = false;
+        }
+
+        // Hitung age jika birth diperbarui
+        let age: number | undefined;
+        if (requestUpdateConsumer.birth) {
+            const birthDate = new Date(requestUpdateConsumer.birth);
+            age = this.calculateAge(birthDate);
+        }
+
+        // Lakukan update pada user yang terhubung dengan consumer
+        const updatedUser = await prismaClient.user.update({
+            where: {
+                id: requestUpdateConsumer.id,
+            },
+            data: {
+                consumer: {
+                    update: {
+                        PersonalInformation: {
+                            update: {
+                                name: requestUpdateConsumer.name,
+                                sex: requestUpdateConsumer.sex,
+                                birth: requestUpdateConsumer.birth,
+                                phone: requestUpdateConsumer.phone,
+                                height: requestUpdateConsumer.height,
+                                weight: requestUpdateConsumer.weight,
+                                ...(age !== undefined && { age }), // Hanya update age jika birth diperbarui
+                            },
+                        },
+                        MedicalHistory: {
+                            update: {
+                                no_history: requestUpdateConsumer.no_history,
+                                diabetes: requestUpdateConsumer.diabetes,
+                                hypertension: requestUpdateConsumer.hypertension,
+                                cardiovascular: requestUpdateConsumer.cardiovascular,
+                            },
+                        },
+                    },
+                },
+            },
+            include: {
+                consumer: {
+                    include: {
+                        PersonalInformation: true,
+                        MedicalHistory: true,
+                    },
+                },
+            },
+        });
+
+        if (!updatedUser) {
+            throw new ResponseError(404, `User with ID ${requestUpdateConsumer.id} not found`);
+        }
+
+        // Menggunakan fungsi toConsumerProfileResponse untuk mengembalikan hasil
+        const { consumer } = updatedUser;
+        const { PersonalInformation, MedicalHistory } = consumer;
+
+        return toConsumerProfileResponse(updatedUser, PersonalInformation!, MedicalHistory!);
+    }
+
+    static async updateRestaurant(request: UpdateRestaurantRequest): Promise<RestaurantProfileResponse> {
+        const requestUpdateRestaurant: UpdateRestaurantRequest = Validation.validate(UserValidation.UPDATERESTAURANT, request);
+
+        const updatedUser = await prismaClient.user.update({
+            where: {
+                id: requestUpdateRestaurant.id,
+            },
+            data: {
+                restaurant: {
+                    update: {
+                        Contact: {
+                            update: {
+                                name: requestUpdateRestaurant.name,
+                                email: requestUpdateRestaurant.email,
+                                phone: requestUpdateRestaurant.phone,
+                            },
+                        },
+                        Address: {
+                            update: {
+                                province: requestUpdateRestaurant.province,
+                                city: requestUpdateRestaurant.email,
+                                address_detail: requestUpdateRestaurant.address_detail,
+                                image_url: requestUpdateRestaurant.image_url,
+                            },
+                        },
+                    },
+                },
+            },
+            include: {
+                restaurant: {
+                    include: {
+                        Contact: true,
+                        Address: true,
+                    },
+                },
+            },
+        });
+
+        if (!updatedUser) {
+            throw new ResponseError(404, `User with ID ${requestUpdateRestaurant.id} not found`);
+        }
+
+        // Menggunakan fungsi toConsumerProfileResponse untuk mengembalikan hasil
+        const { restaurant } = updatedUser;
+        const { Contact, Address } = restaurant;
+
+        return toRestaurantProfile(updatedUser, Contact!, Address!);
+    }
 }

@@ -3,7 +3,7 @@ import {
     CreateAdminRequest,
     CreateConsumerRequest,
     CreateRestaurantRequest,
-    GetUserProfileRequest
+    GetUserProfileRequest, UpdateConsumerRequest, UpdateRestaurantRequest
 } from "../model/user-model";
 import {UserService} from "../service/user-service";
 import {UserRequest} from "../type/user";
@@ -94,7 +94,7 @@ export class UserController {
                 });
             }
 
-            if (req.user.role == "Admin") {
+            if (req.user.role == "Admin" || req.user.role == "Konsumen") {
                 const request: GetUserProfileRequest = req.body as GetUserProfileRequest;
                 request.id = String(req.params.restaurantId);
                 const response = await UserService.getProfileRestaurant(request);
@@ -102,6 +102,65 @@ export class UserController {
                     data: response
                 });
             }
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async getConsumerInfo(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const response = await UserService.getInfoConsumer(req.user!);
+            res.status(200).json({
+                data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async getAllUserConsumer(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const response = await UserService.getAllUserConsumer();
+            res.status(200).json({
+                data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async getAllUserRestaurant(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const response = await UserService.getAllUserRestaurant();
+            res.status(200).json({
+                data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async updateConsumer(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const request:UpdateConsumerRequest = req.body as UpdateConsumerRequest;
+            request.id = String(req.user.id);
+            const response = await UserService.updateConsumer(request);
+            res.status(201).json({
+                data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async updateRestaurant(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const request:UpdateRestaurantRequest = req.body as UpdateRestaurantRequest;
+            request.id = String(req.user.id);
+            const response = await UserService.updateRestaurant(request);
+            res.status(201).json({
+                data: response
+            });
         } catch (e) {
             next(e);
         }
