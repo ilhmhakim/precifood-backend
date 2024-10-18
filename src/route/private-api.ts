@@ -11,14 +11,23 @@ export const privateRouter = express.Router();
 
 // User Module
 // @ts-ignore
-privateRouter.get("/api/users/consumer/profile", authorizeMiddleware(Roles.Consumer), UserController.getProfileConsumer);
+privateRouter.get("/api/users/consumers", authorizeMiddleware(Roles.Admin), UserController.getAllUserConsumer);
+// @ts-ignore
+privateRouter.get("/api/users/restaurants", authorizeMiddleware(Roles.Admin), UserController.getAllUserRestaurant);
+// @ts-ignore
+privateRouter.get("/api/users/consumer/profile", authorizeMiddleware(Roles.Consumer), UserController.getProfileConsumer);4
+// @ts-ignore
+privateRouter.patch("/api/users/consumer/profile", authorizeMiddleware(Roles.Consumer), UserController.updateConsumer);
+// @ts-ignore
+privateRouter.patch("/api/users/restaurant/profile", authorizeMiddleware(Roles.Restaurant), UserController.updateConsumer);
+// @ts-ignore
+privateRouter.get("/api/users/restaurant/profile", authorizeMiddleware(Roles.Restaurant), UserController.getProfileRestaurant);
+// @ts-ignore
+privateRouter.get("/api/users/consumer/information", authorizeMiddleware(Roles.Consumer), UserController.getConsumerInfo);
 // @ts-ignore
 privateRouter.get("/api/users/consumer/:consumerId([a-zA-Z0-9_-]+)", authorizeMiddleware(Roles.Admin), UserController.getProfileConsumer);
 // @ts-ignore
-privateRouter.get("api/users/restaurant/profile", authorizeMiddleware(Roles.Restaurant), UserController.getProfileRestaurant)
-// @ts-ignore
 privateRouter.get("/api/users/restaurant/:restaurantId([a-zA-Z0-9_-]+)", authorizeMiddleware(Roles.AdminAndConsumer), UserController.getProfileRestaurant)
-
 
 
 
@@ -32,9 +41,14 @@ privateRouter.patch("/api/menu/:menuId(\\d+)/status", MenuController.updateMenuA
 
 // Order Module
 privateRouter.post("/api/order", OrderController.createOrder);
+// get
 
 // Notification Module
 // @ts-ignore
 privateRouter.get("/api/notifications", NotificationController.getNotification);
 // @ts-ignore
 privateRouter.patch("/api/notifications/:notificationId(\\d+)", NotificationController.updateNotificationRead);
+
+// Recommendation Module
+// get
+// get
