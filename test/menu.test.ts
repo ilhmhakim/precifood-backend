@@ -9,8 +9,8 @@ describe('POST /api/menu', () => {
         const response = await supertest(web)
             .post("/api/menu")
             .send({
-                "restaurant_id": "R-01928893-0eea-711d-aa5a-684b979fff03",
-                "name": "Ayam Taliwangsss",
+                "restaurant_id": "R-01929985-2e09-7ffa-89b6-7dd808c6aec2",
+                "name": "Ayam Goreng",
                 "category": "Lauk Pauk",
                 "price": 40000,
                 "portion": 5,
@@ -21,7 +21,7 @@ describe('POST /api/menu', () => {
         logger.debug(response.body);
         expect(response.status).toBe(201);
         expect(response.body.data.id).toBeDefined();
-        expect(response.body.data.name).toBe("Ayam Taliwangsss");
+        expect(response.body.data.name).toBe("Ayam Goreng");
         expect(response.body.data.category).toBe("Lauk Pauk");
         expect(response.body.data.price).toBe(40000);
         expect(response.body.data.portion).toBe(5);
@@ -132,7 +132,7 @@ describe('PATCH /api/menu/:menuId/nutrition', () => {
     // Kasus berhasil
     it('should accept sign up new consumer', async () => {
         const response = await supertest(web)
-            .patch(`/api/menu/${4}/status`)
+            .patch(`/api/menu/${7}/status`)
             .send({
                 "status": "Approved"
             });

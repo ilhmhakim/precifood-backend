@@ -1,26 +1,54 @@
 import supertest from 'supertest'
 import {web} from "../src/application/web";
 import {logger} from "../src/application/logging";
-import {UserTest} from "./test-util";
-import fs from 'fs';
-import path from 'path';
-
 
 describe('POST /api/auth/login', () => {
     // Kasus berhasil
-    it('should accept login request', async () => {
+    it('should accept login request for consumer', async () => {
         const response = await supertest(web)
             .post("/api/auth/login")
             .send({
-                "email": "test1@gmail.com",
+                "email": "test@gmail.com",
+                "password": "abc12345",
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data.email).toBe("test@gmail.com");
+        expect(response.body.data.id).toBeDefined();
+        expect(response.body.data.role).toBe("Konsumen");
+        expect(response.body.data.token).toBeDefined();
+    });
+
+    it('should accept login request for restaurant', async () => {
+        const response = await supertest(web)
+            .post("/api/auth/login")
+            .send({
+                "email": "testrestaurant2@gmail.com",
                 "password": "@bc12345",
             });
 
         logger.debug(response.body);
         expect(response.status).toBe(200);
-        expect(response.body.data.email).toBe("test1@gmail.com");
+        expect(response.body.data.email).toBe("testrestaurant2@gmail.com");
         expect(response.body.data.id).toBeDefined();
-        expect(response.body.data.role).toBe("Konsumen");
+        expect(response.body.data.role).toBe("Restoran");
+        expect(response.body.data.token).toBeDefined();
+    });
+
+    it('should accept login request for admin', async () => {
+        const response = await supertest(web)
+            .post("/api/auth/login")
+            .send({
+                "email": "testadmin@gmail.com",
+                "password": "@bc12345",
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data.email).toBe("testadmin@gmail.com");
+        expect(response.body.data.id).toBeDefined();
+        expect(response.body.data.role).toBe("Admin");
         expect(response.body.data.token).toBeDefined();
     });
 });

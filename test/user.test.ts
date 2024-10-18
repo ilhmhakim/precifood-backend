@@ -6,14 +6,14 @@ import fs from 'fs';
 import path from 'path';
 
 
-describe('POST /api/signup/consumer', () => {
+describe('Registrasi Konsumen (POST /api/signup/consumer)', () => {
     // Kasus berhasil
-    it('should accept sign up new consumer', async () => {
+    it('(+) Menerima registrasi konsumen jika seluruh data benar', async () => {
         const response = await supertest(web)
             .post("/api/signup/consumer")
             .send({
                 "name": "Ilham Hakim",
-                "email": "test@gmail.com",
+                "email": "test2@gmail.com",
                 "sex": "Laki-laki",
                 "birth": "1975-09-22",
                 "phone": "085812340000",
@@ -33,7 +33,7 @@ describe('POST /api/signup/consumer', () => {
     });
 
     // Kasus gagal (Input invalid)
-    it('should reject sign up new consumer if request is invalid', async () => {
+    it('(-) Menolak request jika data invalid', async () => {
         const response = await supertest(web)
             .post("/api/signup/consumer")
             .send({
@@ -57,8 +57,7 @@ describe('POST /api/signup/consumer', () => {
         expect(response.body.errors).toBeDefined();
     });
 
-    // Kasus gagal (Email telah digunakan)
-    it('should reject sign up new customer if email is already taken', async () => {
+    it('(-) Menolak jika email yang diregistrasi telah digunakan', async () => {
         const response = await supertest(web)
             .post("/api/signup/consumer")
             .send({
@@ -82,8 +81,7 @@ describe('POST /api/signup/consumer', () => {
         expect(response.body.errors).toBeDefined();
     });
 
-    // Kasus gagal (Password dan Password Confirmation tidak sama)
-    it('should reject sign up new consumer if passwords are not matching', async () => {
+    it('(-) Menolak jika password dan password confirmation tidak sama', async () => {
         const response = await supertest(web)
             .post("/api/signup/consumer")
             .send({
@@ -108,7 +106,7 @@ describe('POST /api/signup/consumer', () => {
     });
 });
 
-describe('POST /api/signup/restaurant', () => {
+describe('Registrasi Restoran (POST /api/signup/restaurant)', () => {
     // Kasus berhasil
     it('should sign up a new restaurant successfully', async () => {
         // const imagePath = path.resolve(__dirname, 'D:\\Kulliah\\Penelitian\\Precifood Backend\\src\\assets\\restaurant.jpg'); // Ganti path dengan lokasi file gambar yang sesuai
@@ -117,11 +115,11 @@ describe('POST /api/signup/restaurant', () => {
             .post('/api/signup/restaurant')
             .send({
                 "name": "Restoran Karimata",
-                "email": "testrestaurant@gmail.com",
+                "email": "testrestaurant2@gmail.com",
                 "phone": "085231004040",
                 "province": "Jawa Barat",
                 "city": "Bogor",
-                "address": "Depan Pintu Tol Sentul Selatan-2 The Grand, Jl. Tol Lkr. Luar Bogor",
+                "address_detail": "Depan Pintu Tol Sentul Selatan-2 The Grand, Jl. Tol Lkr. Luar Bogor",
                 "image": "www.example.com",
                 "password": "@bc12345",
                 "password_confirmation": "@bc12345"
@@ -132,7 +130,7 @@ describe('POST /api/signup/restaurant', () => {
         });
 });
 
-describe('POST /api/signup/admin', () => {
+describe('Registrasi Admin (POST /api/signup/admin)', () => {
     // Kasus berhasil
     it('should sign up admin successfully', async () => {
         const response = await supertest(web)
@@ -149,20 +147,31 @@ describe('POST /api/signup/admin', () => {
 });
 
 
-describe('GET /api/users/consumer/profile', () => {
+describe('Melihat Profile / Detail Konsumen (GET)', () => {
     // Kasus berhasil
     it('should return profile of a consumer when authenticated', async () => {
         const response = await supertest(web)
             .get('/api/users/consumer/profile')
-            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjg2ZWMtMTIzZC03NTVkLWFiNjQtZTBlNGI5YWQ0ODdjIiwiZW1haWwiOiJ0ZXN0MUBnbWFpbC5jb20iLCJyb2xlIjoiS29uc3VtZW4iLCJpc3MiOiJOb2RlLUF1dGgiLCJpYXQiOjE3MjkxMzg3NzEsImV4cCI6MTcyOTE1MzE3MX0.nkWWRioB6aWFURShKTAJf4wRraHOSMND3-fn_m_NEnA'); // Set header Authorization dengan token yang valid
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTI1Nzg5NywiZXhwIjoxNzI5MzAxMDk3fQ.eckB9MnwwFhZ9rvr9RBSCczyD003JVN76vcIuWNlAQY'); // Set header Authorization dengan token yang valid
 
-        // Log response body jika diperlukan
         logger.debug(response.body);
 
-        // Sesuaikan dengan status respons yang diharapkan dari API
         expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
+        expect(response.body.data.user).toBeDefined();
+        expect(response.body.data.personal_information).toBeDefined();
+        expect(response.body.data.medical_history).toBeDefined();
+    });
 
-        // Pastikan respons body memiliki struktur yang sesuai
+    it('should return profile of a consumer when authenticated as admin', async () => {
+        const response = await supertest(web)
+            .get('/api/users/consumer/C-01929984-cbd2-7779-b552-a113938a2054')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkEtMDE5Mjk5ODUtY2FiNS03NzdmLWJjMmUtNDg1NTkyMjdiNDY2IiwiZW1haWwiOiJ0ZXN0YWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MjA0NDgyLCJleHAiOjE3MjkyMTg4ODJ9.68wUwZTSEpK1wJpOdz982670OnJbhi8NE9_ITZh9vj0'); // Set header Authorization dengan token yang valid
+
+        logger.debug(response.body);
+
+        expect(response.status).toBe(200);
         expect(response.body).toBeDefined();
         expect(response.body.data).toBeDefined();
         expect(response.body.data.user).toBeDefined();
@@ -170,3 +179,140 @@ describe('GET /api/users/consumer/profile', () => {
         expect(response.body.data.medical_history).toBeDefined();
     });
 });
+
+describe('Melihat Profile / Detail Restoran (GET)', () => {
+    // Kasus berhasil
+    it('(+) Melihat profile/detail restoran dari akun restoran', async () => {
+        const response = await supertest(web)
+            .get('/api/users/restaurant/profile')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlItMDE5MjljY2ItYWM3NC03NTU5LWIyZjktNTBiMmM2ZjhjMTQ3IiwiZW1haWwiOiJ0ZXN0cmVzdGF1cmFudDJAZ21haWwuY29tIiwicm9sZSI6IlJlc3RvcmFuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MjA3NDcwLCJleHAiOjE3MjkyMjE4NzB9.bwotfFBgvfwgVJq9KOqlqs4LRBhXru9oank9XSn1Kgs'); // Set header Authorization dengan token yang valid
+
+        logger.debug(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
+        expect(response.body.data.user).toBeDefined();
+        expect(response.body.data.contact).toBeDefined();
+        expect(response.body.data.address).toBeDefined();
+    });
+
+    it('(+) Melihat detail/profil restoran sebagai konsumen', async () => {
+        const response = await supertest(web)
+            .get('/api/users/restaurant/R-01929985-2e09-7ffa-89b6-7dd808c6aec2')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTIwNTk5NywiZXhwIjoxNzI5MjIwMzk3fQ.5drkwmB-0eAYp0KXk2kdyJ0K3Vl2rVxOZf4Eu3x6oLM'); // Set header Authorization dengan token yang valid
+
+        logger.debug(response.body);
+
+        expect(response.status).toBe(200);i
+        expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
+        expect(response.body.data.user).toBeDefined();
+        expect(response.body.data.contact).toBeDefined();
+        expect(response.body.data.address).toBeDefined();
+    });
+
+    it('(+) Melihat detail/profile restoran sebagai admin', async () => {
+        const response = await supertest(web)
+            .get('/api/users/restaurant/R-01929985-2e09-7ffa-89b6-7dd808c6aec2')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkEtMDE5Mjk5ODUtY2FiNS03NzdmLWJjMmUtNDg1NTkyMjdiNDY2IiwiZW1haWwiOiJ0ZXN0YWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MjA0NDgyLCJleHAiOjE3MjkyMTg4ODJ9.68wUwZTSEpK1wJpOdz982670OnJbhi8NE9_ITZh9vj0');
+
+        logger.debug(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
+        expect(response.body.data.user).toBeDefined();
+        expect(response.body.data.contact).toBeDefined();
+        expect(response.body.data.address).toBeDefined();
+    });
+});
+
+
+describe('Mendapatkan Pop Up Consumer Information (GET)', () => {
+    it('(+) (Konsumen) Mengembalikan sekilas data terkait personal information dan medical history', async () => {
+        const response = await supertest(web)
+            .get('/api/users/consumer/information')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTIxOTc0NiwiZXhwIjoxNzI5MjYyOTQ2fQ.MzjgKyvP0JGZsmQFmCL0_DRiCCQtkK-p4zJrTPApgh8');
+
+        logger.debug(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
+        expect(response.body.data.medical_history).toBeDefined();
+        expect(response.body.data.personal_information).toBeDefined();
+    });
+});
+
+describe('Mendapatkan seluruh list pengguna konsumen sebagai admin (GET)', () => {
+    it('(+) (Admin) Mengembalikan data konsumen berupa id, nama, dan email', async () => {
+        const response = await supertest(web)
+            .get('/api/users/consumers')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkEtMDE5Mjk5ODUtY2FiNS03NzdmLWJjMmUtNDg1NTkyMjdiNDY2IiwiZW1haWwiOiJ0ZXN0YWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MjM4ODg0LCJleHAiOjE3MjkyODIwODR9.lnCUkRTEN15jXan9e1CYFzuM59PumPPo8ycPIx2BLH8');
+
+        logger.debug(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
+    });
+});
+
+describe('Mendapatkan seluruh list pengguna restoran sebagai admin (GET)', () => {
+    it('(+) (Admin) Mengembalikan data konsumen berupa id, nama, dan email', async () => {
+        const response = await supertest(web)
+            .get('/api/users/restaurants')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkEtMDE5Mjk5ODUtY2FiNS03NzdmLWJjMmUtNDg1NTkyMjdiNDY2IiwiZW1haWwiOiJ0ZXN0YWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MjM4ODg0LCJleHAiOjE3MjkyODIwODR9.lnCUkRTEN15jXan9e1CYFzuM59PumPPo8ycPIx2BLH8');
+
+        logger.debug(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
+    });
+});
+
+
+describe('Konsumen dapat mengupdate profilenya (PATCH)', () => {
+    it('(+) (Konsumen) Mengupdate profile milik pribadi', async () => {
+        const response = await supertest(web)
+            .patch('/api/users/consumer/profile')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTI1Nzg5NywiZXhwIjoxNzI5MzAxMDk3fQ.eckB9MnwwFhZ9rvr9RBSCczyD003JVN76vcIuWNlAQY')
+            .send({
+                "name": "Muhammad Ilham Hakim Suherman"
+            })
+        logger.debug(response.body);
+
+        expect(response.status).toBe(201);
+        expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
+        expect(response.body.data.user).toBeDefined();
+        expect(response.body.data.personal_information).toBeDefined();
+        expect(response.body.data.personal_information.name).toBe("Muhammad Ilham Hakim Suherman");
+        expect(response.body.data.medical_history).toBeDefined();
+    });
+
+    it('(+) (Konsumen) Mengupdate salah satu kondisi riwayat kesehatan menjadi true, maka lainnya akan false', async () => {
+        const response = await supertest(web)
+            .patch('/api/users/consumer/profile')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTI1Nzg5NywiZXhwIjoxNzI5MzAxMDk3fQ.eckB9MnwwFhZ9rvr9RBSCczyD003JVN76vcIuWNlAQY')
+            .send({
+                "hypertension": true
+            })
+        logger.debug(response.body);
+
+        expect(response.status).toBe(201);
+        expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
+        expect(response.body.data.user).toBeDefined();
+        expect(response.body.data.personal_information).toBeDefined();
+        expect(response.body.data.personal_information.name).toBe("Muhammad Ilham Hakim Suherman");
+        expect(response.body.data.medical_history).toBeDefined();
+        expect(response.body.data.medical_history.no_history).toBe(false);
+        expect(response.body.data.medical_history.diabetes).toBe(false);
+        expect(response.body.data.medical_history.cardiovascular).toBe(false);
+        expect(response.body.data.medical_history.hypertension).toBe(true);
+    });
+});
+
