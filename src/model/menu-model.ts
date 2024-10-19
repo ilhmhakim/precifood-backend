@@ -10,18 +10,18 @@ export type MenuResponse = {
     description: string;
     image_url: string;
     nutrition?: {
-        weight_per_portion: number;
-        weight_with_bdd: number;
-        calory: number;
-        protein: number;
-        fat: number;
-        carbohydrate: number;
-        fiber: number;
-        natrium: number;
-        cholesterol: number;
-        sfa: number;
-        mufa: number;
-        pufa: number;
+        weight_per_portion: number | null;
+        weight_with_bdd: number | null;
+        calory: number | null;
+        protein: number | null;
+        fat: number | null;
+        carbohydrate: number | null;
+        fiber: number | null;
+        natrium: number | null;
+        cholesterol: number | null;
+        sfa: number | null;
+        mufa: number | null;
+        pufa: number | null;
     }
 }
 
@@ -46,22 +46,24 @@ export type UpdateMenuRequest = {
     image_url?: string;
 }
 
-export type GetMenuRequest = {
+export type GetAllMenuRequest = {
+    restaurant_id: string;
+    role: string;
+}
+
+export type GetMenuDetailRequest = {
     restaurant_id: string;
     menu_id: number;
 }
 
-export type DeleteMenuRequest = GetMenuRequest;
+export type DeleteMenuRequest = GetMenuDetailRequest;
 
 export type SearchMenuRequest = {
     restaurant_id: string;
-    name: string;
-}
-
-export type FilterMenuRequest = {
-    restaurant_id: string;
+    role: string;
+    name?: string;
     category?: string;
-    price?: number;
+    price?: string;
     status?: string;
 }
 
@@ -119,6 +121,33 @@ export function toMenuResponse(menu: Menu): MenuResponse {
 }
 
 export function toMenuDetailResponse(menu: Menu, nutrition: Nutrition): MenuResponse {
+    if (!nutrition) {
+        return {
+            id: menu.id,
+            name: menu.name,
+            status: menu.status,
+            price: menu.price,
+            portion: menu.portion,
+            category: menu.category,
+            description: menu.description,
+            image_url: menu.image_url,
+            nutrition: {
+                weight_per_portion: null,
+                weight_with_bdd: null,
+                calory: null,
+                protein: null,
+                fat: null,
+                carbohydrate: null,
+                fiber: null,
+                natrium: null,
+                cholesterol: null,
+                sfa: null,
+                mufa: null,
+                pufa: null
+            }
+        }
+    }
+
     return {
         id: menu.id,
         name: menu.name,

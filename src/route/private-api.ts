@@ -33,24 +33,35 @@ privateRouter.get("/api/users/restaurant/:restaurantId([a-zA-Z0-9_-]+)", authori
 
 // Menu Module
 // @ts-ignore
-privateRouter.post("/api/menu", authorizeMiddleware(Roles.Restaurant), MenuController.createMenu);
+privateRouter.post("/api/restaurant/menu", authorizeMiddleware(Roles.Restaurant), MenuController.createMenu);
 // @ts-ignore
-privateRouter.patch("/api/menu/:menuId(\\d+)", authorizeMiddleware(Roles.Restaurant), MenuController.updateMenu);
+privateRouter.get("/api/restaurant/menus", authorizeMiddleware(Roles.Restaurant), MenuController.getAllRestaurantMenu);
 // @ts-ignore
-privateRouter.delete("/api/menu/:menuId(\\d+)", authorizeMiddleware(Roles.Restaurant), MenuController.deleteMenu);
+privateRouter.get("/api/restaurant/menus/search", authorizeMiddleware(Roles.Restaurant), MenuController.searchMenu);
+// @ts-ignore
+privateRouter.get("/api/restaurant/menu/:menuId(\\d+)", authorizeMiddleware(Roles.Restaurant), MenuController.getMenuDetail);
+// @ts-ignore
+privateRouter.patch("/api/restaurant/menu/:menuId(\\d+)", authorizeMiddleware(Roles.Restaurant), MenuController.updateMenu);
+// @ts-ignore
+privateRouter.delete("/api/restaurant/menu/:menuId(\\d+)", authorizeMiddleware(Roles.Restaurant), MenuController.deleteMenu);
+// @ts-ignore
+privateRouter.get("/api/restaurant/:restaurantId([a-zA-Z0-9_-]+)/menus", authorizeMiddleware(Roles.AdminAndConsumer), MenuController.getAllRestaurantMenu);
+// @ts-ignore
+privateRouter.get("/api/restaurant/:restaurantId([a-zA-Z0-9_-]+)/menus/search", authorizeMiddleware(Roles.AdminAndConsumer), MenuController.searchMenu);
+// @ts-ignore
+privateRouter.get("/api/restaurant/:restaurantId([a-zA-Z0-9_-]+)/menu/:menuId(\\d+)", authorizeMiddleware(Roles.AdminAndConsumer), MenuController.getMenuDetail);
 // @ts-ignore
 privateRouter.post("/api/restaurant/:restaurantId([a-zA-Z0-9_-]+)/menu/:menuId(\\d+)/nutrition", authorizeMiddleware(Roles.Admin), MenuController.createMenuNutrition);
 // @ts-ignore
 privateRouter.patch("/api/restaurant/:restaurantId([a-zA-Z0-9_-]+)/menu/:menuId(\\d+)/nutrition", authorizeMiddleware(Roles.Admin), MenuController.updateMenuNutrition);
-// @ts-ignoreRES
+// @ts-ignore
 privateRouter.patch("/api/restaurant/:restaurantId([a-zA-Z0-9_-]+)/menu/:menuId(\\d+)/status", authorizeMiddleware(Roles.Admin), MenuController.updateMenuApproval);
-// get all
-// search name
-// filter
+
 
 // Order Module
-privateRouter.post("/api/order", OrderController.createOrder);
-// get all
+// @ts-ignore
+privateRouter.post("/api/order", authorizeMiddleware(Roles.Consumer), OrderController.createOrder);
+// get alL
 // get detail
 
 // Notification Module

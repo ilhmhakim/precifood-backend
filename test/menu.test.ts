@@ -7,10 +7,10 @@ describe('Membuat menu oleh restoran (POST)', () => {
     // Kasus berhasil
     it('(+) (Restoran) Berhasil membuat menu saat semua data yang diisikan valid', async () => {
         const response = await supertest(web)
-            .post("/api/menu")
+            .post("/api/restaurant/menu")
             .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlItMDE5MjljY2ItYWM3NC03NTU5LWIyZjktNTBiMmM2ZjhjMTQ3IiwiZW1haWwiOiJ0ZXN0cmVzdGF1cmFudDJAZ21haWwuY29tIiwicm9sZSI6IlJlc3RvcmFuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MzAxNzQyLCJleHAiOjE3MjkzNDQ5NDJ9.lvs7Uwxqq02EpUNX0AKT_W1ujKXULWllWmH3OCjMNp4")
             .send({
-                "name": "Ayam Goreng",
+                "name": "Ayam Goreng Testing 2",
                 "category": "Lauk Pauk",
                 "price": 40000,
                 "portion": 5,
@@ -21,7 +21,7 @@ describe('Membuat menu oleh restoran (POST)', () => {
         logger.debug(response.body);
         expect(response.status).toBe(201);
         expect(response.body.data.id).toBeDefined();
-        expect(response.body.data.name).toBe("Ayam Goreng");
+        expect(response.body.data.name).toBe("Ayam Goreng Testing 2");
         expect(response.body.data.category).toBe("Lauk Pauk");
         expect(response.body.data.price).toBe(40000);
         expect(response.body.data.portion).toBe(5);
@@ -33,7 +33,7 @@ describe('Membuat menu oleh restoran (POST)', () => {
 describe('Mengupdate menu oleh restoran (PATCH)', () => {
     it('(+) (Restoran) Berhasil mengupdate menu dengan metode patch saat semua datanya valid', async () => {
         const response = await supertest(web)
-            .patch(`/api/menu/${8}`)
+            .patch(`/api/restaurant/menu/${8}`)
             .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlItMDE5MjljY2ItYWM3NC03NTU5LWIyZjktNTBiMmM2ZjhjMTQ3IiwiZW1haWwiOiJ0ZXN0cmVzdGF1cmFudDJAZ21haWwuY29tIiwicm9sZSI6IlJlc3RvcmFuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MzAxNzQyLCJleHAiOjE3MjkzNDQ5NDJ9.lvs7Uwxqq02EpUNX0AKT_W1ujKXULWllWmH3OCjMNp4")
             .send({
                 "name": "Ayam Goreng Terbaru",
@@ -56,12 +56,10 @@ describe('Mengupdate menu oleh restoran (PATCH)', () => {
     });
 });
 
-describe('DELETE /api/menu/:menuId', () => {
-    // Kasus berhasil
-
-    it('should accept sign up new consumer', async () => {
+describe('Delete menu yang tersedia di restaurant (DELETE)', () => {
+    it('(+) (Restoran) Delete menu berhasil apabila restaurantId dan menuId sesuai', async () => {
         const response = await supertest(web)
-            .delete(`/api/menu/${8}`)
+            .delete(`/api/restaurant/menu/${8}`)
             .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlItMDE5MjljY2ItYWM3NC03NTU5LWIyZjktNTBiMmM2ZjhjMTQ3IiwiZW1haWwiOiJ0ZXN0cmVzdGF1cmFudDJAZ21haWwuY29tIiwicm9sZSI6IlJlc3RvcmFuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MzAxNzQyLCJleHAiOjE3MjkzNDQ5NDJ9.lvs7Uwxqq02EpUNX0AKT_W1ujKXULWllWmH3OCjMNp4")
 
         logger.debug(response.body);
@@ -70,12 +68,10 @@ describe('DELETE /api/menu/:menuId', () => {
     });
 });
 
-describe('POST /api/menu/:menuId/nutrition', () => {
-    // Kasus berhasil
-
-    it('should accept sign up new consumer', async () => {
+describe('Membuat nutrisi menu oleh admin (POST)', () => {
+    it('(+) (Admin) Berhasil membuat detail nutrisi menu apabila data valid', async () => {
         const response = await supertest(web)
-            .post(`/api/restaurant/R-01929985-2e09-7ffa-89b6-7dd808c6aec2/menu/${7}/nutrition`)
+            .post(`/api/restaurant/R-01929ccb-ac74-7559-b2f9-50b2c6f8c147/menu/${9}/nutrition`)
             .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkEtMDE5Mjk5ODUtY2FiNS03NzdmLWJjMmUtNDg1NTkyMjdiNDY2IiwiZW1haWwiOiJ0ZXN0YWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MzAzMDY2LCJleHAiOjE3MjkzNDYyNjZ9.pGKftuRxlQEvsBgrSE3R0nmQNSD7c6rUOzSQXvzqzM4")
             .send({
                 "weight_per_portion": 50,
@@ -100,10 +96,9 @@ describe('POST /api/menu/:menuId/nutrition', () => {
     });
 });
 
-describe('PUT /api/menu/:menuId/nutrition', () => {
-
+describe('Mengupdate nutrisi pada menu spesifik (PATCH)', () => {
     // Kasus berhasil
-    it('should accept sign up new consumer', async () => {
+    it('(+) (Admin) Berhasil update nutrisi menu apabila data valid', async () => {
         const response = await supertest(web)
             .patch(`/api/restaurant/R-01929985-2e09-7ffa-89b6-7dd808c6aec2/menu/${7}/nutrition`)
             .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkEtMDE5Mjk5ODUtY2FiNS03NzdmLWJjMmUtNDg1NTkyMjdiNDY2IiwiZW1haWwiOiJ0ZXN0YWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MzAzMDY2LCJleHAiOjE3MjkzNDYyNjZ9.pGKftuRxlQEvsBgrSE3R0nmQNSD7c6rUOzSQXvzqzM4")
@@ -130,19 +125,97 @@ describe('PUT /api/menu/:menuId/nutrition', () => {
     });
 });
 
-describe('PATCH /api/menu/:menuId/nutrition', () => {
-    // Kasus berhasil
-    it('should accept sign up new consumer', async () => {
+describe('Mengupdate status pada menu oleh admin (PATCH)', () => {
+    it('(+) (Admin) Berhasil update status menu apabila data valid', async () => {
         const response = await supertest(web)
             .patch(`/api/restaurant/R-01929985-2e09-7ffa-89b6-7dd808c6aec2/menu/${7}/status`)
             .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkEtMDE5Mjk5ODUtY2FiNS03NzdmLWJjMmUtNDg1NTkyMjdiNDY2IiwiZW1haWwiOiJ0ZXN0YWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MzAzMDY2LCJleHAiOjE3MjkzNDYyNjZ9.pGKftuRxlQEvsBgrSE3R0nmQNSD7c6rUOzSQXvzqzM4")
             .send({
-                "status": "Rejected"
+                "status": "Approved"
             });
 
         logger.debug(response.body);
         expect(response.status).toBe(201);
         expect(response.body.message).toBeDefined();
-        expect(response.body.data.status).toBe("Rejected");
+        expect(response.body.data.status).toBe("Approved");
     });
 });
+
+describe('Mendapatkan seluruh menu (GET)', () => {
+    it('(+) (Admin) Berhasil mendapatkan seluruh menu pada restoran spesifik beserta semua statusnya', async () => {
+        const response = await supertest(web)
+            .get(`/api/restaurant/R-01929ccb-ac74-7559-b2f9-50b2c6f8c147/menus`)
+            .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkEtMDE5Mjk5ODUtY2FiNS03NzdmLWJjMmUtNDg1NTkyMjdiNDY2IiwiZW1haWwiOiJ0ZXN0YWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MzAzMDY2LCJleHAiOjE3MjkzNDYyNjZ9.pGKftuRxlQEvsBgrSE3R0nmQNSD7c6rUOzSQXvzqzM4")
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
+    });
+
+    it('(+) (Konsumen) Berhasil mendapatkan seluruh menu pada restoran spesifik yang statusnya diapproved', async () => {
+        const response = await supertest(web)
+            .get(`/api/restaurant/R-01929985-2e09-7ffa-89b6-7dd808c6aec2/menus`)
+            .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTMwODYzNCwiZXhwIjoxNzI5MzUxODM0fQ.bIi2kbtHQLOKgjnSZS5-UMPvXwR5OXtd8tjgl5yEe-c")
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
+    });
+
+    it('(+) (Restoran) Berhasil mendapatkan seluruh menu yang dimilikinya', async () => {
+        const response = await supertest(web)
+            .get(`/api/restaurant/menus`)
+            .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlItMDE5MjljY2ItYWM3NC03NTU5LWIyZjktNTBiMmM2ZjhjMTQ3IiwiZW1haWwiOiJ0ZXN0cmVzdGF1cmFudDJAZ21haWwuY29tIiwicm9sZSI6IlJlc3RvcmFuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MzAxNzQyLCJleHAiOjE3MjkzNDQ5NDJ9.lvs7Uwxqq02EpUNX0AKT_W1ujKXULWllWmH3OCjMNp4")
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data).toBeDefined();
+    });
+});
+
+
+describe('Mencari menu berdasarkan nama / kategori / harga / status (GET)', () => {
+    it('(+) (Admin) Berhasil mendapatkan seluruh menu pada restoran spesifik berdasarkan query', async () => {
+        const response = await supertest(web)
+            .get(`/api/restaurant/R-01929ccb-ac74-7559-b2f9-50b2c6f8c147/menus/search`)
+            .query({
+                category: "Lauk Pauk",
+                status: "Waiting"
+            })
+            .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkEtMDE5Mjk5ODUtY2FiNS03NzdmLWJjMmUtNDg1NTkyMjdiNDY2IiwiZW1haWwiOiJ0ZXN0YWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MzAzMDY2LCJleHAiOjE3MjkzNDYyNjZ9.pGKftuRxlQEvsBgrSE3R0nmQNSD7c6rUOzSQXvzqzM4")
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+        expect(response.body.data).toBeDefined();
+    });
+
+    it('(+) (Konsumen) Berhasil mendapatkan seluruh menu pada restoran spesifik yang statusnya diapproved', async () => {
+        const response = await supertest(web)
+            .get(`/api/restaurant/R-01929ccb-ac74-7559-b2f9-50b2c6f8c147/menus/search`)
+            .query({
+                category: "Lauk Pauk",
+                status: ""
+            })
+            .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTMyMzQ4MiwiZXhwIjoxNzI5MzY2NjgyfQ.PV82bJZrlFrRJbSwgG_YWzRW5DnBHGkrHB9Xjoo7qH0")
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+
+    });
+
+    it('(+) (Restoran) Berhasil mendapatkan seluruh menu yang dimilikinya', async () => {
+        const response = await supertest(web)
+            .get(`/api/restaurant/menus`)
+            .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlItMDE5MjljY2ItYWM3NC03NTU5LWIyZjktNTBiMmM2ZjhjMTQ3IiwiZW1haWwiOiJ0ZXN0cmVzdGF1cmFudDJAZ21haWwuY29tIiwicm9sZSI6IlJlc3RvcmFuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MzAxNzQyLCJleHAiOjE3MjkzNDQ5NDJ9.lvs7Uwxqq02EpUNX0AKT_W1ujKXULWllWmH3OCjMNp4")
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data).toBeDefined();
+    });
+});
+
+
+

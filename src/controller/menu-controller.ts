@@ -2,12 +2,13 @@ import {Request, Response, NextFunction} from "express";
 import {
     CreateMenuNutritionRequest,
     CreateMenuRequest,
-    DeleteMenuRequest, UpdateMenuApprovalRequest,
+    DeleteMenuRequest,
+    GetAllMenuRequest, GetMenuDetailRequest, SearchMenuRequest,
+    UpdateMenuApprovalRequest,
     UpdateMenuNutritionRequest,
     UpdateMenuRequest
 } from "../model/menu-model";
 import {MenuService} from "../service/menu-service";
-import {logger} from "../application/logging";
 import {UserRequest} from "../type/user";
 
 export class MenuController {
@@ -93,6 +94,74 @@ export class MenuController {
             const response = await MenuService.updateMenuApproval(request);
             res.status(201).json({
                 message: "Status menu berhasil diupdate",
+                data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async getAllRestaurantMenu(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const requestRole = String(req.user.role);
+            const requestRestaurantId = requestRole === "Restoran" ? String(req.user.id) : String(req.params.restaurantId);
+
+            const request: GetAllMenuRequest = {
+                restaurant_id: requestRestaurantId,
+                role: requestRole
+            };
+
+            const response = await MenuService.getAllRestaurantMenu(request);
+
+            res.status(200).json({
+                data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async getMenuDetail(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const requestRole = String(req.user.role);
+            const requestRestaurantId = requestRole === "Restoran" ? String(req.user.id) : String(req.params.restaurantId);
+            const requestMenuId = Number(req.params.menuId);
+
+            const request: GetMenuDetailRequest = {
+                restaurant_id: requestRestaurantId,
+                menu_id: requestMenuId,
+            };
+
+            const response = await MenuService.getMenuDetail(request);
+            res.status(200).json({
+                data: response
+            });
+
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async searchMenu(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const requestRole = String(req.user.role);
+            const requestRestaurantId = requestRole === "Restoran" ? String(req.user.id) : String(req.params.restaurantId);
+
+            if (requestRole == "Konsumen" && req.query.status) {
+                req.query.status = "Approved";
+            }
+
+            const request: SearchMenuRequest = {
+                restaurant_id: requestRestaurantId,
+                role: requestRole,
+                name: req.query.name ? String(req.query.name) : undefined,
+                category: req.query.category ? String(req.query.category) : undefined,
+                status: req.query.status ? String(req.query.status) : undefined,
+                price: req.query.price ? String(req.query.price).toLowerCase() : undefined,  // Lowercase untuk handling asc/desc
+            };
+
+            const response = await MenuService.searchMenu(request);
+            res.status(200).json({
                 data: response
             });
         } catch (e) {

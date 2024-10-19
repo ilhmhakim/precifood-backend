@@ -2,12 +2,12 @@ import {UserRequest} from "../type/user";
 import {
     CreateMenuNutritionRequest,
     CreateMenuRequest,
-    DeleteMenuRequest,
-    MenuResponse, toMenuDetailResponse,
+    DeleteMenuRequest, GetAllMenuRequest, GetMenuDetailRequest,
+    MenuResponse, SearchMenuRequest, toMenuDetailResponse,
     toMenuResponse, UpdateMenuApprovalRequest, UpdateMenuNutritionRequest,
     UpdateMenuRequest
 } from "../model/menu-model";
-import {Address, Contact, Menu, Nutrition} from "@prisma/client";
+import {Address, Contact, Menu, Nutrition, Prisma} from "@prisma/client";
 import {Validation} from "../validation/validation";
 import {MenuValidation} from "../validation/menu-validation";
 import {prismaClient} from "../application/database";
@@ -195,6 +195,105 @@ export class MenuService {
         });
 
         return toMenuResponse(menu!);
+    }
+
+    static async getAllRestaurantMenu(request: GetAllMenuRequest): Promise<Array<MenuResponse>> {
+        const requestGetAllRestaurantMenu = Validation.validate(MenuValidation.GETALLMENU, request);
+
+        await this.checkRestaurantExist(requestGetAllRestaurantMenu.restaurant_id);
+
+        let menuQuery: any = {
+            where: {
+                restaurant_id: requestGetAllRestaurantMenu.restaurant_id,
+            }
+        };
+
+        if (requestGetAllRestaurantMenu.role === "Konsumen") {
+            menuQuery.where.status = "Approved";
+        }
+
+        const menus = await prismaClient.menu.findMany(menuQuery);
+
+        if (menus.length === 0) {
+            throw new ResponseError(404, "Belum ada menu yang tersedia");
+        }
+
+        return menus.map((menu) => toMenuResponse(menu));
+    }
+
+    static async getMenuDetail(request: GetMenuDetailRequest): Promise<MenuResponse> {
+        const requestMenuDetail: GetMenuDetailRequest = Validation.validate(MenuValidation.GETMENUDETAIL, request);
+
+        await this.checkRestaurantExist(requestMenuDetail.restaurant_id);
+        const menu = await this.checkMenuExist(requestMenuDetail.menu_id, requestMenuDetail.restaurant_id);
+
+        return toMenuDetailResponse(menu.menu, menu.nutrition);
+    }
+
+    static async searchMenu(request: SearchMenuRequest): Promise<Array<MenuResponse>> {
+        // Validasi input
+        const requestSearchMenu = Validation.validate(MenuValidation.SEARCHMENU, request);
+
+        // Cek apakah restoran ada
+        await this.checkRestaurantExist(requestSearchMenu.restaurant_id);
+
+        const filters: any[] = [];
+
+        // Tambahkan filter nama jika tersedia
+        if (requestSearchMenu.name) {
+            filters.push({
+                name: {
+                    contains: requestSearchMenu.name,
+                    mode: 'insensitive'  // Pencarian tidak peka huruf besar-kecil
+                }
+            });
+        }
+
+        // Tambahkan filter kategori jika tersedia
+        if (requestSearchMenu.category) {
+            filters.push({
+                category: requestSearchMenu.category
+            });
+        }
+
+        // Konsumen tidak diperbolehkan mencari berdasarkan status
+        if (requestSearchMenu.role === "Konsumen") {
+            filters.push({
+                status: "Approved"  // Konsumen hanya bisa melihat menu yang disetujui
+            });
+        } else if (requestSearchMenu.status) {
+            // Tambahkan filter status jika tersedia dan pengguna bukan Konsumen
+            filters.push({
+                status: requestSearchMenu.status
+            });
+        }
+
+        // Siapkan default orderBy untuk harga (desc)
+        let orderByPrice: 'asc' | 'desc' = 'desc';
+
+        // Cek apakah pengguna mengirim parameter `price` untuk pengurutan
+        if (requestSearchMenu.price === 'asc' || requestSearchMenu.price === 'desc') {
+            orderByPrice = requestSearchMenu.price as 'asc' | 'desc';
+        }
+
+        // Query Prisma untuk mencari menu
+        const menus = await prismaClient.menu.findMany({
+            where: {
+                restaurant_id: requestSearchMenu.restaurant_id,
+                AND: filters.length > 0 ? filters : undefined // Filter tambahan jika ada
+            },
+            orderBy: {
+                price: orderByPrice  // Urutkan berdasarkan harga sesuai dengan query
+            }
+        });
+
+        // Mengembalikan error jika tidak ada menu yang ditemukan
+        if (menus.length === 0) {
+            throw new ResponseError(404, "Menu tidak ditemukan");
+        }
+
+        // Mengubah hasil query menjadi array MenuResponse
+        return menus.map((menu) => toMenuResponse(menu));
     }
 
 

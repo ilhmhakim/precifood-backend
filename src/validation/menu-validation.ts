@@ -1,6 +1,16 @@
 import {z, ZodType} from "zod";
 
 export class MenuValidation {
+    static readonly GETALLMENU: ZodType = z.object({
+        restaurant_id: z.string().min(38).max(38),
+        role: z.string().min(1)
+    });
+
+    static readonly GETMENUDETAIL: ZodType = z.object({
+        restaurant_id: z.string().min(38).max(38),
+        menu_id: z.number().positive()
+    })
+
     static readonly CREATEMENU: ZodType = z.object({
         restaurant_id: z.string().min(38).max(38),
         name: z.string().min(1).max(255),
@@ -100,7 +110,14 @@ static readonly UPDATEMENUNUTRITION = z.object({
 
     static readonly UPDATEMENUAPPROVAL = z.object({
         restaurant_id: z.string().min(38).max(38),
-        menu_id: z.number().positive(),
         status: z.string().min(1)
     });
+
+    static readonly SEARCHMENU = z.object({
+        restaurant_id: z.string().min(38).max(38),
+        name: z.string().trim().min(1).optional(),
+        category: z.string().trim().min(1).optional(),
+        price: z.string().min(1).optional(),
+        status: z.string().min(1).optional()
+    })
 }
