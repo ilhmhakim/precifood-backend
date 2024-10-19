@@ -356,7 +356,7 @@ export class UserService {
         let age: number | undefined;
         if (requestUpdateConsumer.birth) {
             const birthDate = new Date(requestUpdateConsumer.birth);
-            age = this.calculateAge(birthDate);
+            age = Number(this.calculateAge(birthDate))
         }
 
         // Lakukan update pada user yang terhubung dengan consumer

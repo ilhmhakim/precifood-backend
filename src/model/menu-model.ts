@@ -11,11 +11,13 @@ export type MenuResponse = {
     image_url: string;
     nutrition?: {
         weight_per_portion: number;
+        weight_with_bdd: number;
         calory: number;
         protein: number;
         fat: number;
         carbohydrate: number;
-        sodium: number;
+        fiber: number;
+        natrium: number;
         cholesterol: number;
         sfa: number;
         mufa: number;
@@ -36,12 +38,12 @@ export type CreateMenuRequest = {
 export type UpdateMenuRequest = {
     restaurant_id: string;
     menu_id: number;
-    name: string;
-    category: string;
-    price: number;
-    portion: number;
-    description: string;
-    image_url: string;
+    name?: string;
+    category?: string;
+    price?: number;
+    portion?: number;
+    description?: string;
+    image_url?: string;
 }
 
 export type GetMenuRequest = {
@@ -52,36 +54,28 @@ export type GetMenuRequest = {
 export type DeleteMenuRequest = GetMenuRequest;
 
 export type SearchMenuRequest = {
+    restaurant_id: string;
     name: string;
 }
 
 export type FilterMenuRequest = {
+    restaurant_id: string;
     category?: string;
     price?: number;
     status?: string;
 }
 
-export type MenuNutritionResponse = {
-    weigth_per_portion: number;
-    calory: number;
-    protein: number;
-    fat: number;
-    carbohydrate: number;
-    sodium: number;
-    cholesterol: number;
-    sfa: number;
-    mufa: number;
-    pufa: number;
-}
-
 export type CreateMenuNutritionRequest = {
+    restaurant_id: string;
     menu_id: number;
     weight_per_portion: number;
+    weight_with_bdd: number;
     calory: number;
     protein: number;
     fat: number;
     carbohydrate: number;
-    sodium: number;
+    fiber: number;
+    natrium: number;
     cholesterol: number;
     sfa: number;
     mufa: number;
@@ -89,20 +83,24 @@ export type CreateMenuNutritionRequest = {
 }
 
 export type UpdateMenuNutritionRequest = {
+    restaurant_id: string;
     menu_id: number;
-    weight_per_portion: number;
-    calory: number;
-    protein: number;
-    fat: number;
-    carbohydrate: number;
-    sodium: number;
-    cholesterol: number;
-    sfa: number;
-    mufa: number;
-    pufa: number;
+    weight_per_portion?: number;
+    weight_with_bdd?: number;
+    calory?: number;
+    protein?: number;
+    fat?: number;
+    carbohydrate?: number;
+    fiber?: number;
+    natrium?: number;
+    cholesterol?: number;
+    sfa?: number;
+    mufa?: number;
+    pufa?: number;
 }
 
 export type UpdateMenuApprovalRequest = {
+    restaurant_id: string;
     menu_id: number;
     status: string;
 }
@@ -132,15 +130,17 @@ export function toMenuDetailResponse(menu: Menu, nutrition: Nutrition): MenuResp
         image_url: menu.image_url,
         nutrition: {
             weight_per_portion: nutrition.weight_per_portion,
+            weight_with_bdd: nutrition.weight_with_bdd,
             calory: nutrition.calory,
-            protein: nutrition.protein,
-            fat: nutrition.fat,
-            carbohydrate: nutrition.carbohydrate,
-            sodium: nutrition.sodium,
-            cholesterol: nutrition.cholesterol,
-            sfa: nutrition.sfa,
-            mufa: nutrition.mufa,
-            pufa: nutrition.pufa
+            protein: nutrition.protein.toNumber(),
+            fat: nutrition.fat.toNumber(),
+            carbohydrate: nutrition.carbohydrate.toNumber(),
+            fiber: nutrition.fiber.toNumber(),
+            natrium: nutrition.natrium.toNumber(),
+            cholesterol: nutrition.cholesterol.toNumber(),
+            sfa: nutrition.sfa.toNumber(),
+            mufa: nutrition.mufa.toNumber(),
+            pufa: nutrition.pufa.toNumber()
         }
     }
 }

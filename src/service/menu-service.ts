@@ -2,56 +2,103 @@ import {UserRequest} from "../type/user";
 import {
     CreateMenuNutritionRequest,
     CreateMenuRequest,
-    DeleteMenuRequest, MenuNutritionResponse,
+    DeleteMenuRequest,
     MenuResponse, toMenuDetailResponse,
     toMenuResponse, UpdateMenuApprovalRequest, UpdateMenuNutritionRequest,
     UpdateMenuRequest
 } from "../model/menu-model";
-import {Menu} from "@prisma/client";
+import {Address, Contact, Menu, Nutrition} from "@prisma/client";
 import {Validation} from "../validation/validation";
 import {MenuValidation} from "../validation/menu-validation";
 import {prismaClient} from "../application/database";
-import {logger} from "../application/logging";
+import {ResponseError} from "../error/response-error";
+import {Decimal} from "@prisma/client/runtime/library";
 
 export class MenuService {
 
-    static async createMenu(request: CreateMenuRequest): Promise<MenuResponse> {
-        let createMenuRequest = Validation.validate(MenuValidation.CREATEMENU, request);
-
-        const menu = await prismaClient.menu.create({
-            data: {
-                restaurant_id: createMenuRequest.restaurant_id,
-                name: createMenuRequest.name,
-                category: createMenuRequest.category,
-                price: createMenuRequest.price,
-                portion: createMenuRequest.portion,
-                description: createMenuRequest.description,
-                image_url: createMenuRequest.image_url,
-            }
-        });
-
-        const restaurantInformation = await prismaClient.contact.findFirst({
+    static async checkRestaurantExist(restaurantId: string): Promise<{contact: Contact, address: Address}> {
+        const restaurant = await prismaClient.restaurant.findFirst({
             where: {
-                restaurant_id: createMenuRequest.restaurant_id,
+                restaurant_id: restaurantId,
+            },
+            include: {
+                Contact: true,  // Sertakan relasi Contact
+                Address: true   // Sertakan relasi Address
             }
         });
 
+        // Jika restoran tidak ditemukan
+        if (!restaurant) {
+            throw new ResponseError(404, `Tidak ditemukan restoran dengan ID ${restaurantId}`);
+        }
 
-        await prismaClient.notification.create({
-            data: {
-                title: "Menu baru ditambahkan!",
-                // @ts-ignore
-                restaurant_name: String(restaurantInformation.name),
-                restaurant_id: createMenuRequest.restaurant_id,
-                menu_id: menu.id,
-                menu_name: createMenuRequest.name
+        // Destrukturisasi objek restaurant untuk mendapatkan Contact dan Address
+        const { Contact, Address } = restaurant;
+
+        // Kembalikan Contact dan Address sebagai objek
+        return { contact: Contact!, address: Address! };
+    }
+
+
+
+    static async checkMenuExist(menuId: number, restaurantId: string): Promise<{menu: Menu, nutrition: Nutrition}> {
+        const menu = await prismaClient.menu.findFirst({
+            where: {
+                id: menuId,
+                restaurant_id: restaurantId
+            },
+            include: {
+                Nutrition: true
             }
-        })
-        return toMenuResponse(menu)
+        });
+
+        if (!menu) {
+            throw new ResponseError(404, `Tidak ditemukan menu dengan ID ${menuId} pada restaurant ID ${restaurantId}`);
+        }
+
+        const { Nutrition } = menu;
+        return { menu, nutrition: Nutrition! };
+    }
+
+    static async createMenu(request: CreateMenuRequest): Promise<MenuResponse> {
+        const createMenuRequest = Validation.validate(MenuValidation.CREATEMENU, request);
+        const checkRestaurantExist = await this.checkRestaurantExist(createMenuRequest.restaurant_id);
+
+        const menuResponse = await prismaClient.$transaction(async (prisma) => {
+            const menu = await prisma.menu.create({
+                data: {
+                    restaurant_id: createMenuRequest.restaurant_id,
+                    name: createMenuRequest.name,
+                    category: createMenuRequest.category,
+                    price: createMenuRequest.price,
+                    portion: createMenuRequest.portion,
+                    description: createMenuRequest.description,
+                    image_url: createMenuRequest.image_url,
+                }
+            });
+
+            // Buat notifikasi menu baru
+            await prisma.notification.create({
+                data: {
+                    title: "Menu baru ditambahkan!",
+                    restaurant_name: checkRestaurantExist.contact.name,
+                    restaurant_id: createMenuRequest.restaurant_id,
+                    menu_id: menu.id,
+                    menu_name: createMenuRequest.name
+                }
+            });
+
+            return toMenuResponse(menu);
+        });
+
+        return menuResponse;
     }
 
     static async updateMenu(request: UpdateMenuRequest): Promise<MenuResponse> {
         const updateMenuRequest = Validation.validate(MenuValidation.UPDATEMENU, request);
+        await this.checkRestaurantExist(updateMenuRequest.restaurant_id);
+        await this.checkMenuExist(updateMenuRequest.menu_id, updateMenuRequest.restaurant_id);
+
         const menu = await prismaClient.menu.update({
             where: {
                 id: updateMenuRequest.menu_id,
@@ -71,6 +118,8 @@ export class MenuService {
 
     static async deleteMenu(request: DeleteMenuRequest) {
         const deleteRequest = Validation.validate(MenuValidation.DELETEMENU, request);
+        await this.checkRestaurantExist(deleteRequest.restaurant_id);
+        await this.checkMenuExist(deleteRequest.menu_id, deleteRequest.restaurant_id);
 
         const menu = await prismaClient.menu.delete({
            where: {
@@ -83,41 +132,33 @@ export class MenuService {
     }
 
     static async createMenuNutrition(request: CreateMenuNutritionRequest): Promise<MenuResponse> {
-        const createMenuNutritionRequest: CreateMenuNutritionRequest = Validation.validate(MenuValidation.CREATEMENUNUTRITION, request);
-
-        const menu = await prismaClient.menu.findFirst({
-            where: {
-                id: createMenuNutritionRequest.menu_id
-            }
-        });
+        const createMenuNutritionRequest = Validation.validate(MenuValidation.CREATEMENUNUTRITION, request);
+        const checkMenuExist = await this.checkMenuExist(createMenuNutritionRequest.menu_id, createMenuNutritionRequest.restaurant_id);
 
         const nutrition = await prismaClient.nutrition.create({
             data: {
                 menu_id: createMenuNutritionRequest.menu_id,
                 weight_per_portion: createMenuNutritionRequest.weight_per_portion,
+                weight_with_bdd: createMenuNutritionRequest.weight_with_bdd,
                 calory: createMenuNutritionRequest.calory,
-                protein: createMenuNutritionRequest.protein,
-                fat: createMenuNutritionRequest.fat,
-                carbohydrate: createMenuNutritionRequest.carbohydrate,
-                sodium: createMenuNutritionRequest.sodium,
-                cholesterol: createMenuNutritionRequest.cholesterol,
-                sfa: createMenuNutritionRequest.sfa,
-                mufa: createMenuNutritionRequest.mufa,
-                pufa: createMenuNutritionRequest.pufa
+                protein: new Decimal(createMenuNutritionRequest.protein),  // Convert number to Decimal
+                fat: new Decimal(createMenuNutritionRequest.fat),          // Convert number to Decimal
+                carbohydrate: new Decimal(createMenuNutritionRequest.carbohydrate),
+                fiber: new Decimal(createMenuNutritionRequest.fiber),
+                natrium: new Decimal(createMenuNutritionRequest.natrium),
+                cholesterol: new Decimal(createMenuNutritionRequest.cholesterol),
+                sfa: new Decimal(createMenuNutritionRequest.sfa),
+                mufa: new Decimal(createMenuNutritionRequest.mufa),
+                pufa: new Decimal(createMenuNutritionRequest.pufa),
             }
         });
 
-        return toMenuDetailResponse(menu!, nutrition);
+        return toMenuDetailResponse(checkMenuExist.menu, nutrition);
     }
 
     static async updateMenuNutrition(request: UpdateMenuNutritionRequest): Promise<MenuResponse> {
         const updateMenuNutritionRequest: UpdateMenuNutritionRequest = Validation.validate(MenuValidation.UPDATEMENUNUTRITION, request);
-
-        const menu = await prismaClient.menu.findFirst({
-            where: {
-                id: updateMenuNutritionRequest.menu_id
-            }
-        });
+        const checkMenuExist = await this.checkMenuExist(updateMenuNutritionRequest.menu_id, updateMenuNutritionRequest.restaurant_id);
 
         const nutrition = await prismaClient.nutrition.update({
             where: {
@@ -129,7 +170,8 @@ export class MenuService {
                 protein: updateMenuNutritionRequest.protein,
                 fat: updateMenuNutritionRequest.fat,
                 carbohydrate: updateMenuNutritionRequest.carbohydrate,
-                sodium: updateMenuNutritionRequest.sodium,
+                fiber: updateMenuNutritionRequest.fiber,
+                natrium: updateMenuNutritionRequest.natrium,
                 cholesterol: updateMenuNutritionRequest.cholesterol,
                 sfa: updateMenuNutritionRequest.sfa,
                 mufa: updateMenuNutritionRequest.mufa,
@@ -137,13 +179,13 @@ export class MenuService {
             }
         });
 
-        return toMenuDetailResponse(menu!, nutrition);
+        return toMenuDetailResponse(checkMenuExist.menu, nutrition);
     }
 
     static async updateMenuApproval(request: UpdateMenuApprovalRequest): Promise<MenuResponse> {
         const updateMenuApprovalRequest = Validation.validate(MenuValidation.UPDATEMENUAPPROVAL, request);
 
-        await prismaClient.menu.update({
+        const menu = await prismaClient.menu.update({
             where: {
                 id: updateMenuApprovalRequest.menu_id,
             },
@@ -152,11 +194,6 @@ export class MenuService {
             }
         });
 
-        const menu = await prismaClient.menu.findFirst({
-            where: {
-                id: updateMenuApprovalRequest.menu_id
-            }
-        });
         return toMenuResponse(menu!);
     }
 
