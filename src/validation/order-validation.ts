@@ -13,4 +13,13 @@ export class OrderValidation {
             menu_price: z.number().positive("Menu price must be a positive number"),
         }))
     });
+
+    static readonly GETALLORDER: ZodType = z.object({
+        consumer_id: z.string().min(38).max(38)
+    });
+
+    static readonly GETORDERDETAIL: ZodType = z.object({
+        consumer_id: z.string().min(38).max(38),
+        order_id: z.number().positive()
+    });
 }

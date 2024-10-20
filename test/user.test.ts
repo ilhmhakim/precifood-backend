@@ -1,9 +1,7 @@
 import supertest from 'supertest'
 import {web} from "../src/application/web";
 import {logger} from "../src/application/logging";
-import {UserTest} from "./test-util";
-import fs from 'fs';
-import path from 'path';
+
 
 
 describe('Registrasi Konsumen (POST /api/signup/consumer)', () => {
@@ -204,7 +202,7 @@ describe('Melihat Profile / Detail Restoran (GET)', () => {
 
         logger.debug(response.body);
 
-        expect(response.status).toBe(200);i
+        expect(response.status).toBe(200);
         expect(response.body).toBeDefined();
         expect(response.body.data).toBeDefined();
         expect(response.body.data.user).toBeDefined();
@@ -232,9 +230,8 @@ describe('Melihat Profile / Detail Restoran (GET)', () => {
 describe('Mendapatkan Pop Up Consumer Information (GET)', () => {
     it('(+) (Konsumen) Mengembalikan sekilas data terkait personal information dan medical history', async () => {
         const response = await supertest(web)
-            .get('/api/users/consumer/information')
-            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTIxOTc0NiwiZXhwIjoxNzI5MjYyOTQ2fQ.MzjgKyvP0JGZsmQFmCL0_DRiCCQtkK-p4zJrTPApgh8');
-
+            .get('/api/users/consumers/information')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTM4NTg2OSwiZXhwIjoxNzI5NDI5MDY5fQ.zdqilvT109CRl3NdkAy3e3sja_eLQEVmva19MifrFEI')
         logger.debug(response.body);
 
         expect(response.status).toBe(200);
@@ -277,10 +274,10 @@ describe('Mendapatkan seluruh list pengguna restoran sebagai admin (GET)', () =>
 describe('Konsumen dapat mengupdate profilenya (PATCH)', () => {
     it('(+) (Konsumen) Mengupdate profile milik pribadi', async () => {
         const response = await supertest(web)
-            .patch('/api/users/consumer/profile')
-            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTI1Nzg5NywiZXhwIjoxNzI5MzAxMDk3fQ.eckB9MnwwFhZ9rvr9RBSCczyD003JVN76vcIuWNlAQY')
+            .patch('/api/users/consumers/profile')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTM4NTg2OSwiZXhwIjoxNzI5NDI5MDY5fQ.zdqilvT109CRl3NdkAy3e3sja_eLQEVmva19MifrFEI')
             .send({
-                "name": "Muhammad Ilham Hakim Suherman"
+                "name": "Muhammad Ilham Hakim Suherman Test"
             })
         logger.debug(response.body);
 
@@ -289,7 +286,7 @@ describe('Konsumen dapat mengupdate profilenya (PATCH)', () => {
         expect(response.body.data).toBeDefined();
         expect(response.body.data.user).toBeDefined();
         expect(response.body.data.personal_information).toBeDefined();
-        expect(response.body.data.personal_information.name).toBe("Muhammad Ilham Hakim Suherman");
+        expect(response.body.data.personal_information.name).toBe("Muhammad Ilham Hakim Suherman Test");
         expect(response.body.data.medical_history).toBeDefined();
     });
 

@@ -145,6 +145,8 @@ model RecommendationList {
   rank                     Int                        @db.Integer
   // Many RecommendationList hanya dimiliki oleh 1 Rekomendasi
   recommendation_id        Int                        @db.Integer
+  description              String                     @db.Text
+  total_price              Int                        @db.Integer
   recommendation           Recommendation             @relation(fields: [recommendation_id], references: [id], onDelete: Cascade)
   // 1 RecommendationList memiliki Many RecommendationListDetail (Ada 1 Set Menu terdiri dari 4 macam menu yang dihasilkan)
   RecommendationListDetail RecommendationListDetail[]
@@ -155,6 +157,9 @@ model RecommendationList {
 model RecommendationListDetail {
   id                     Int                @id @default(autoincrement())
   menu_id                Int                @db.Integer
+  menu_category          String             @db.VarChar(50)
+  menu_price             Int                @db.Integer
+  image_url              String             @db.Text
   // Many RecommendationListDetail hanya dimiliki oleh 1 RecommendationList saja
   recommendation_list_id Int                @db.Integer
   recommendation_list    RecommendationList @relation(fields: [recommendation_list_id], references: [id], onDelete: Cascade)

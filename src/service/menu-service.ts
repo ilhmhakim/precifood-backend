@@ -295,6 +295,4 @@ export class MenuService {
         // Mengubah hasil query menjadi array MenuResponse
         return menus.map((menu) => toMenuResponse(menu));
     }
-
-
 }

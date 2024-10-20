@@ -8,7 +8,6 @@ import {UserPayload} from "../type/user";
 import {issueToken} from "../middleware/auth-middleware";
 import {AuthValidation} from "../validation/auth-validation";
 
-// test
 export class AuthService {
 
     static async login(request: LoginUserRequest): Promise<UserResponse> {

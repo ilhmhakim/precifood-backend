@@ -26,8 +26,30 @@ export type GetOrderDetailRequest = {
     order_id: number;
 }
 
-export type CreateOrderRequest = {
-    id: number;
+// export type CreateOrderRequest = {
+//     consumer_id: string;
+//     restaurant_id: string;
+//     recommendation_id: number;
+//     recommendation_list_id: number;
+//     recommendation_list_detail_id: number;
+// }
+
+// export type CreateOrderRequest = {
+//     id: number;
+//     consumer_id: string;
+//     restaurant_id: string;
+//     restaurant_name: string;
+//     total_price: number;
+//     detail:
+//         {
+//             menu_id: number;
+//             menu_name: string;
+//             menu_category: string;
+//             menu_price: number;
+//         } [];
+// }
+
+export type CreateOrderRequestSeed = {
     consumer_id: string;
     restaurant_id: string;
     restaurant_name: string;
@@ -39,6 +61,15 @@ export type CreateOrderRequest = {
             menu_category: string;
             menu_price: number;
         } [];
+}
+
+export function toAllOrderResponse(order: Order): OrderResponse {
+    return {
+        id: order.id,
+        restaurant_name: order.restaurant_name,
+        total_price: order.total_price,
+        ordered_at: order.ordered_at.toLocaleDateString(),
+    }
 }
 
 export function toOrderResponse(order: Order, orderDetails: OrderDetail[]): OrderResponse {

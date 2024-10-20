@@ -181,8 +181,7 @@ describe('Mencari menu berdasarkan nama / kategori / harga / status (GET)', () =
         const response = await supertest(web)
             .get(`/api/restaurant/R-01929ccb-ac74-7559-b2f9-50b2c6f8c147/menus/search`)
             .query({
-                category: "Lauk Pauk",
-                status: "Waiting"
+                price: "asc"
             })
             .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkEtMDE5Mjk5ODUtY2FiNS03NzdmLWJjMmUtNDg1NTkyMjdiNDY2IiwiZW1haWwiOiJ0ZXN0YWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MzAzMDY2LCJleHAiOjE3MjkzNDYyNjZ9.pGKftuRxlQEvsBgrSE3R0nmQNSD7c6rUOzSQXvzqzM4")
 
@@ -196,8 +195,7 @@ describe('Mencari menu berdasarkan nama / kategori / harga / status (GET)', () =
         const response = await supertest(web)
             .get(`/api/restaurant/R-01929ccb-ac74-7559-b2f9-50b2c6f8c147/menus/search`)
             .query({
-                category: "Lauk Pauk",
-                status: ""
+                price: "asc"
             })
             .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTMyMzQ4MiwiZXhwIjoxNzI5MzY2NjgyfQ.PV82bJZrlFrRJbSwgG_YWzRW5DnBHGkrHB9Xjoo7qH0")
 

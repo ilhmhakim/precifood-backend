@@ -8,7 +8,7 @@ describe('POST /api/order', () => {
         const response = await supertest(web)
             .post("/api/order")
             .send({
-                "consumer_id": "C-0192812c-2c28-7dd9-b340-cd0e0c3b7182",
+                "consumer_id": "C-01929984-cbd2-7779-b552-a113938a2054",
                 "restaurant_id": "R-01928893-0eea-711d-aa5a-684b979fff03",
                 "restaurant_name": "Restoran Karimata",
                 "total_price": 95000,
@@ -52,5 +52,24 @@ describe('POST /api/order', () => {
         expect(response.body.data.order_detail[1].menu_name).toBe("Ayam Bakar"); // Cek menu kedua
         expect(response.body.data.order_detail[2].menu_price).toBe(30000); // Cek harga menu ketiga
         expect(response.body.data.order_detail[3].menu_category).toBe("Minuman"); // Cek kategori menu keempat
+    });
+});
+
+describe('Mengakses riwayat order (GET)', () => {
+    it('(+) (Konsumen) Dapat mengakses seluruh order yang telah dipesan ', async () => {
+        const response = await supertest(web)
+            .get("/api/consumer/orders")
+            .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTM4MzQwMiwiZXhwIjoxNzI5NDI2NjAyfQ.O0eRD-VRpNvHQZn2soCpH5Fqpw9nyp5J23RKpjHNNyk`)
+
+        logger.debug(response.body);
+        expect(response.body.data).toHaveLength(2);
+    });
+
+    it('(+) (Konsumen) Dapat mengakses seluruh order yang telah dipesan ', async () => {
+        const response = await supertest(web)
+            .get(`/api/consumer/orders/${2}`)
+            .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTM4MzQwMiwiZXhwIjoxNzI5NDI2NjAyfQ.O0eRD-VRpNvHQZn2soCpH5Fqpw9nyp5J23RKpjHNNyk`)
+
+        logger.debug(response.body);
     });
 });

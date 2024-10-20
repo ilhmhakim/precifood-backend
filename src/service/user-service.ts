@@ -405,6 +405,7 @@ export class UserService {
 
         // Menggunakan fungsi toConsumerProfileResponse untuk mengembalikan hasil
         const { consumer } = updatedUser;
+        // @ts-ignore
         const { PersonalInformation, MedicalHistory } = consumer;
 
         return toConsumerProfileResponse(updatedUser, PersonalInformation!, MedicalHistory!);
@@ -454,6 +455,7 @@ export class UserService {
 
         // Menggunakan fungsi toConsumerProfileResponse untuk mengembalikan hasil
         const { restaurant } = updatedUser;
+        // @ts-ignore
         const { Contact, Address } = restaurant;
 
         return toRestaurantProfile(updatedUser, Contact!, Address!);

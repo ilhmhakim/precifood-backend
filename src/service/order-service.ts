@@ -1,11 +1,17 @@
-import {NextFunction} from "express";
-import {CreateOrderRequest, OrderResponse, toOrderResponse} from "../model/order-model";
+import {NextFunction, request} from "express";
+import {
+    CreateOrderRequestSeed,
+    GetAllOrdersRequest,
+    GetOrderDetailRequest,
+    OrderResponse, toAllOrderResponse,
+    toOrderResponse
+} from "../model/order-model";
 import {Validation} from "../validation/validation";
 import {prismaClient} from "../application/database";
 import {OrderValidation} from "../validation/order-validation";
 
 export class OrderService {
-    static async createOrder(request: CreateOrderRequest): Promise<OrderResponse> {
+    static async createOrder(request: CreateOrderRequestSeed): Promise<OrderResponse> {
         const createOrderRequest = Validation.validate(OrderValidation.CREATEORDER, request);
 
         // Membuat order beserta detailnya
@@ -34,4 +40,39 @@ export class OrderService {
         // Menggunakan fungsi toOrderResponse untuk mengembalikan hasil
         return toOrderResponse(order, order.OrderDetail);
     }
+
+    static async getAllOrder(request: GetAllOrdersRequest): Promise<Array<OrderResponse>> {
+        const requestGetAllOrder = Validation.validate(OrderValidation.GETALLORDER, request)
+
+        const orders = await prismaClient.order.findMany({
+           where: {
+               consumer_id: requestGetAllOrder.consumer_id
+           }
+        });
+
+        return orders.map((order) => toAllOrderResponse(order));
+    }
+
+    static async getOrderDetail(request: GetOrderDetailRequest): Promise<OrderResponse> {
+        const requestOrderDetail = Validation.validate(OrderValidation.GETORDERDETAIL, request);
+
+        // Cari order berdasarkan consumer_id dan order_id
+        const order = await prismaClient.order.findFirst({
+            where: {
+                consumer_id: requestOrderDetail.consumer_id,
+                id: requestOrderDetail.order_id // Pastikan order_id dicocokkan di level Order
+            },
+            include: {
+                OrderDetail: true // Ambil semua OrderDetail terkait dengan order ini
+            }
+        });
+
+        // Handle jika order tidak ditemukan
+        if (!order) {
+            throw new Error('Order not found');
+        }
+
+        return toOrderResponse(order, order.OrderDetail);
+    }
+
 }
