@@ -1,16 +1,41 @@
-const consumer = {
+import {v7 as uuid7} from "uuid";
 
+export const consumerSeed = {
+    "id": String(`C-${uuid7()}`),
+    "name": "Ilham Hakim",
+    "email": "ilhamhakim@gmail.com",
+    "sex": "Laki-laki",
+    "birth": "2003-04-11",
+    "phone": "085863190000",
+    "height": 173,
+    "weight": 70,
+    "no_history": true,
+    "diabetes": false,
+    "hypertension": false,
+    "cardiovascular": false,
+    "password": "abc12345",
+    "password_confirmation": "abc12345"
 }
 
-const restaurant = {
-
+export const restaurantSeed = {
+    "id": String(`R-${uuid7()}`),
+    "name": "Restoran Karimata",
+    "email": "restorankarimata@gmail.com",
+    "phone": "085782887745",
+    "province": "Jawa Barat",
+    "city": "Bogor",
+    "address_detail": "Depan Pintu Tol Sentul Selatan-2 The Grand, Jl. Tol Lkr. Luar Bogor",
+    "image": "www.example.com",
+    "password": "abc12345",
 }
 
-const admin = {
-
+const adminSeed = {
+    "id": String(`R-${uuid7()}`),
+    "email": "admin@gmail.com",
+    "password": "abc12345"
 }
 
-const menus = [
+const menuSeed = [
     {
         "name": "Nasi",
         "category": "Makanan Pokok",
