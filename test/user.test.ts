@@ -3,6 +3,14 @@ import {web} from "../src/application/web";
 import {logger} from "../src/application/logging";
 
 
+describe('seed', () => {
+    it('should seeds', async () => {
+        const response = await supertest(web)
+            .post("/api/seeds")
+
+        logger.debug(response.body);
+    });
+});
 
 describe('Registrasi Konsumen (POST /api/signup/consumer)', () => {
     // Kasus berhasil
@@ -10,13 +18,13 @@ describe('Registrasi Konsumen (POST /api/signup/consumer)', () => {
         const response = await supertest(web)
             .post("/api/signup/consumer")
             .send({
-                "name": "Ilham Hakim",
-                "email": "test2@gmail.com",
-                "sex": "Laki-laki",
-                "birth": "1975-09-22",
+                "name": "Malika",
+                "email": "malika@gmail.com",
+                "sex": "Perempuan",
+                "birth": "1975-09-11",
                 "phone": "085812340000",
                 "height": 170,
-                "weight": 75,
+                "weight": 60,
                 "no_history": true,
                 "diabetes": false,
                 "hypertension": false,
@@ -149,8 +157,8 @@ describe('Melihat Profile / Detail Konsumen (GET)', () => {
     // Kasus berhasil
     it('should return profile of a consumer when authenticated', async () => {
         const response = await supertest(web)
-            .get('/api/users/consumer/profile')
-            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTI1Nzg5NywiZXhwIjoxNzI5MzAxMDk3fQ.eckB9MnwwFhZ9rvr9RBSCczyD003JVN76vcIuWNlAQY'); // Set header Authorization dengan token yang valid
+            .get('/api/users/consumers/profile')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmE3ZjgtMDhhNS03MzM2LWI5NDMtNjc1NDIxOGNlNTI4IiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5Mzk1MTk4LCJleHAiOjE3Mjk1Njc5OTh9.QywCU8le0gHfct8TySSHAQe_EpQluM_6tZzfMu8Jpd0')
 
         logger.debug(response.body);
 
@@ -182,7 +190,7 @@ describe('Melihat Profile / Detail Restoran (GET)', () => {
     // Kasus berhasil
     it('(+) Melihat profile/detail restoran dari akun restoran', async () => {
         const response = await supertest(web)
-            .get('/api/users/restaurant/profile')
+            .get('/api/users/restaurants/profile')
             .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlItMDE5MjljY2ItYWM3NC03NTU5LWIyZjktNTBiMmM2ZjhjMTQ3IiwiZW1haWwiOiJ0ZXN0cmVzdGF1cmFudDJAZ21haWwuY29tIiwicm9sZSI6IlJlc3RvcmFuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MjA3NDcwLCJleHAiOjE3MjkyMjE4NzB9.bwotfFBgvfwgVJq9KOqlqs4LRBhXru9oank9XSn1Kgs'); // Set header Authorization dengan token yang valid
 
         logger.debug(response.body);
@@ -197,8 +205,8 @@ describe('Melihat Profile / Detail Restoran (GET)', () => {
 
     it('(+) Melihat detail/profil restoran sebagai konsumen', async () => {
         const response = await supertest(web)
-            .get('/api/users/restaurant/R-01929985-2e09-7ffa-89b6-7dd808c6aec2')
-            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTIwNTk5NywiZXhwIjoxNzI5MjIwMzk3fQ.5drkwmB-0eAYp0KXk2kdyJ0K3Vl2rVxOZf4Eu3x6oLM'); // Set header Authorization dengan token yang valid
+            .get('/api/users/restaurants/R-01929ccb-ac74-7559-b2f9-50b2c6f8c147')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmE3ZjgtMDhhNS03MzM2LWI5NDMtNjc1NDIxOGNlNTI4IiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5Mzk1MTk4LCJleHAiOjE3Mjk1Njc5OTh9.QywCU8le0gHfct8TySSHAQe_EpQluM_6tZzfMu8Jpd0'); // Set header Authorization dengan token yang valid
 
         logger.debug(response.body);
 
@@ -231,7 +239,7 @@ describe('Mendapatkan Pop Up Consumer Information (GET)', () => {
     it('(+) (Konsumen) Mengembalikan sekilas data terkait personal information dan medical history', async () => {
         const response = await supertest(web)
             .get('/api/users/consumers/information')
-            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTM4NTg2OSwiZXhwIjoxNzI5NDI5MDY5fQ.zdqilvT109CRl3NdkAy3e3sja_eLQEVmva19MifrFEI')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmE3ZjgtMDhhNS03MzM2LWI5NDMtNjc1NDIxOGNlNTI4IiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5Mzk1MTk4LCJleHAiOjE3Mjk1Njc5OTh9.QywCU8le0gHfct8TySSHAQe_EpQluM_6tZzfMu8Jpd0')
         logger.debug(response.body);
 
         expect(response.status).toBe(200);
@@ -275,9 +283,11 @@ describe('Konsumen dapat mengupdate profilenya (PATCH)', () => {
     it('(+) (Konsumen) Mengupdate profile milik pribadi', async () => {
         const response = await supertest(web)
             .patch('/api/users/consumers/profile')
-            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTM4NTg2OSwiZXhwIjoxNzI5NDI5MDY5fQ.zdqilvT109CRl3NdkAy3e3sja_eLQEVmva19MifrFEI')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmE3ZjgtMDhhNS03MzM2LWI5NDMtNjc1NDIxOGNlNTI4IiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5Mzk1MTk4LCJleHAiOjE3Mjk1Njc5OTh9.QywCU8le0gHfct8TySSHAQe_EpQluM_6tZzfMu8Jpd0')
             .send({
-                "name": "Muhammad Ilham Hakim Suherman Test"
+                "name": "Malika Sejati",
+                "birth": "1975-09-30",
+                "diabetes": true
             })
         logger.debug(response.body);
 
@@ -286,7 +296,7 @@ describe('Konsumen dapat mengupdate profilenya (PATCH)', () => {
         expect(response.body.data).toBeDefined();
         expect(response.body.data.user).toBeDefined();
         expect(response.body.data.personal_information).toBeDefined();
-        expect(response.body.data.personal_information.name).toBe("Muhammad Ilham Hakim Suherman Test");
+        expect(response.body.data.personal_information.name).toBe("Malika Sejati");
         expect(response.body.data.medical_history).toBeDefined();
     });
 

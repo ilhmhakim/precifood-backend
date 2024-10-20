@@ -8,6 +8,7 @@ export class AuthController {
             const request: LoginUserRequest = req.body as LoginUserRequest;
             const response = await AuthService.login(request);
             res.status(200).json({
+                message: "Login berhasil!",
                 data: response
             });
         } catch (e) {

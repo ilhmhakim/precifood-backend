@@ -59,7 +59,7 @@ export class UserService {
         registerConsumerRequest.password = await bcrypt.hash(registerConsumerRequest.password, 10);
 
         const birth = new Date(registerConsumerRequest.birth);
-        const age = Number(this.calculateAge(birth));
+        const age = Number(await this.calculateAge(birth));
 
         const consumer_id = String(`C-${uuid7()}`);
 
@@ -353,10 +353,12 @@ export class UserService {
         }
 
         // Hitung age jika birth diperbarui
+
         let age: number | undefined;
+        let birth: Date | undefined;
         if (requestUpdateConsumer.birth) {
-            const birthDate = new Date(requestUpdateConsumer.birth);
-            age = Number(this.calculateAge(birthDate))
+            birth = new Date(requestUpdateConsumer.birth);
+            age = Number(await this.calculateAge(birth));
         }
 
         // Lakukan update pada user yang terhubung dengan consumer
@@ -371,7 +373,7 @@ export class UserService {
                             update: {
                                 name: requestUpdateConsumer.name,
                                 sex: requestUpdateConsumer.sex,
-                                birth: requestUpdateConsumer.birth,
+                                birth: birth,
                                 phone: requestUpdateConsumer.phone,
                                 height: requestUpdateConsumer.height,
                                 weight: requestUpdateConsumer.weight,

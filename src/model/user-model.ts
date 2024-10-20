@@ -65,7 +65,7 @@ export type ConsumerProfileResponse = {
     personal_information?: {
         name: string;
         sex: string;
-        birth: Date;
+        birth: string;
         phone: string;
         height: number;
         weight: number;
@@ -186,7 +186,7 @@ export function toConsumerProfileResponse(user: User, personalInformation: Perso
         personal_information: {
             name: personalInformation.name,
             sex: personalInformation.sex,
-            birth: personalInformation.birth,
+            birth: personalInformation.birth.toLocaleDateString(),
             phone: personalInformation.phone,
             height: personalInformation.height,
             weight: personalInformation.weight,

@@ -8,13 +8,13 @@ describe('POST /api/auth/login', () => {
         const response = await supertest(web)
             .post("/api/auth/login")
             .send({
-                "email": "test@gmail.com",
+                "email": "malika@gmail.com",
                 "password": "abc12345",
             });
 
         logger.debug(response.body);
         expect(response.status).toBe(200);
-        expect(response.body.data.email).toBe("test@gmail.com");
+        expect(response.body.data.email).toBe("malika@gmail.com");
         expect(response.body.data.id).toBeDefined();
         expect(response.body.data.role).toBe("Konsumen");
         expect(response.body.data.token).toBeDefined();
