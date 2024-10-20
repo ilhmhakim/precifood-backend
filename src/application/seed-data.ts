@@ -25,17 +25,17 @@ export const restaurantSeed = {
     "province": "Jawa Barat",
     "city": "Bogor",
     "address_detail": "Depan Pintu Tol Sentul Selatan-2 The Grand, Jl. Tol Lkr. Luar Bogor",
-    "image": "www.example.com",
+    "image_url": "www.example.com",
     "password": "abc12345",
 }
 
-const adminSeed = {
+export const adminSeed = {
     "id": String(`R-${uuid7()}`),
     "email": "admin@gmail.com",
     "password": "abc12345"
 }
 
-const menuSeed = [
+export const menuSeed = [
     {
         "name": "Nasi",
         "category": "Makanan Pokok",
