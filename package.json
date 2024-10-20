@@ -4,7 +4,9 @@
   "description": "Backend API PreciFood BIMA 2024",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "tsc",
+    "run": "node dist/main.js"
   },
   "jest": {
     "transform": {
