@@ -30,7 +30,7 @@ export const restaurantSeed = {
 }
 
 export const adminSeed = {
-    "id": String(`R-${uuid7()}`),
+    "id": String(`A-${uuid7()}`),
     "email": "admin@gmail.com",
     "password": "abc12345"
 }
