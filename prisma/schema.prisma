@@ -148,7 +148,6 @@ model Recommendation {
 
 model RecommendationList {
   id                       Int                        @id @default(autoincrement())
-  rank                     Int                        @db.Integer
   // Many RecommendationList hanya dimiliki oleh 1 Rekomendasi
   recommendation_id        Int                        @db.Integer
   description              String                     @db.Text
@@ -163,6 +162,7 @@ model RecommendationList {
 model RecommendationListDetail {
   id                     Int                @id @default(autoincrement())
   menu_id                Int                @db.Integer
+  menu_name              String             @db.VarChar(255)
   menu_category          String             @db.VarChar(50)
   menu_price             Int                @db.Integer
   image_url              String             @db.Text
