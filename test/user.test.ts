@@ -20,7 +20,7 @@ describe('Registrasi Konsumen (POST /api/signup/consumer)', () => {
             .send({
                 "name": "Malika",
                 "email": "malika@gmail.com",
-                "sex": "Perempuan",
+                "sex": "Laki-laki",
                 "birth": "1975-09-11",
                 "phone": "085812340000",
                 "height": 170,

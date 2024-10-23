@@ -5,6 +5,7 @@ import {MenuController} from "../controller/menu-controller";
 import {OrderController} from "../controller/order-controller";
 import {NotificationController} from "../controller/notification-controller";
 import {Roles} from "../type/role";
+import {RecommendationController} from "../controller/recommendation-controller";
 
 export const privateRouter = express.Router();
 
@@ -73,5 +74,6 @@ privateRouter.get("/api/notifications", authorizeMiddleware(Roles.Admin), Notifi
 privateRouter.patch("/api/notifications/:notificationId(\\d+)", authorizeMiddleware(Roles.Admin), NotificationController.updateNotificationRead);
 
 // Recommendation Module
-// get
+// @ts-ignore
+privateRouter.get("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/recommendations", authorizeMiddleware(Roles.Consumer), RecommendationController.getRecommendations);
 // get
