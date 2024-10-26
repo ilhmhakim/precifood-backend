@@ -76,12 +76,16 @@ privateRouter.patch("/api/notifications/:notificationId(\\d+)", authorizeMiddlew
 
 // Recommendation Module
 // @ts-ignore
-privateRouter.get("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/recommendations", authorizeMiddleware(Roles.Consumer), RecommendationController.getRecommendationFromModel);
+privateRouter.post("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/recommendations", authorizeMiddleware(Roles.Consumer), RecommendationController.getRecommendationFromModel);
 // @ts-ignore
-privateRouter.get("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/recommendations/list", authorizeMiddleware(Roles.Consumer), RecommendationController.getRecommendation);
+privateRouter.get("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/recommendations", authorizeMiddleware(Roles.Consumer), RecommendationController.getRecommendation);
 // @ts-ignore
-privateRouter.get("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/recommendations/list/:recommendationId(\\d+)", authorizeMiddleware(Roles.Consumer), RecommendationController.getRecommendationDetail);
+privateRouter.get("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/recommendations/:recommendationId(\\d+)", authorizeMiddleware(Roles.Consumer), RecommendationController.getRecommendationDetail);
 
 // Auth module
+// @ts-ignore
+privateRouter.put("/api/auth/email", authorizeMiddleware(Roles.All), AuthController.updateEmail);
+// @ts-ignore
+privateRouter.put("/api/auth/password", authorizeMiddleware(Roles.All), AuthController.updatePassword);
 // @ts-ignore
 privateRouter.delete("/api/auth/logout", authorizeMiddleware(Roles.All), AuthController.logOut);

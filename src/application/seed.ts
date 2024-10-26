@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { prismaClient } from "./database";
-import {consumerSeed, restaurantSeed, menuSeed, adminSeed} from "./seed-data"; // Pastikan menuSeed di-import
+import {consumerSeed, restaurantSeed, menuSeed, adminSeed} from "./seed-data";
+import bcrypt from "bcrypt"; // Pastikan menuSeed di-import
 
 export async function Seed(req: Request, res: Response, next: NextFunction) {
     try {
@@ -9,7 +10,7 @@ export async function Seed(req: Request, res: Response, next: NextFunction) {
             data: {
                 id: String(consumerSeed.id),
                 email: consumerSeed.email,
-                password: consumerSeed.password,
+                password: await bcrypt.hash(consumerSeed.password, 10),
                 role: "Konsumen",
                 consumer: {
                     create: {
@@ -42,7 +43,7 @@ export async function Seed(req: Request, res: Response, next: NextFunction) {
             data: {
                 id: String(restaurantSeed.id),
                 email: restaurantSeed.email,
-                password: restaurantSeed.password,
+                password: await bcrypt.hash(restaurantSeed.password, 10),
                 role: "Restoran",
                 restaurant: {
                     create: {
@@ -103,7 +104,7 @@ export async function Seed(req: Request, res: Response, next: NextFunction) {
             data: {
                 id: String(adminSeed.id),
                 email: adminSeed.email,
-                password: adminSeed.password,
+                password: await bcrypt.hash(adminSeed.password, 10),
                 role: "Admin"
             }
         });

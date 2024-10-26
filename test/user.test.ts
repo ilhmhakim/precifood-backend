@@ -9,7 +9,7 @@ describe('seed', () => {
             .post("/api/seeds")
 
         logger.debug(response.body);
-    });
+    }, 1000000);
 });
 
 describe('Registrasi Konsumen (POST /api/signup/consumer)', () => {

@@ -12,10 +12,9 @@ import { AuthValidation } from "../validation/auth-validation";
 import {
     RefreshTokenRequest,
     toUserLoginResponse,
-    toUserRefreshToken, UserLoginResponse,
+    toUserRefreshToken, UpdateEmailRequest, UpdatePasswordRequest, UserLoginResponse,
     UserRefreshAccessTokenResponse
 } from "../model/auth-model";
-import {request} from "express";
 
 export class AuthService {
     static async login(request: LoginUserRequest): Promise<UserLoginResponse> {
@@ -58,6 +57,58 @@ export class AuthService {
         const accessToken = issueAccessToken(userPayload);
 
         return toUserRefreshToken(accessToken);
+    }
+
+    static async updateEmail(request: UpdateEmailRequest) {
+        const requestUpdateEmail = Validation.validate(AuthValidation.UPDATEEMAIL, request);
+
+        const user = await prismaClient.user.findFirst({
+            where: {
+                id: requestUpdateEmail.user_id
+            }
+        });
+
+        if (!(await bcrypt.compare(requestUpdateEmail.password, user!.password))) {
+            throw new ResponseError(400, "Password invalid");
+        }
+
+        await prismaClient.user.update({
+            where: {
+                id: requestUpdateEmail.user_id
+            },
+            data: {
+                email: requestUpdateEmail.new_email
+            }
+        });
+    }
+
+    static async updatePassword(request: UpdatePasswordRequest) {
+        const requestUpdatePassword = Validation.validate(AuthValidation.UPDATEPASSWORD, request);
+
+        const user = await prismaClient.user.findFirst({
+            where: {
+                id: requestUpdatePassword.user_id
+            }
+        });
+
+        if (!(await bcrypt.compare(requestUpdatePassword.old_password, user!.password))) {
+            throw new ResponseError(400, "Password lama tidak sesuai");
+        }
+
+        if (requestUpdatePassword.new_password != requestUpdatePassword.password_confirmation) {
+            throw new ResponseError(400, "Password baru dan password konfirmasi tidak sama");
+        }
+
+        requestUpdatePassword.new_password = await bcrypt.hash(requestUpdatePassword.new_password, 10);
+
+        await prismaClient.user.update({
+            where: {
+                id: requestUpdatePassword.user_id
+            },
+            data: {
+                password: requestUpdatePassword.new_password
+            }
+        });
     }
 
     static async logOut(userId: string) {

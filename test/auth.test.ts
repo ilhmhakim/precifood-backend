@@ -8,7 +8,7 @@ describe('POST /api/auth/login', () => {
         const response = await supertest(web)
             .post("/api/auth/login")
             .send({
-                "email": "malika@gmail.com",
+                "email": "ilhamhakim@gmail.com",
                 "password": "abc12345",
             });
 
@@ -61,6 +61,36 @@ describe('Refresh Token', () => {
         expect(response.status).toBe(201);
     });
 });
+
+describe('Change email', () => {
+    it('should refresh token', async () => {
+        const response = await supertest(web)
+            .put("/api/auth/email")
+            .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmI4OTMtY2Y2OS03ZmZhLWIxNjEtMzhjY2MxNjAyMDMzIiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaWF0IjoxNzI5ODU1NzE4LCJleHAiOjE3MzAwMjg1MTh9.fb9kXdylick0aaJoabVpAyA0lu1jYPfiCvmrYwXyN6I`)
+            .send({
+                new_email: "malikanew@gmail.com",
+                password: "abc12345",
+            });
+        logger.debug(response.body);
+        expect(response.status).toBe(201);
+    });
+});
+
+describe('Change password', () => {
+    it('should refresh token', async () => {
+        const response = await supertest(web)
+            .put("/api/auth/password")
+            .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmI4OTMtY2Y2OS03ZmZhLWIxNjEtMzhjY2MxNjAyMDMzIiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaWF0IjoxNzI5ODU1NzE4LCJleHAiOjE3MzAwMjg1MTh9.fb9kXdylick0aaJoabVpAyA0lu1jYPfiCvmrYwXyN6I`)
+            .send({
+                old_password: "abc12345",
+                new_password: "@bc12345",
+                password_confirmation: "@bc12345"
+            });
+        logger.debug(response.body);
+        expect(response.status).toBe(201);
+    });
+});
+
 
 
 describe('Logout', () => {
