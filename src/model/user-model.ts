@@ -1,12 +1,5 @@
 import {User, Consumer, Restaurant, PersonalInformation, MedicalHistory, Contact, Address} from "@prisma/client";
 
-// Model User
-export type UserResponse = {
-    id: string;
-    email: string;
-    role: string;
-    token?: string | null;
-}
 
 // Create (Register)
 export type CreateConsumerRequest = {
@@ -153,13 +146,6 @@ export type AllUsersResponse = {
     email: string;
 }
 
-export function toUserResponse(user: User): UserResponse {
-    return {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-    }
-}
 
 export function toConsumerInfo(personalInformation: PersonalInformation, medicalHistory: MedicalHistory): ConsumerInfoResponse {
     return {

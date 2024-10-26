@@ -6,11 +6,15 @@ import {
     CreateConsumerRequest,
     CreateRestaurantRequest,
     GetUserProfileRequest,
-    RestaurantProfileResponse, toAllConsumers, toAllRestaurant, toConsumerInfo,
+    RestaurantProfileResponse,
+    toAllConsumers,
+    toAllRestaurant,
+    toConsumerInfo,
     toConsumerProfileResponse,
     toRestaurantProfile,
-    toUserResponse, UpdateConsumerRequest, UpdateRestaurantRequest,
-    UserResponse
+    UpdateConsumerRequest,
+    UpdateRestaurantRequest,
+
 } from "../model/user-model";
 import {Validation} from "../validation/validation";
 import {UserValidation} from "../validation/user-validation";
@@ -18,7 +22,6 @@ import {prismaClient} from "../application/database";
 import {ResponseError} from "../error/response-error";
 import bcrypt from "bcrypt";
 import {v7 as uuid7} from "uuid";
-import {Consumer, User} from "@prisma/client";
 
 
 export class UserService {
@@ -39,7 +42,7 @@ export class UserService {
         return age;
     }
 
-    static async registerConsumer(request: CreateConsumerRequest): Promise<UserResponse> {
+    static async registerConsumer(request: CreateConsumerRequest) {
         const registerConsumerRequest = Validation.validate(UserValidation.REGISTERCONSUMER, request);
 
         const totalUserWithSameEmail = await prismaClient.user.count({
@@ -97,11 +100,9 @@ export class UserService {
                 }
             }
         });
-
-        return toUserResponse(user);
     }
 
-    static async registerRestaurant(request: CreateRestaurantRequest) : Promise<UserResponse> {
+    static async registerRestaurant(request: CreateRestaurantRequest) {
         const registerRestaurantRequest = Validation.validate(UserValidation.REGISTERRESTAURANT, request);
 
         const totalUserWithSameEmail = await prismaClient.user.count({
@@ -152,12 +153,10 @@ export class UserService {
                 }
             }
         });
-
-        return toUserResponse(user);
     }
 
     // Registrasi admin
-    static async registerAdmin(request: CreateAdminRequest) : Promise<UserResponse> {
+    static async registerAdmin(request: CreateAdminRequest) {
         const registerAdminRequest = Validation.validate(UserValidation.REGISTERADMIN, request);
 
         const totalUserWithSameEmail = await prismaClient.user.count({
@@ -186,8 +185,6 @@ export class UserService {
                role: "Admin"
            }
         });
-
-        return toUserResponse(user);
     }
 
     // Mendapatkan detail spesifik user
