@@ -1,45 +1,73 @@
-import {LoginUserRequest, toUserResponse, UserResponse} from "../model/user-model";
-import {Validation} from "../validation/validation";
-import {UserValidation} from "../validation/user-validation";
-import {prismaClient} from "../application/database";
-import {ResponseError} from "../error/response-error";
+// src/service/auth-service.ts
+import { prismaClient } from "../application/database";
+import { LoginUserRequest } from "../model/user-model";
+import { Validation } from "../validation/validation";
+import { ResponseError } from "../error/response-error";
 import bcrypt from "bcrypt";
-import {UserPayload} from "../type/user";
-import {issueToken} from "../middleware/auth-middleware";
-import {AuthValidation} from "../validation/auth-validation";
+import jwt from "jsonwebtoken";
+import {jwtRefresh, jwtSecret} from "../config/jwt";
+import {issueAccessToken, issueRefreshToken} from "../middleware/auth-middleware";
+import { UserPayload } from "../type/user";
+import { AuthValidation } from "../validation/auth-validation";
+import {
+    RefreshTokenRequest,
+    toUserLoginResponse,
+    toUserRefreshToken, UserLoginResponse,
+    UserRefreshAccessTokenResponse
+} from "../model/auth-model";
+import {request} from "express";
 
 export class AuthService {
-
-    static async login(request: LoginUserRequest): Promise<UserResponse> {
+    static async login(request: LoginUserRequest): Promise<UserLoginResponse> {
         const loginRequest = Validation.validate(AuthValidation.LOGIN, request);
 
-        let user = await prismaClient.user.findUnique({
-            where: {
-                email: loginRequest.email
-            }
+        const user = await prismaClient.user.findUnique({
+            where: { email: loginRequest.email }
         });
 
-        if (!user) {
+        if (!user || !(await bcrypt.compare(loginRequest.password, user.password))) {
             throw new ResponseError(401, "Email atau password salah");
         }
 
-        const isPasswordValid = await bcrypt.compare(loginRequest.password, user.password);
-        if (!isPasswordValid) {
-            throw new ResponseError(401, "Email atau password salah");
+        const userPayload: UserPayload = { id: user.id, email: user.email, role: user.role };
+        const accessToken = issueAccessToken(userPayload);
+        const refreshToken = issueRefreshToken(userPayload);
+
+        const userToken = await prismaClient.user.update({
+            where: { id: user.id },
+            data: { token: refreshToken }
+        });
+
+        return toUserLoginResponse(accessToken, userToken);
+    }
+
+    static async refreshToken(request: RefreshTokenRequest): Promise<UserRefreshAccessTokenResponse> {
+        const requestRefreshToken = Validation.validate(AuthValidation.REFRESH, request);
+        if (!requestRefreshToken) {
+            throw new ResponseError(401, "Refresh token tidak tersedia");
         }
 
-        // User authenticate
-        const userPayload: UserPayload = {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-        };
+        const decoded = jwt.verify(requestRefreshToken.refresh_token, jwtRefresh.secret!) as { id: string };
+        const user = await prismaClient.user.findFirst({ where: { id: decoded.id } });
 
-        const token = issueToken(userPayload);
+        if (!user || user.token !== requestRefreshToken.refresh_token) {
+            throw new ResponseError(403, "Refresh token tidak valid");
+        }
 
-        // Response
-        const response = toUserResponse(user);
-        response.token = token!;
-        return response;
+        const userPayload: UserPayload = { id: user.id, email: user.email, role: user.role };
+        const accessToken = issueAccessToken(userPayload);
+
+        return toUserRefreshToken(accessToken);
+    }
+
+    static async logOut(userId: string) {
+        await prismaClient.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                token: null
+            }
+        });
     }
 }

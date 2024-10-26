@@ -6,6 +6,7 @@ import {OrderController} from "../controller/order-controller";
 import {NotificationController} from "../controller/notification-controller";
 import {Roles} from "../type/role";
 import {RecommendationController} from "../controller/recommendation-controller";
+import {AuthController} from "../controller/auth-controller";
 
 export const privateRouter = express.Router();
 
@@ -61,7 +62,7 @@ privateRouter.patch("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/menus/:menuI
 
 // Order Module
 // @ts-ignore
- privateRouter.post("/api/order", OrderController.createOrder);
+ privateRouter.post("/api/consumers/orders/:recommendationId(\\d+)", OrderController.createOrder);
 // @ts-ignore
 privateRouter.get("/api/consumers/orders", authorizeMiddleware(Roles.Consumer), OrderController.getAllOrder);
 // @ts-ignore
@@ -75,5 +76,12 @@ privateRouter.patch("/api/notifications/:notificationId(\\d+)", authorizeMiddlew
 
 // Recommendation Module
 // @ts-ignore
-privateRouter.get("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/recommendations", authorizeMiddleware(Roles.Consumer), RecommendationController.getRecommendations);
-// get
+privateRouter.get("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/recommendations", authorizeMiddleware(Roles.Consumer), RecommendationController.getRecommendationFromModel);
+// @ts-ignore
+privateRouter.get("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/recommendations/list", authorizeMiddleware(Roles.Consumer), RecommendationController.getRecommendation);
+// @ts-ignore
+privateRouter.get("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/recommendations/list/:recommendationId(\\d+)", authorizeMiddleware(Roles.Consumer), RecommendationController.getRecommendationDetail);
+
+// Auth module
+// @ts-ignore
+privateRouter.delete("/api/auth/logout", authorizeMiddleware(Roles.All), AuthController.logOut);

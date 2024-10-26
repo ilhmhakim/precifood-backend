@@ -7,3 +7,10 @@ export const jwtSecret = {
         expiresIn: process.env.JWT_SECRET_EXPIRE
     }
 };
+
+export const jwtRefresh = {
+    secret: process.env.JWT_SECRET_REFRESH,
+    options: {
+        expiresIn: process.env.JWT_SECRET_REFRESH_EXPIRE
+    }
+};
