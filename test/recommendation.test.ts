@@ -5,7 +5,7 @@ import { logger } from "../src/application/logging";
 describe('Mendapatkan rekomendasi pada model (GET)', () => {
     it('(+) (Konsumen) Dapat mengakses seluruh order yang telah dipesan ', async () => {
         const response = await supertest(web)
-            .get("/api/restaurants/R-0192c857-35e6-7cc2-98da-46f0faf6f651/recommendations")
+            .post("/api/restaurants/R-0192c857-35e6-7cc2-98da-46f0faf6f651/recommendations")
             .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmM4NTctMzVlNi03Y2MyLTk4ZGEtM2Q3NmY4Mjc5NDE2IiwiZW1haWwiOiJpbGhhbWhha2ltQGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlhdCI6MTcyOTkzODEwMCwiZXhwIjoxNzMwMTEwOTAwfQ.yLhlqkeTAx6gNOkWXA5VDAyd09LKRs2Xln-_FmCLNhQ`)
         logger.debug(response.body);
         expect(response.body.message).toBeDefined();

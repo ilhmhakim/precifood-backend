@@ -64,7 +64,7 @@ export class RecommendationService {
             restaurantId: recommendationRequest.restaurant_id,
         };
 
-        const response = await fetch('http://127.0.0.1:5000/get_menu', {
+        const response = await fetch('https://precifood-model.et.r.appspot.com/get_menu', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
