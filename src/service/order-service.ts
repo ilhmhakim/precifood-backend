@@ -1,9 +1,10 @@
 import {
-    CreateOrderRequest,
+    CreateOrderRequest, CreateOrderResponse,
     GetAllOrdersRequest,
     GetOrderDetailRequest,
-    OrderResponse, toAllOrderResponse,
-    toOrderResponse
+    OrderResponse,
+    toAllOrderResponse, toCreateOrderResponse,
+    toOrderDetailResponse
 } from "../model/order-model";
 import {Validation} from "../validation/validation";
 import {prismaClient} from "../application/database";
@@ -11,7 +12,7 @@ import {OrderValidation} from "../validation/order-validation";
 import {ResponseError} from "../error/response-error";
 
 export class OrderService {
-    static async createOrder(request: CreateOrderRequest): Promise<OrderResponse> {
+    static async createOrder(request: CreateOrderRequest): Promise<CreateOrderResponse> {
         // Validasi input request
         const createOrderRequest = Validation.validate(OrderValidation.CREATEORDER, request);
 
@@ -50,12 +51,16 @@ export class OrderService {
                 }
             },
             include: {
-                OrderDetail: true // Include OrderDetail untuk dikembalikan dalam response
+                consumer: {
+                    include: {
+                        PersonalInformation: true,
+                    }
+                },
             }
         });
 
         // Menggunakan fungsi toOrderResponse untuk mengembalikan hasil
-        return toOrderResponse(order, order.OrderDetail);
+        return toCreateOrderResponse(order.consumer.PersonalInformation!, order);
     }
 
     static async getAllOrder(request: GetAllOrdersRequest): Promise<Array<OrderResponse>> {
@@ -89,7 +94,7 @@ export class OrderService {
             throw new ResponseError(404, 'Order tidak ditemukan');
         }
 
-        return toOrderResponse(order, order.OrderDetail);
+        return toOrderDetailResponse(order, order.OrderDetail);
     }
 
 }

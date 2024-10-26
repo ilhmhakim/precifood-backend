@@ -1,5 +1,5 @@
 import {MenuResponse} from "./menu-model";
-import {Order, OrderDetail} from "@prisma/client";
+import {Consumer, Order, OrderDetail, PersonalInformation} from "@prisma/client";
 
 export type OrderResponse = {
     id: number;
@@ -30,6 +30,12 @@ export type CreateOrderRequest = {
     recommendation_id: number;
 }
 
+export type CreateOrderResponse = {
+    consumer_name: string;
+    restaurant_name: string;
+    total_price: number;
+}
+
 export function toAllOrderResponse(order: Order): OrderResponse {
     return {
         id: order.id,
@@ -39,7 +45,7 @@ export function toAllOrderResponse(order: Order): OrderResponse {
     }
 }
 
-export function toOrderResponse(order: Order, orderDetails: OrderDetail[]): OrderResponse {
+export function toOrderDetailResponse(order: Order, orderDetails: OrderDetail[]): OrderResponse {
     return {
         id: order.id,
         restaurant_name: order.restaurant_name,
@@ -53,4 +59,12 @@ export function toOrderResponse(order: Order, orderDetails: OrderDetail[]): Orde
             menu_price: detail.menu_price,
         }))
     };
+}
+
+export function toCreateOrderResponse(consumer: PersonalInformation, order: Order): CreateOrderResponse {
+    return {
+        consumer_name: consumer.name,
+        restaurant_name: order.restaurant_name,
+        total_price: order.total_price
+    }
 }
