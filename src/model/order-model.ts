@@ -26,41 +26,8 @@ export type GetOrderDetailRequest = {
     order_id: number;
 }
 
-// export type CreateOrderRequest = {
-//     consumer_id: string;
-//     restaurant_id: string;
-//     recommendation_id: number;
-//     recommendation_list_id: number;
-//     recommendation_list_detail_id: number;
-// }
-
-// export type CreateOrderRequest = {
-//     id: number;
-//     consumer_id: string;
-//     restaurant_id: string;
-//     restaurant_name: string;
-//     total_price: number;
-//     detail:
-//         {
-//             menu_id: number;
-//             menu_name: string;
-//             menu_category: string;
-//             menu_price: number;
-//         } [];
-// }
-
-export type CreateOrderRequestSeed = {
-    consumer_id: string;
-    restaurant_id: string;
-    restaurant_name: string;
-    total_price: number;
-    detail:
-        {
-            menu_id: number;
-            menu_name: string;
-            menu_category: string;
-            menu_price: number;
-        } [];
+export type CreateOrderRequest = {
+    recommendation_id: number;
 }
 
 export function toAllOrderResponse(order: Order): OrderResponse {

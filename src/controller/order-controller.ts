@@ -1,5 +1,9 @@
 import {Request, Response, NextFunction, request} from "express";
-import {CreateOrderRequestSeed, GetAllOrdersRequest, GetOrderDetailRequest} from "../model/order-model";
+import {
+    CreateOrderRequest,
+    GetAllOrdersRequest,
+    GetOrderDetailRequest
+} from "../model/order-model";
 import {OrderService} from "../service/order-service";
 import {UserRequest} from "../type/user";
 import {Validation} from "../validation/validation";
@@ -9,7 +13,9 @@ import {prismaClient} from "../application/database";
 export class OrderController {
     static async createOrder(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const request: CreateOrderRequestSeed = req.body as CreateOrderRequestSeed;
+            const request: CreateOrderRequest = {
+                recommendation_id: Number(req.params.recommendationId)
+            }
             const response = await OrderService.createOrder(request);
             res.status(201).json({
                 data: response

@@ -1,6 +1,5 @@
-import {NextFunction, request} from "express";
 import {
-    CreateOrderRequestSeed,
+    CreateOrderRequest,
     GetAllOrdersRequest,
     GetOrderDetailRequest,
     OrderResponse, toAllOrderResponse,
@@ -9,31 +8,49 @@ import {
 import {Validation} from "../validation/validation";
 import {prismaClient} from "../application/database";
 import {OrderValidation} from "../validation/order-validation";
+import {ResponseError} from "../error/response-error";
 
 export class OrderService {
-    static async createOrder(request: CreateOrderRequestSeed): Promise<OrderResponse> {
+    static async createOrder(request: CreateOrderRequest): Promise<OrderResponse> {
+        // Validasi input request
         const createOrderRequest = Validation.validate(OrderValidation.CREATEORDER, request);
 
-        // Membuat order beserta detailnya
+        // Cari recommendation list berdasarkan recommendation_id dan include data Recommendation
+        const recommendationList = await prismaClient.recommendationList.findFirst({
+            where: {
+                id: createOrderRequest.recommendation_id
+            },
+            include: {
+                recommendation: true, // Include Recommendation untuk mendapatkan data restaurant, consumer, dll
+                RecommendationListDetail: true // Include detail dari recommendation list
+            }
+        });
+
+        // Jika recommendation list tidak ditemukan, lemparkan error
+        if (!recommendationList) {
+            throw new ResponseError(404, "Recommendation list not found");
+        }
+
+        // Buat order beserta detailnya dengan data dari Recommendation
         const order = await prismaClient.order.create({
             data: {
-                consumer_id: createOrderRequest.consumer_id,
-                restaurant_id: createOrderRequest.restaurant_id,
-                restaurant_name: createOrderRequest.restaurant_name,
-                total_price: createOrderRequest.total_price,
+                restaurant_id: recommendationList.recommendation.restaurant_id, // Ambil dari Recommendation
+                consumer_id: recommendationList.recommendation.consumer_id,     // Ambil dari Recommendation
+                restaurant_name: recommendationList.recommendation.restaurant_name, // Ambil dari Recommendation
+                total_price: recommendationList.total_price, // Total price dari recommendation list
                 OrderDetail: {
                     createMany: {
-                        data: createOrderRequest.detail.map((item) => ({
-                            menu_id: item.menu_id,
-                            menu_name: item.menu_name,
-                            menu_category: item.menu_category,
-                            menu_price: item.menu_price,
+                        data: recommendationList.RecommendationListDetail.map(detail => ({
+                            menu_id: detail.menu_id,
+                            menu_name: detail.menu_name,
+                            menu_category: detail.menu_category,
+                            menu_price: detail.menu_price
                         }))
                     }
                 }
             },
             include: {
-                OrderDetail: true // Include OrderDetail to return it in response
+                OrderDetail: true // Include OrderDetail untuk dikembalikan dalam response
             }
         });
 
@@ -69,7 +86,7 @@ export class OrderService {
 
         // Handle jika order tidak ditemukan
         if (!order) {
-            throw new Error('Order not found');
+            throw new ResponseError(404, 'Order tidak ditemukan');
         }
 
         return toOrderResponse(order, order.OrderDetail);
