@@ -45,7 +45,7 @@ model User {
   email         String      @unique @db.VarChar(255)
   password      String      @db.VarChar(255)
   registered_at DateTime    @default(now()) @db.Timestamp()
-  token         String?     @db.VarChar(36)
+  token         String?     @db.Text
   role          RoleName
   // User dapat menjadi Konsumen atau tidak
   consumer      Consumer?
@@ -150,6 +150,7 @@ model RecommendationList {
   id                       Int                        @id @default(autoincrement())
   // Many RecommendationList hanya dimiliki oleh 1 Rekomendasi
   recommendation_id        Int                        @db.Integer
+  rank                     Int                        @db.Integer
   description              String                     @db.Text
   total_price              Int                        @db.Integer
   recommendation           Recommendation             @relation(fields: [recommendation_id], references: [id], onDelete: Cascade)
@@ -164,7 +165,9 @@ model RecommendationListDetail {
   menu_id                Int                @db.Integer
   menu_name              String             @db.VarChar(255)
   menu_category          String             @db.VarChar(50)
+  menu_portion           Int                @db.Integer
   menu_price             Int                @db.Integer
+  menu_description       String             @db.Text
   image_url              String             @db.Text
   // Many RecommendationListDetail hanya dimiliki oleh 1 RecommendationList saja
   recommendation_list_id Int                @db.Integer
