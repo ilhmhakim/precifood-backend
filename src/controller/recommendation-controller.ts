@@ -1,11 +1,30 @@
 import {UserRequest} from "../type/user";
 import {Response, NextFunction} from "express";
-import {GetRecommendationRequest} from "../model/recommendation-model";
+import {GetRecommendationListDetailRequest, GetRecommendationRequest} from "../model/recommendation-model";
 import {MenuService} from "../service/menu-service";
 import {RecommendationService} from "../service/recommendation-service";
 
 export class RecommendationController {
-    static async getRecommendations(req: UserRequest, res: Response, next: NextFunction) {
+    static async getRecommendationFromModel(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const request: GetRecommendationRequest = {
+                consumer_id: req.user.id,
+                restaurant_id: req.params.restaurantId
+            }
+
+            const response = await RecommendationService.getRecommendationFromModel(request);
+
+            res.status(200).json({
+                message: "Success!",
+                data: response
+            });
+
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async getRecommendation(req: UserRequest, res: Response, next: NextFunction) {
         try {
             const request: GetRecommendationRequest = {
                 consumer_id: req.user.id,
@@ -17,7 +36,24 @@ export class RecommendationController {
             res.status(200).json({
                 message: "Success!",
                 data: response
-            })
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async getRecommendationDetail(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const request: GetRecommendationListDetailRequest = {
+                recommendation_id: Number(req.params.recommendationId)
+            }
+
+            const response = await RecommendationService.getRecommendationListDetail(request);
+
+            res.status(200).json({
+                message: "Success!",
+                data: response
+            });
 
         } catch (e) {
             next(e);

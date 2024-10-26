@@ -1,4 +1,3 @@
-import {UserRequest} from "../type/user";
 import {
     CreateMenuNutritionRequest,
     CreateMenuRequest,

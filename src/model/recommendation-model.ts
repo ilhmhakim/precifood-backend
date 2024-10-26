@@ -1,5 +1,5 @@
-import {Recommendation} from "@prisma/client";
-export type RecommendationResponse = RecommendationDetail[];
+import {Recommendation, RecommendationList, RecommendationListDetail} from "@prisma/client";
+import {number} from "zod";
 
 export type RecommendationDetail = {
     rekomendasi: string;
@@ -19,220 +19,67 @@ export type RecommendationDetail = {
     fitness: number;
 }
 
-
-
-export type RecommendationResponses = {
+export type RecommendationResponse = {
     restaurant_id: string;
-    restaurant_name: number;
+    restaurant_name: string;
     recommended_at: string;
-    list?: {
-        list_id: number;
+    recommendations: {
+        id: number;
         rank: number;
         description: string;
         total_price: number;
-        detail: {
-            menu_id: number;
-            menu_name: string;
-            menu_category: string;
-            menu_price: number;
-            image_url: string;
-        } [],
-        nutrition_review?: {
-            calory: number;
-            protein: number;
-            fat: number;
-            carbohydrate: number;
-            natrium: number;
-            cholesterol: number;
-            mufa: number;
-            pufa: number;
-            sfa: number;
-            fitness: number;
-        }
-    } [],
-
+    }[];
 }
+
+export type RecommendationDetailResponse = {
+    id: number;
+    name: string;
+    category: string;
+    portion: number;
+    price: number;
+    description: string;
+    image_url: string;
+}
+
 
 export type GetRecommendationRequest = {
     consumer_id: string;
     restaurant_id: string;
 }
 
-export type GetMenuRecommendationDetailRequest = {
-    consumer_id: string;
+export type GetRecommendationListRequest = {
     restaurant_id: string;
     recommendation_id: number;
 }
 
-export type ModelResponse = {
-    recommendation_1: {
-        recommendation: string;
-        makanan_pokok: number;
-        lauk_pauk: number;
-        sayuran: number;
-        minuman: number;
-        calory: number;
-        protein: number;
-        fat: number;
-        carbohydrate: number;
-        natrium: number;
-        cholesterol: number;
-        mufa: number;
-        pufa: number;
-        sfa: number;
-        fitness: number;
-    },
-    recommendation_2: {
-        recommendation: string;
-        makanan_pokok: number;
-        lauk_pauk: number;
-        sayuran: number;
-        minuman: number;
-        calory: number;
-        protein: number;
-        fat: number;
-        carbohydrate: number;
-        natrium: number;
-        cholesterol: number;
-        mufa: number;
-        pufa: number;
-        sfa: number;
-        fitness: number;
-    },
-    recommendation_3: {
-        recommendation: string;
-        makanan_pokok: number;
-        lauk_pauk: number;
-        sayuran: number;
-        minuman: number;
-        calory: number;
-        protein: number;
-        fat: number;
-        carbohydrate: number;
-        natrium: number;
-        cholesterol: number;
-        mufa: number;
-        pufa: number;
-        sfa: number;
-        fitness: number;
-    },
-    recommendation_4: {
-        recommendation: string;
-        makanan_pokok: number;
-        lauk_pauk: number;
-        sayuran: number;
-        minuman: number;
-        calory: number;
-        protein: number;
-        fat: number;
-        carbohydrate: number;
-        natrium: number;
-        cholesterol: number;
-        mufa: number;
-        pufa: number;
-        sfa: number;
-        fitness: number;
-    },
-    recommendation_5: {
-        recommendation: string;
-        makanan_pokok: number;
-        lauk_pauk: number;
-        sayuran: number;
-        minuman: number;
-        calory: number;
-        protein: number;
-        fat: number;
-        carbohydrate: number;
-        natrium: number;
-        cholesterol: number;
-        mufa: number;
-        pufa: number;
-        sfa: number;
-        fitness: number;
-    },
-    recommendation_6: {
-        recommendation: string;
-        makanan_pokok: number;
-        lauk_pauk: number;
-        sayuran: number;
-        minuman: number;
-        calory: number;
-        protein: number;
-        fat: number;
-        carbohydrate: number;
-        natrium: number;
-        cholesterol: number;
-        mufa: number;
-        pufa: number;
-        sfa: number;
-        fitness: number;
-    },
-    recommendation_7: {
-        recommendation: string;
-        makanan_pokok: number;
-        lauk_pauk: number;
-        sayuran: number;
-        minuman: number;
-        calory: number;
-        protein: number;
-        fat: number;
-        carbohydrate: number;
-        natrium: number;
-        cholesterol: number;
-        mufa: number;
-        pufa: number;
-        sfa: number;
-        fitness: number;
-    },
-    recommendation_8: {
-        recommendation: string;
-        makanan_pokok: number;
-        lauk_pauk: number;
-        sayuran: number;
-        minuman: number;
-        calory: number;
-        protein: number;
-        fat: number;
-        carbohydrate: number;
-        natrium: number;
-        cholesterol: number;
-        mufa: number;
-        pufa: number;
-        sfa: number;
-        fitness: number;
-    },
-    recommendation_9: {
-        recommendation: string;
-        makanan_pokok: number;
-        lauk_pauk: number;
-        sayuran: number;
-        minuman: number;
-        calory: number;
-        protein: number;
-        fat: number;
-        carbohydrate: number;
-        natrium: number;
-        cholesterol: number;
-        mufa: number;
-        pufa: number;
-        sfa: number;
-        fitness: number;
-    },
-    recommendation_10: {
-        recommendation: string;
-        makanan_pokok: number;
-        lauk_pauk: number;
-        sayuran: number;
-        minuman: number;
-        calory: number;
-        protein: number;
-        fat: number;
-        carbohydrate: number;
-        natrium: number;
-        cholesterol: number;
-        mufa: number;
-        pufa: number;
-        sfa: number;
-        fitness: number;
+
+export type GetRecommendationListDetailRequest = {
+    recommendation_id: number;
+}
+
+export function toGetRecommendation(recommendation: Recommendation, recommendationLists: RecommendationList[]): RecommendationResponse {
+    return {
+        restaurant_id: recommendation.restaurant_id,
+        restaurant_name: recommendation.restaurant_name,
+        recommended_at: recommendation.recommended_at.toLocaleDateString(),
+        recommendations: recommendationLists.map(list => ({
+            id: list.id,
+            rank: list.rank,
+            description: list.description,
+            total_price: list.total_price
+        }))
+    };
+}
+
+export function toGetRecommendationDetail(recommendation: RecommendationListDetail): RecommendationDetailResponse {
+    return {
+        id: recommendation.menu_id,
+        name: recommendation.menu_name,
+        category: recommendation.menu_category,
+        portion: recommendation.menu_portion,
+        price: recommendation.menu_price,
+        description: recommendation.menu_description,
+        image_url: recommendation.image_url
     }
 }
+

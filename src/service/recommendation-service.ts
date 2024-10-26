@@ -1,17 +1,67 @@
 import { prismaClient } from "../application/database";
-import { GetRecommendationRequest, RecommendationDetail, RecommendationResponse } from "../model/recommendation-model";
+import {
+    GetRecommendationListDetailRequest,
+    GetRecommendationRequest,
+    RecommendationDetail, RecommendationDetailResponse,
+    toGetRecommendation, toGetRecommendationDetail
+} from "../model/recommendation-model";
 import { ResponseError } from "../error/response-error";
 import { MenuService } from "./menu-service";
+import {Validation} from "../validation/validation";
+import {RecommendationValidation} from "../validation/recommendation-validation";
 
 export class RecommendationService {
-    static async getRecommendationList(request) {
-        const requestRecommendationList
+
+    static async getRecommendation(request: GetRecommendationRequest) {
+        const requestRecommendation = Validation.validate(RecommendationValidation.GETRECOMMENDATION, request);
+
+        // Mencari rekomendasi terlebih dahulu
+        const recommendation = await prismaClient.recommendation.findFirst({
+            where: {
+                restaurant_id: requestRecommendation.restaurant_id,
+                consumer_id: requestRecommendation.consumer_id,
+            },
+            orderBy: {
+                recommended_at: "desc"
+            }
+        });
+
+        if (!recommendation) {
+            throw new ResponseError(404, "Tidak ditemukan rekomendasi, silahkan generate rekomendasi baru");
+        }
+
+        // Mengambil RecommendationList berdasarkan recommendation_id dan mengurutkan berdasarkan rank
+        const recommendationLists = await prismaClient.recommendationList.findMany({
+            where: {
+                recommendation_id: recommendation.id
+            },
+            orderBy: {
+                rank: 'asc'
+            }
+        });
+
+        // Menggunakan toGetRecommendation untuk mengembalikan hasil dengan RecommendationList yang sudah diurutkan
+        return toGetRecommendation(recommendation, recommendationLists);
     }
 
-    static async getRecommendation(request: GetRecommendationRequest): Promise<RecommendationResponse> {
+
+    static async getRecommendationListDetail(request: GetRecommendationListDetailRequest): Promise <Array<RecommendationDetailResponse>> {
+
+        const recommendationListDetails = await prismaClient.recommendationListDetail.findMany({
+            where: {
+                recommendation_list_id: request.recommendation_id
+            }
+        });
+
+        return recommendationListDetails.map((recommendationListDetail) => toGetRecommendationDetail(recommendationListDetail));
+    }
+
+    static async getRecommendationFromModel(request: GetRecommendationRequest) {
+       const recommendationRequest = Validation.validate(RecommendationValidation.GETRECOMMENDATION, request);
+
         const payload = {
-            consumerId: request.consumer_id,
-            restaurantId: request.restaurant_id,
+            consumerId: recommendationRequest.consumer_id,
+            restaurantId: recommendationRequest.restaurant_id,
         };
 
         const response = await fetch('http://127.0.0.1:5000/get_menu', {
@@ -31,32 +81,32 @@ export class RecommendationService {
         // Simpan rekomendasi ke database
         await this.createRecommendations(data, request.restaurant_id, request.consumer_id);
 
-        // Kembalikan data rekomendasi pertama
-        return data[0];
+        const recommendation = await this.getRecommendation(recommendationRequest);
+
+        return recommendation;
     }
 
     static async createRecommendations(recommendations: any, restaurantId: string, consumerId: string) {
-        // Verifikasi apakah restoran ada atau tidak
         const restaurant = await MenuService.checkRestaurantExist(restaurantId);
 
-        // Buat dan simpan rekomendasi utama
         const recommendation = await prismaClient.recommendation.create({
             data: {
                 consumer_id: consumerId,
                 restaurant_id: restaurantId,
                 restaurant_name: restaurant.contact.name
+            },
+            include: {
+                RecommendationList: true
             }
         });
 
         // Simpan semua rekomendasi
         for (let i = 0; i < recommendations.length; i++) {
-            await this.createRecommendationOne(recommendations[i], restaurantId, recommendation.id);
+            await this.createRecommendation(recommendations[i], restaurantId, recommendation.id, i);
         }
-
-        return { message: 'Recommendation saved successfully!' };
     }
 
-    static async createRecommendationOne(recommendationDetail: RecommendationDetail, restaurantId: string, recommendationId: number) {
+    static async createRecommendation(recommendationDetail: RecommendationDetail, restaurantId: string, recommendationId: number, i: number) {
         // Ambil detail menu dari database berdasarkan ID yang diterima
         const menuOne = await MenuService.checkMenuExist(recommendationDetail.makanan_pokok, restaurantId);
         const menuTwo = await MenuService.checkMenuExist(recommendationDetail.lauk_pauk, restaurantId);
@@ -72,6 +122,7 @@ export class RecommendationService {
         await prismaClient.recommendationList.create({
             data: {
                 recommendation_id: recommendationId,
+                rank: i + 1,
                 description: `${menuOne.menu.name}, ${menuTwo.menu.name}, ${menuThree.menu.name}, ${menuFour.menu.name}`,
                 total_price: menuOne.menu.price + menuTwo.menu.price + menuThree.menu.price + menuFour.menu.price,
                 RecommendationListDetail: {
@@ -81,28 +132,36 @@ export class RecommendationService {
                                 menu_id: menuOne.menu.id,
                                 menu_name: menuOne.menu.name,
                                 menu_category: menuOne.menu.category,
+                                menu_portion: menuOne.menu.portion,
                                 menu_price: menuOne.menu.price,
+                                menu_description: menuOne.menu.description,
                                 image_url: menuOne.menu.image_url
                             },
                             {
                                 menu_id: menuTwo.menu.id,
                                 menu_name: menuTwo.menu.name,
                                 menu_category: menuTwo.menu.category,
+                                menu_portion: menuTwo.menu.portion,
                                 menu_price: menuTwo.menu.price,
+                                menu_description: menuTwo.menu.description,
                                 image_url: menuTwo.menu.image_url
                             },
                             {
                                 menu_id: menuThree.menu.id,
                                 menu_name: menuThree.menu.name,
                                 menu_category: menuThree.menu.category,
+                                menu_portion: menuThree.menu.portion,
                                 menu_price: menuThree.menu.price,
+                                menu_description: menuThree.menu.description,
                                 image_url: menuThree.menu.image_url
                             },
                             {
                                 menu_id: menuFour.menu.id,
                                 menu_name: menuFour.menu.name,
                                 menu_category: menuFour.menu.category,
+                                menu_portion: menuFour.menu.portion,
                                 menu_price: menuFour.menu.price,
+                                menu_description: menuFour.menu.description,
                                 image_url: menuFour.menu.image_url
                             }
                         ]

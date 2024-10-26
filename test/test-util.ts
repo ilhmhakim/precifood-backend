@@ -11,8 +11,3 @@ export class UserTest {
         })
     }
 }
-
-// export class AuthTest   {
-//
-//     // static async loginConsumer()
-// }
