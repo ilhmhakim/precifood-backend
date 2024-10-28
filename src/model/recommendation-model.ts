@@ -28,6 +28,9 @@ export type RecommendationResponse = {
         rank: number;
         description: string;
         total_price: number;
+        image_url: {
+            url: string
+        }[];
     }[];
 }
 
@@ -57,7 +60,7 @@ export type GetRecommendationListDetailRequest = {
     recommendation_id: number;
 }
 
-export function toGetRecommendation(recommendation: Recommendation, recommendationLists: RecommendationList[]): RecommendationResponse {
+export function toGetRecommendation(recommendation: Recommendation, recommendationLists: (RecommendationList & { RecommendationListDetail: RecommendationListDetail[] })[]): RecommendationResponse {
     return {
         restaurant_id: recommendation.restaurant_id,
         restaurant_name: recommendation.restaurant_name,
@@ -66,10 +69,15 @@ export function toGetRecommendation(recommendation: Recommendation, recommendati
             id: list.id,
             rank: list.rank,
             description: list.description,
-            total_price: list.total_price
+            total_price: list.total_price,
+            image_url: list.RecommendationListDetail.map(detail => ({
+                url: detail.image_url
+            }))
         }))
     };
 }
+
+
 
 export function toGetRecommendationDetail(recommendation: RecommendationListDetail): RecommendationDetailResponse {
     return {

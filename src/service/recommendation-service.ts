@@ -11,11 +11,10 @@ import {Validation} from "../validation/validation";
 import {RecommendationValidation} from "../validation/recommendation-validation";
 
 export class RecommendationService {
-
     static async getRecommendation(request: GetRecommendationRequest) {
         const requestRecommendation = Validation.validate(RecommendationValidation.GETRECOMMENDATION, request);
 
-        // Mencari rekomendasi terlebih dahulu
+        // Mencari rekomendasi berdasarkan restaurant_id dan consumer_id
         const recommendation = await prismaClient.recommendation.findFirst({
             where: {
                 restaurant_id: requestRecommendation.restaurant_id,
@@ -30,31 +29,23 @@ export class RecommendationService {
             throw new ResponseError(404, "Tidak ditemukan rekomendasi, silahkan generate rekomendasi baru");
         }
 
-        // Mengambil RecommendationList berdasarkan recommendation_id dan mengurutkan berdasarkan rank
+        // Mengambil RecommendationList dan meng-include RecommendationListDetail di dalamnya
         const recommendationLists = await prismaClient.recommendationList.findMany({
             where: {
                 recommendation_id: recommendation.id
+            },
+            include: {
+                RecommendationListDetail: true // Meng-include RecommendationListDetail untuk akses langsung
             },
             orderBy: {
                 rank: 'asc'
             }
         });
 
-        // Menggunakan toGetRecommendation untuk mengembalikan hasil dengan RecommendationList yang sudah diurutkan
+        // Menggunakan toGetRecommendation untuk mengembalikan hasil
         return toGetRecommendation(recommendation, recommendationLists);
     }
 
-
-    static async getRecommendationListDetail(request: GetRecommendationListDetailRequest): Promise <Array<RecommendationDetailResponse>> {
-
-        const recommendationListDetails = await prismaClient.recommendationListDetail.findMany({
-            where: {
-                recommendation_list_id: request.recommendation_id
-            }
-        });
-
-        return recommendationListDetails.map((recommendationListDetail) => toGetRecommendationDetail(recommendationListDetail));
-    }
 
     static async getRecommendationFromModel(request: GetRecommendationRequest) {
        const recommendationRequest = Validation.validate(RecommendationValidation.GETRECOMMENDATION, request);
