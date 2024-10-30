@@ -41,7 +41,8 @@ export function toAllOrderResponse(order: Order): OrderResponse {
         id: order.id,
         restaurant_name: order.restaurant_name,
         total_price: order.total_price,
-        ordered_at: order.ordered_at.toLocaleDateString()
+        ordered_at: order.ordered_at.toLocaleDateString(),
+        description: order.description
     }
 }
 

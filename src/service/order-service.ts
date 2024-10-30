@@ -39,6 +39,7 @@ export class OrderService {
                 consumer_id: recommendationList.recommendation.consumer_id,     // Ambil dari Recommendation
                 restaurant_name: recommendationList.recommendation.restaurant_name, // Ambil dari Recommendation
                 total_price: recommendationList.total_price, // Total price dari recommendation list
+                description: recommendationList.description,
                 OrderDetail: {
                     createMany: {
                         data: recommendationList.RecommendationListDetail.map(detail => ({

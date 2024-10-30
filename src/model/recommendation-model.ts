@@ -35,13 +35,16 @@ export type RecommendationResponse = {
 }
 
 export type RecommendationDetailResponse = {
-    id: number;
-    name: string;
-    category: string;
-    portion: number;
-    price: number;
-    description: string;
-    image_url: string;
+    total_price: number;
+    recommendations: {
+        id: number;
+        name: string;
+        category: string;
+        portion: number;
+        price: number;
+        description: string;
+        image_url: string;
+    }
 }
 
 
@@ -78,16 +81,21 @@ export function toGetRecommendation(recommendation: Recommendation, recommendati
 }
 
 
-
-export function toGetRecommendationDetail(recommendation: RecommendationListDetail): RecommendationDetailResponse {
+export function toGetRecommendationDetail(
+    recommendationList: RecommendationList,
+    recommendationDetail: RecommendationListDetail
+): RecommendationDetailResponse {
     return {
-        id: recommendation.menu_id,
-        name: recommendation.menu_name,
-        category: recommendation.menu_category,
-        portion: recommendation.menu_portion,
-        price: recommendation.menu_price,
-        description: recommendation.menu_description,
-        image_url: recommendation.image_url
-    }
+        total_price: recommendationList.total_price,
+        recommendations: {
+            id: recommendationDetail.menu_id,
+            name: recommendationDetail.menu_name,
+            category: recommendationDetail.menu_category,
+            portion: recommendationDetail.menu_portion,
+            price: recommendationDetail.menu_price,
+            description: recommendationDetail.menu_description,
+            image_url: recommendationDetail.image_url
+        }
+    };
 }
 

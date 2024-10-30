@@ -6,11 +6,8 @@ describe('POST /api/order', () => {
     // Kasus berhasil
     it('should create a new order', async () => {
         const response = await supertest(web)
-            .post(`/api/consumers/orders/${12157}`)
-            .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmI4OTMtY2Y2OS03ZmZhLWIxNjEtMzhjY2MxNjAyMDMzIiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5NjczNTYxLCJleHAiOjE3Mjk4NDYzNjF9.KR98fvEMlPW2t9l8kb7JcjnooBa_RI2NwNIaxEyC01M`)
-
-
-
+            .post(`/api/consumers/orders/${12}`)
+            .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmM5MjYtMTcwMS03ZGQ0LTliZTQtMTlmZTZlNzQxOWFlIiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaWF0IjoxNzMwMTcyMzMyLCJleHAiOjE3MzAzNDUxMzJ9._2Q7qMrhs2Jx8DBtxAuWCqF8hCtm9KEBbGUEdZm1Kck`)
         logger.debug(response.body); // Ini untuk debugging (opsional)
         // expect(response.status).toBe(201); // Mengecek apakah status 201 (Created)
         // expect(response.body.data.id).toBeDefined(); // Mengecek apakah id didefinisikan

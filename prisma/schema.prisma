@@ -112,6 +112,7 @@ model Order {
   restaurant_id   String        @db.VarChar(38)
   restaurant_name String        @db.VarChar(255)
   total_price     Int           @db.Integer
+  description     String        @db.Text
   ordered_at      DateTime      @default(now()) @db.Timestamp()
   OrderDetail     OrderDetail[]
 

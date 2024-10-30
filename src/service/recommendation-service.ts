@@ -46,16 +46,23 @@ export class RecommendationService {
         return toGetRecommendation(recommendation, recommendationLists);
     }
 
-    static async getRecommendationListDetail(request: GetRecommendationListDetailRequest): Promise <Array<RecommendationDetailResponse>> {
-
+    static async getRecommendationListDetail(request: GetRecommendationListDetailRequest): Promise<Array<RecommendationDetailResponse>> {
+        // Mendapatkan semua detail rekomendasi berdasarkan ID rekomendasi
         const recommendationListDetails = await prismaClient.recommendationListDetail.findMany({
             where: {
                 recommendation_list_id: request.recommendation_id
+            },
+            include: {
+                recommendation_list: true
             }
         });
 
-        return recommendationListDetails.map((recommendationListDetail) => toGetRecommendationDetail(recommendationListDetail));
+        // Memetakan hasil yang didapatkan ke bentuk response yang diinginkan
+        return recommendationListDetails.map((recommendationListDetail) =>
+            toGetRecommendationDetail(recommendationListDetail.recommendation_list, recommendationListDetail)
+        );
     }
+
 
     static async getRecommendationFromModel(request: GetRecommendationRequest) {
        const recommendationRequest = Validation.validate(RecommendationValidation.GETRECOMMENDATION, request);
