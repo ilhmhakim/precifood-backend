@@ -114,6 +114,7 @@ export class MenuController {
             const response = await MenuService.getAllRestaurantMenu(request);
 
             res.status(200).json({
+                message: "Success!",
                 data: response
             });
         } catch (e) {
@@ -134,6 +135,7 @@ export class MenuController {
 
             const response = await MenuService.getMenuDetail(request);
             res.status(200).json({
+                message: "Success!",
                 data: response
             });
 
@@ -162,6 +164,7 @@ export class MenuController {
 
             const response = await MenuService.searchMenu(request);
             res.status(200).json({
+                message: "Success!",
                 data: response
             });
         } catch (e) {

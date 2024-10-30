@@ -18,6 +18,7 @@ export class OrderController {
             }
             const response = await OrderService.createOrder(request);
             res.status(201).json({
+                message: "Pesanan berhasil! Silahkan sampaikan pesanan kepada waitress",
                 data: response
             })
         } catch (e) {
@@ -32,6 +33,7 @@ export class OrderController {
             }
             const response = await OrderService.getAllOrder(request);
             res.status(200).json({
+                message: "Success!",
                 data: response
             })
         } catch (e) {
@@ -50,6 +52,7 @@ export class OrderController {
 
             const response = await OrderService.getOrderDetail(request);
             res.status(200).json({
+                message: "Success!",
                 data: response
             });
         } catch (e) {

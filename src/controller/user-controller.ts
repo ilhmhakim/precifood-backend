@@ -68,6 +68,7 @@ export class UserController {
             if (req.user.role == "Konsumen") {
                 const response = await UserService.getProfileConsumer(req.user!);
                 res.status(200).json({
+                    message: "Success!",
                     data: response
                 });
             }
@@ -77,6 +78,7 @@ export class UserController {
                 request.id = String(req.params.consumerId);
                 const response = await UserService.getProfileConsumer(request);
                 res.status(200).json({
+                    message: "Success!",
                     data: response
                 });
             }
@@ -90,6 +92,7 @@ export class UserController {
             if (req.user.role == "Restoran") {
                 const response = await UserService.getProfileRestaurant(req.user!);
                 res.status(200).json({
+                    message: "Success!",
                     data: response
                 });
             }
@@ -99,6 +102,7 @@ export class UserController {
                 request.id = String(req.params.restaurantId);
                 const response = await UserService.getProfileRestaurant(request);
                 res.status(200).json({
+                    message: "Success!",
                     data: response
                 });
             }
@@ -111,6 +115,7 @@ export class UserController {
         try {
             const response = await UserService.getInfoConsumer(req.user!);
             res.status(200).json({
+                message: "Success!",
                 data: response
             });
         } catch (e) {
@@ -122,6 +127,7 @@ export class UserController {
         try {
             const response = await UserService.getAllUserConsumer();
             res.status(200).json({
+                message: "Success!",
                 data: response
             });
         } catch (e) {
@@ -133,6 +139,7 @@ export class UserController {
         try {
             const response = await UserService.getAllUserRestaurant();
             res.status(200).json({
+                message: "Success!",
                 data: response
             });
         } catch (e) {
@@ -146,6 +153,7 @@ export class UserController {
             request.id = String(req.user.id);
             const response = await UserService.updateConsumer(request);
             res.status(201).json({
+                message: "Success!",
                 data: response
             });
         } catch (e) {
@@ -159,6 +167,7 @@ export class UserController {
             request.id = String(req.user.id);
             const response = await UserService.updateRestaurant(request);
             res.status(201).json({
+                message: "Success!",
                 data: response
             });
         } catch (e) {

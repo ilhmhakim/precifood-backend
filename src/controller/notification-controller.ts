@@ -7,6 +7,7 @@ export class NotificationController {
         try {
             const response = await NotificationService.getNotification();
             return res.status(200).json({
+                message: "Success!",
                 data: response
             });
         } catch (e) {

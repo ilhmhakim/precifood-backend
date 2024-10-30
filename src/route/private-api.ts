@@ -21,7 +21,7 @@ privateRouter.get("/api/users/consumers/profile", authorizeMiddleware(Roles.Cons
 // @ts-ignore
 privateRouter.patch("/api/users/consumers/profile", authorizeMiddleware(Roles.Consumer), UserController.updateConsumer);
 // @ts-ignore
-privateRouter.patch("/api/users/restaurants/profile", authorizeMiddleware(Roles.Restaurant), UserController.updateConsumer);
+privateRouter.patch("/api/users/restaurants/profile", authorizeMiddleware(Roles.Restaurant), UserController.updateRestaurant);
 // @ts-ignore
 privateRouter.get("/api/users/restaurants/profile", authorizeMiddleware(Roles.Restaurant), UserController.getProfileRestaurant);
 // @ts-ignore
@@ -62,7 +62,7 @@ privateRouter.patch("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/menus/:menuI
 
 // Order Module
 // @ts-ignore
- privateRouter.post("/api/consumers/orders/:recommendationId(\\d+)", OrderController.createOrder);
+ privateRouter.post("/api/consumers/orders/:recommendationId(\\d+)", authorizeMiddleware(Roles.Consumer), OrderController.createOrder);
 // @ts-ignore
 privateRouter.get("/api/consumers/orders", authorizeMiddleware(Roles.Consumer), OrderController.getAllOrder);
 // @ts-ignore

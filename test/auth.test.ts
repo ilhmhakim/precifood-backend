@@ -52,7 +52,7 @@ describe('POST /api/auth/login', () => {
 describe('Refresh Token', () => {
     it('should refresh token', async () => {
         const response = await supertest(web)
-            .post("/api/auth/refreshtoken")
+            .post("/api/auth/token")
             .send({
                 "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmI4OTMtY2Y2OS03ZmZhLWIxNjEtMzhjY2MxNjAyMDMzIiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaWF0IjoxNzI5ODU1NjYxLCJleHAiOjE3MzA0NjA0NjF9.fD53o9pMpBz4_nEtULusfacvfAbY7QUKlXle0HA9wqE"
             });
