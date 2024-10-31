@@ -111,7 +111,7 @@ export class AuthService {
         });
     }
 
-    static async logOut(userId: string) {
+    static async logout(userId: string) {
         await prismaClient.user.update({
             where: {
                 id: userId

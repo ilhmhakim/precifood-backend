@@ -10,7 +10,7 @@ export class AuthController {
         try {
             const response = await AuthService.login(req.body);
             res.status(200).json({
-                message: "Login berhasil!",
+                message: "Success!",
                 data: response
             });
         } catch (e) {
@@ -65,12 +65,12 @@ export class AuthController {
         }
     }
 
-    static async logOut(req: UserRequest, res: Response, next: NextFunction) {
+    static async logout(req: UserRequest, res: Response, next: NextFunction) {
         try {
             const userId = req.user.id;
-            await AuthService.logOut(userId);
+            await AuthService.logout(userId);
             res.status(200).json({
-                message: "Logout berhasil!"
+                message: "Success!"
             });
         } catch (e) {
             next(e);

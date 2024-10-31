@@ -10,7 +10,6 @@ import {AuthController} from "../controller/auth-controller";
 
 export const privateRouter = express.Router();
 
-
 // User Module
 // @ts-ignore
 privateRouter.get("/api/users/consumers", authorizeMiddleware(Roles.Admin), UserController.getAllUserConsumer);
@@ -88,4 +87,4 @@ privateRouter.put("/api/auth/email", authorizeMiddleware(Roles.All), AuthControl
 // @ts-ignore
 privateRouter.put("/api/auth/password", authorizeMiddleware(Roles.All), AuthController.updatePassword);
 // @ts-ignore
-privateRouter.delete("/api/auth/logout", authorizeMiddleware(Roles.All), AuthController.logOut);
+privateRouter.delete("/api/auth/logout", authorizeMiddleware(Roles.All), AuthController.logout);
