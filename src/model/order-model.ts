@@ -6,6 +6,7 @@ export type OrderResponse = {
     restaurant_name: string;
     total_price: number;
     ordered_at: string;
+    description: string;
     order_detail?:
         {
             id: number;
@@ -52,6 +53,7 @@ export function toOrderDetailResponse(order: Order, orderDetails: OrderDetail[])
         restaurant_name: order.restaurant_name,
         total_price: order.total_price,
         ordered_at: order.ordered_at.toLocaleDateString(),
+        description: order.description,
         order_detail: orderDetails.map((detail) => ({
             id: detail.id,
             menu_id: detail.menu_id,

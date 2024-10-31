@@ -36,7 +36,7 @@ export type RecommendationResponse = {
 
 export type RecommendationDetailResponse = {
     total_price: number;
-    recommendations: {
+    recommendations: Array<{
         id: number;
         name: string;
         category: string;
@@ -44,8 +44,8 @@ export type RecommendationDetailResponse = {
         price: number;
         description: string;
         image_url: string;
-    }
-}
+    }>;
+};
 
 
 export type GetRecommendationRequest = {
@@ -81,21 +81,22 @@ export function toGetRecommendation(recommendation: Recommendation, recommendati
 }
 
 
+// Fungsi untuk mengonversi ke RecommendationDetailResponse
 export function toGetRecommendationDetail(
     recommendationList: RecommendationList,
-    recommendationDetail: RecommendationListDetail
+    recommendationDetails: RecommendationListDetail[]
 ): RecommendationDetailResponse {
     return {
         total_price: recommendationList.total_price,
-        recommendations: {
-            id: recommendationDetail.menu_id,
-            name: recommendationDetail.menu_name,
-            category: recommendationDetail.menu_category,
-            portion: recommendationDetail.menu_portion,
-            price: recommendationDetail.menu_price,
-            description: recommendationDetail.menu_description,
-            image_url: recommendationDetail.image_url
-        }
+        recommendations: recommendationDetails.map(detail => ({
+            id: detail.menu_id,
+            name: detail.menu_name,
+            category: detail.menu_category,
+            portion: detail.menu_portion,
+            price: detail.menu_price,
+            description: detail.menu_description,
+            image_url: detail.image_url
+        }))
     };
 }
 

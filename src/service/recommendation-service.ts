@@ -46,7 +46,8 @@ export class RecommendationService {
         return toGetRecommendation(recommendation, recommendationLists);
     }
 
-    static async getRecommendationListDetail(request: GetRecommendationListDetailRequest): Promise<Array<RecommendationDetailResponse>> {
+    // Fungsi utama untuk mendapatkan rekomendasi detail
+    static async getRecommendationListDetail(request: GetRecommendationListDetailRequest): Promise<RecommendationDetailResponse> {
         // Mendapatkan semua detail rekomendasi berdasarkan ID rekomendasi
         const recommendationListDetails = await prismaClient.recommendationListDetail.findMany({
             where: {
@@ -57,10 +58,15 @@ export class RecommendationService {
             }
         });
 
-        // Memetakan hasil yang didapatkan ke bentuk response yang diinginkan
-        return recommendationListDetails.map((recommendationListDetail) =>
-            toGetRecommendationDetail(recommendationListDetail.recommendation_list, recommendationListDetail)
-        );
+        if (recommendationListDetails.length === 0) {
+            throw new Error("Recommendation list not found");
+        }
+
+        // Ambil recommendation_list untuk mengambil total_price
+        const recommendationList = recommendationListDetails[0].recommendation_list;
+
+        // Mengembalikan response dalam bentuk yang diinginkan
+        return toGetRecommendationDetail(recommendationList, recommendationListDetails);
     }
 
 
