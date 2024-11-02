@@ -7,6 +7,7 @@ import {NotificationController} from "../controller/notification-controller";
 import {Roles} from "../type/role";
 import {RecommendationController} from "../controller/recommendation-controller";
 import {AuthController} from "../controller/auth-controller";
+import {multerMiddleware} from "../middleware/multer-middleware";
 
 export const privateRouter = express.Router();
 
@@ -20,7 +21,7 @@ privateRouter.get("/api/users/consumers/profile", authorizeMiddleware(Roles.Cons
 // @ts-ignore
 privateRouter.patch("/api/users/consumers/profile", authorizeMiddleware(Roles.Consumer), UserController.updateConsumer);
 // @ts-ignore
-privateRouter.patch("/api/users/restaurants/profile", authorizeMiddleware(Roles.Restaurant), UserController.updateRestaurant);
+privateRouter.patch("/api/users/restaurants/profile", authorizeMiddleware(Roles.Restaurant), multerMiddleware, UserController.updateRestaurant);
 // @ts-ignore
 privateRouter.get("/api/users/restaurants/profile", authorizeMiddleware(Roles.Restaurant), UserController.getProfileRestaurant);
 // @ts-ignore

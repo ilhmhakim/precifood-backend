@@ -7,6 +7,7 @@ import {
 } from "../model/user-model";
 import {UserService} from "../service/user-service";
 import {UserRequest} from "../type/user";
+import {ImageUploaderService} from "../service/image-uploader-service";
 
 export class UserController {
     static async registerConsumer(req: Request, res: Response, next: NextFunction) {
@@ -14,7 +15,7 @@ export class UserController {
             const request: CreateConsumerRequest = req.body as CreateConsumerRequest;
             const response = await UserService.registerConsumer(request);
             res.status(201).json({
-                message: "Konsumen berhasil sign up",
+                message: "Success!",
                 data: response
             });
         } catch (e) {
@@ -24,38 +25,22 @@ export class UserController {
 
     static async registerRestaurant(req: Request, res: Response, next: NextFunction) {
         try {
-            // const requestFile = req.file;
-            //
-            // // Check if a file is uploaded
-            // if (!requestFile) {
-            //     return res.status(400).json({ errors: "No file uploaded." });
-            // }
-            //
-            // const imageUrl = await ImageUploaderService.uploadImage(requestFile);
-            //
-            // const request: CreateRestaurantRequest = {
-            //     ...req.body,
-            //     image: imageUrl // Assuming you want to save the image URL in the request
-            // } as CreateRestaurantRequest;
+            const requestFile = req.file;
 
-            const request: CreateRestaurantRequest = req.body as CreateRestaurantRequest;
+            console.log("File received:", req.file);
+            console.log("Request body:", req.body);
+
+            const imageUrl = await ImageUploaderService.uploadImage(requestFile, 'restaurant-profiles-images');
+
+            const request: CreateRestaurantRequest = {
+                ...req.body,
+                image_url: imageUrl // Assuming you want to save the image URL in the request
+            } as CreateRestaurantRequest;
+
 
             const response = await UserService.registerRestaurant(request);
             res.status(201).json({
-                message: "Restoran berhasil sign up",
-                data: response
-            });
-        } catch (e) {
-            next(e);
-        }
-    }
-
-    static async registerAdmin(req: Request, res: Response, next: NextFunction) {
-        try {
-            const request: CreateAdminRequest = req.body as CreateAdminRequest;
-            const response = await UserService.registerAdmin(request);
-            res.status(201).json({
-                message: "Admin berhasil sign up",
+                message: "Success!",
                 data: response
             });
         } catch (e) {
@@ -163,15 +148,25 @@ export class UserController {
 
     static async updateRestaurant(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const request:UpdateRestaurantRequest = req.body as UpdateRestaurantRequest;
-            request.id = String(req.user.id);
-            const response = await UserService.updateRestaurant(request);
-            res.status(201).json({
-                message: "Success!",
-                data: response
+            let imageUrl;
+            if (req.file) {
+                // Hanya update image jika ada file yang diunggah
+                imageUrl = await ImageUploaderService.uploadImage(req.file, 'restaurant-profiles-images');
+            }
+
+            const request: UpdateRestaurantRequest = {
+                ...req.body, // Mengambil hanya field yang diubah dari req.body
+                id: String(req.user.id),
+                image_url: imageUrl || req.body.image_url, // Hanya update jika imageUrl ada
+            };
+
+            await UserService.updateRestaurant(request);
+            res.status(200).json({
+                message: "Success!"
             });
         } catch (e) {
             next(e);
         }
     }
+
 }

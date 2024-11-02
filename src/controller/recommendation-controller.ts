@@ -12,13 +12,17 @@ export class RecommendationController {
                 restaurant_id: req.params.restaurantId
             }
 
-            const response = await RecommendationService.getRecommendationFromModel(request);
-
             res.status(200).json({
-                message: "Success!",
-                data: response
+                message: "Generate rekomendasi berhasil! Silahkan untuk merefresh halaman rekomendasi menu setelah 5 menit",
             });
 
+            setImmediate(async () => {
+                try {
+                    await RecommendationService.getRecommendationFromModel(request);
+                } catch (error) {
+                    console.error("Error in RecommendationService.getRecommendation:", error);
+                }
+            });
         } catch (e) {
             next(e);
         }

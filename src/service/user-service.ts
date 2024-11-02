@@ -2,7 +2,6 @@ import {
     AllUsersResponse,
     ConsumerInfoResponse,
     ConsumerProfileResponse,
-    CreateAdminRequest,
     CreateConsumerRequest,
     CreateRestaurantRequest,
     GetUserProfileRequest,
@@ -25,6 +24,67 @@ import {v7 as uuid7} from "uuid";
 
 
 export class UserService {
+    static async checkConsumer(consumerId: string) {
+        const consumer = await prismaClient.consumer.findFirst({
+            where: {
+                consumer_id: consumerId
+            },
+            include: {
+                user: true,
+                PersonalInformation: true,
+                MedicalHistory: true
+            },
+        });
+
+        if (!consumer) {
+            throw new ResponseError(404, "Konsumen tidak ditemukan");
+        }
+
+        return consumer;
+    }
+
+    static async checkRestaurant(restaurantId: string) {
+        const restaurant = await prismaClient.restaurant.findFirst({
+            where: {
+                restaurant_id: restaurantId
+            },
+            include: {
+                user: true,
+                Contact: true,
+                Address: true
+            }
+        });
+
+        if (!restaurant) {
+            throw new ResponseError(404, "Restoran tidak ditemukan");
+        }
+
+        return restaurant;
+    }
+
+    static async updateConsumerAge(userId: string): Promise<void> {
+        const consumer = await this.checkConsumer(userId);
+
+        if (consumer && consumer?.PersonalInformation?.birth) {
+            const birthDate = consumer.PersonalInformation.birth;
+            const today = new Date();
+
+            // Hitung umur terkini
+            const calculatedAge = await this.calculateAge(birthDate);
+
+            // Jika hari ini ulang tahun, perbarui umur di database
+            if (today.getMonth() === birthDate.getMonth() && today.getDate() === birthDate.getDate()) {
+                await prismaClient.personalInformation.update({
+                    where: {
+                        consumer_id: consumer.consumer_id
+                    },
+                    data: {
+                        age: calculatedAge
+                    },
+                });
+            }
+        }
+    }
 
     static async calculateAge(birthDate: Date): Promise<number> {
         const today = new Date();
@@ -51,12 +111,28 @@ export class UserService {
             }
         });
 
-        if (totalUserWithSameEmail != 0) {
-            throw new ResponseError(400, "Email is already taken");
+        if (totalUserWithSameEmail !== 0) {
+            throw new ResponseError(400, "Email telah digunakan pengguna lain");
         }
 
-        if (registerConsumerRequest.password != registerConsumerRequest.password_confirmation) {
-            throw new ResponseError(400, "Password and Password Confirmation are not the same");
+        if (registerConsumerRequest.password !== registerConsumerRequest.password_confirmation) {
+            throw new ResponseError(400, "Password dan konfirmasi password tidak sama");
+        }
+
+        if(registerConsumerRequest.medical_history == "no_history"){
+            registerConsumerRequest.no_history = true;
+        }
+
+        if(registerConsumerRequest.medical_history == "diabetes"){
+            registerConsumerRequest.diabetes = true;
+        }
+
+        if(registerConsumerRequest.medical_history == "cardiovascular"){
+            registerConsumerRequest.cardiovascular = true;
+        }
+
+        if(registerConsumerRequest.medical_history == "hypertension"){
+            registerConsumerRequest.hypertension = true;
         }
 
         registerConsumerRequest.password = await bcrypt.hash(registerConsumerRequest.password, 10);
@@ -66,15 +142,14 @@ export class UserService {
 
         const consumer_id = String(`C-${uuid7()}`);
 
-        const user = await prismaClient.user.create({
+        await prismaClient.user.create({
             data: {
-                id: consumer_id, // ID yang sama digunakan untuk User dan Consumer
+                id: consumer_id,
                 email: registerConsumerRequest.email,
                 password: registerConsumerRequest.password,
-                role: "Konsumen", // Sesuai dengan role yang sudah ditentukan
+                role: "Konsumen",
                 consumer: {
                     create: {
-                        // Buat data untuk PersonalInformation
                         PersonalInformation: {
                             create: {
                                 name: registerConsumerRequest.name,
@@ -86,8 +161,6 @@ export class UserService {
                                 phone: registerConsumerRequest.phone,
                             }
                         },
-
-                        // Buat data untuk MedicalHistory
                         MedicalHistory: {
                             create: {
                                 no_history: registerConsumerRequest.no_history,
@@ -101,6 +174,7 @@ export class UserService {
             }
         });
     }
+
 
     static async registerRestaurant(request: CreateRestaurantRequest) {
         const registerRestaurantRequest = Validation.validate(UserValidation.REGISTERRESTAURANT, request);
@@ -123,7 +197,7 @@ export class UserService {
 
         const restaurant_id = String(`R-${uuid7()}`);
 
-        const user = await prismaClient.user.create({
+        await prismaClient.user.create({
             data: {
                 id: restaurant_id, // ID yang sama digunakan untuk User dan Restaurant
                 email: registerRestaurantRequest.email,
@@ -155,112 +229,31 @@ export class UserService {
         });
     }
 
-    // Registrasi admin
-    static async registerAdmin(request: CreateAdminRequest) {
-        const registerAdminRequest = Validation.validate(UserValidation.REGISTERADMIN, request);
-
-        const totalUserWithSameEmail = await prismaClient.user.count({
-            where: {
-                email: registerAdminRequest.email
-            }
-        });
-
-        if (totalUserWithSameEmail != 0) {
-            throw new ResponseError(400, "Email is already taken");
-        }
-
-        if (registerAdminRequest.password != registerAdminRequest.password_confirmation) {
-            throw new ResponseError(400, "Password and Password Confirmation are not the same");
-        }
-
-        registerAdminRequest.password = await bcrypt.hash(registerAdminRequest.password, 10);
-
-        const admin_id = String(`A-${uuid7()}`);
-
-        const user = await prismaClient.user.create({
-           data: {
-               id: admin_id, // ID yang sama digunakan untuk User dan Restaurant
-               email: registerAdminRequest.email,
-               password: registerAdminRequest.password,
-               role: "Admin"
-           }
-        });
-    }
-
     // Mendapatkan detail spesifik user
     static async getProfileConsumer(request: GetUserProfileRequest): Promise<ConsumerProfileResponse> {
-        const requestId = Validation.validate(UserValidation.GETUSERPROFILE, request);
-        const user = await prismaClient.user.findFirst({
-            where: {
-                id: requestId.id,
-            },
-            include: {
-                consumer: {
-                    include: {
-                        PersonalInformation: true,
-                        MedicalHistory: true,
-                    },
-                },
-            },
-        });
+        const requestProfileConsumer = Validation.validate(UserValidation.GETUSERPROFILE, request);
 
-        if (!user || !user.consumer) {
-            throw new ResponseError(404, "Konsumen tidak ditemukan");
-        }
+        const consumer = await this.checkConsumer(requestProfileConsumer.id)
 
-        const { PersonalInformation, MedicalHistory } = user.consumer;
-
-        return toConsumerProfileResponse(user, PersonalInformation!, MedicalHistory!);
+        return toConsumerProfileResponse(consumer.user, consumer.PersonalInformation!, consumer.MedicalHistory!);
     }
 
     static async getProfileRestaurant(request: GetUserProfileRequest): Promise<RestaurantProfileResponse> {
-        const requestId = Validation.validate(UserValidation.GETUSERPROFILE, request);
-        const user = await prismaClient.user.findFirst({
-            where: {
-                id: requestId.id,
-            },
-            include: {
-                restaurant: {
-                    include: {
-                        Contact: true,
-                        Address: true,
-                    }
-                }
-            }
-        });
+        const requestProfileRestaurant = Validation.validate(UserValidation.GETUSERPROFILE, request);
 
-        if (!user || !user.restaurant) {
-            throw new ResponseError(404, "Restoran tidak ditemukan");
-        }
+        const restaurant = await this.checkRestaurant(requestProfileRestaurant.id);
 
-        const { Contact, Address } = user.restaurant;
-
-        return toRestaurantProfile(user, Contact!, Address!);
+        return toRestaurantProfile(restaurant.user, restaurant.Contact!, restaurant.Address!);
     }
 
     static async getInfoConsumer(request: GetUserProfileRequest): Promise<ConsumerInfoResponse> {
-        const requestId = Validation.validate(UserValidation.GETUSERPROFILE, request);
-        const user = await prismaClient.user.findFirst({
-            where: {
-                id: requestId.id,
-            },
-            include: {
-                consumer: {
-                    include: {
-                        PersonalInformation: true,
-                        MedicalHistory: true,
-                    },
-                },
-            },
-        });
+        const requestInfoConsumer = Validation.validate(UserValidation.GETUSERPROFILE, request);
 
-        if (!user || !user.consumer) {
-            throw new ResponseError(404, "Konsumen tidak ditemukan");
-        }
+        await this.updateConsumerAge(requestInfoConsumer.id);
 
-        const { PersonalInformation, MedicalHistory } = user.consumer;
+        const consumer = await this.checkConsumer(requestInfoConsumer.id)
 
-        return toConsumerInfo(PersonalInformation!, MedicalHistory!);
+        return toConsumerInfo(consumer.PersonalInformation!, consumer.MedicalHistory!);
     }
 
     static async getAllUserConsumer(): Promise<Array<AllUsersResponse>> {
@@ -328,29 +321,44 @@ export class UserService {
     static async updateConsumer(request: UpdateConsumerRequest): Promise<ConsumerProfileResponse> {
         const requestUpdateConsumer: UpdateConsumerRequest = Validation.validate(UserValidation.UPDATECONSUMER, request);
 
-        // Validasi logika: jika salah satu bernilai true, yang lainnya harus false
         const { no_history, diabetes, hypertension, cardiovascular } = requestUpdateConsumer;
 
-        if (no_history === true) {
+        // Validasi hanya satu kondisi true
+        const trueCount = [no_history, diabetes, hypertension, cardiovascular].filter(Boolean).length;
+
+        if (trueCount > 1) {
+            throw new ResponseError(400, "Hanya satu dari no_history, diabetes, hypertension, atau cardiovascular yang boleh bernilai true");
+        }
+
+        if(requestUpdateConsumer.medical_history == "no_history"){
+            requestUpdateConsumer.no_history = true;
             requestUpdateConsumer.diabetes = false;
             requestUpdateConsumer.hypertension = false;
             requestUpdateConsumer.cardiovascular = false;
-        } else if (diabetes === true) {
+        }
+
+        if(requestUpdateConsumer.medical_history == "diabetes"){
+            requestUpdateConsumer.diabetes = true;
             requestUpdateConsumer.no_history = false;
             requestUpdateConsumer.hypertension = false;
             requestUpdateConsumer.cardiovascular = false;
-        } else if (hypertension === true) {
-            requestUpdateConsumer.no_history = false;
-            requestUpdateConsumer.diabetes = false;
-            requestUpdateConsumer.cardiovascular = false;
-        } else if (cardiovascular === true) {
+        }
+
+        if(requestUpdateConsumer.medical_history == "cardiovascular"){
+            requestUpdateConsumer.cardiovascular = true;
             requestUpdateConsumer.no_history = false;
             requestUpdateConsumer.diabetes = false;
             requestUpdateConsumer.hypertension = false;
         }
 
-        // Hitung age jika birth diperbarui
+        if(requestUpdateConsumer.medical_history == "hypertension"){
+            requestUpdateConsumer.hypertension = true;
+            requestUpdateConsumer.no_history = false;
+            requestUpdateConsumer.diabetes = false;
+            requestUpdateConsumer.cardiovascular = false;
+        }
 
+        // Hitung age jika birth diperbarui
         let age: number | undefined;
         let birth: Date | undefined;
         if (requestUpdateConsumer.birth) {
@@ -358,8 +366,7 @@ export class UserService {
             age = Number(await this.calculateAge(birth));
         }
 
-        // Lakukan update pada user yang terhubung dengan consumer
-        const updatedUser = await prismaClient.user.update({
+        await prismaClient.user.update({
             where: {
                 id: requestUpdateConsumer.id,
             },
@@ -387,76 +394,43 @@ export class UserService {
                         },
                     },
                 },
-            },
-            include: {
-                consumer: {
-                    include: {
-                        PersonalInformation: true,
-                        MedicalHistory: true,
-                    },
-                },
-            },
+            }
         });
 
-        if (!updatedUser) {
-            throw new ResponseError(404, `User with ID ${requestUpdateConsumer.id} not found`);
-        }
+        const consumer = await this.checkConsumer(requestUpdateConsumer.id)
 
-        // Menggunakan fungsi toConsumerProfileResponse untuk mengembalikan hasil
-        const { consumer } = updatedUser;
-        // @ts-ignore
-        const { PersonalInformation, MedicalHistory } = consumer;
-
-        return toConsumerProfileResponse(updatedUser, PersonalInformation!, MedicalHistory!);
+        return toConsumerProfileResponse(consumer.user, consumer.PersonalInformation!, consumer.MedicalHistory!);
     }
 
-    static async updateRestaurant(request: UpdateRestaurantRequest): Promise<RestaurantProfileResponse> {
-        const requestUpdateRestaurant: UpdateRestaurantRequest = Validation.validate(UserValidation.UPDATERESTAURANT, request);
+    static async updateRestaurant(request: UpdateRestaurantRequest) {
+        const validatedRequest = Validation.validate(UserValidation.UPDATERESTAURANT, request);
 
-        const updatedUser = await prismaClient.user.update({
-            where: {
-                id: requestUpdateRestaurant.id,
-            },
+        await prismaClient.user.update({
+            where: { id: validatedRequest.id },
             data: {
                 restaurant: {
                     update: {
                         Contact: {
                             update: {
-                                name: requestUpdateRestaurant.name,
-                                email: requestUpdateRestaurant.email,
-                                phone: requestUpdateRestaurant.phone,
+                                ...(validatedRequest.name && { name: validatedRequest.name }),
+                                ...(validatedRequest.email && { email: validatedRequest.email }),
+                                ...(validatedRequest.phone && { phone: validatedRequest.phone }),
                             },
                         },
                         Address: {
                             update: {
-                                province: requestUpdateRestaurant.province,
-                                city: requestUpdateRestaurant.email,
-                                address_detail: requestUpdateRestaurant.address_detail,
-                                image_url: requestUpdateRestaurant.image_url,
+                                ...(validatedRequest.province && { province: validatedRequest.province }),
+                                ...(validatedRequest.city && { city: validatedRequest.city }),
+                                ...(validatedRequest.address_detail && { address_detail: validatedRequest.address_detail }),
+                                ...(validatedRequest.image_url && { image_url: validatedRequest.image_url }),
                             },
                         },
                     },
                 },
             },
-            include: {
-                restaurant: {
-                    include: {
-                        Contact: true,
-                        Address: true,
-                    },
-                },
-            },
         });
-
-        if (!updatedUser) {
-            throw new ResponseError(404, `User with ID ${requestUpdateRestaurant.id} not found`);
-        }
-
-        // Menggunakan fungsi toConsumerProfileResponse untuk mengembalikan hasil
-        const { restaurant } = updatedUser;
-        // @ts-ignore
-        const { Contact, Address } = restaurant;
-
-        return toRestaurantProfile(updatedUser, Contact!, Address!);
+        // const restaurant = await this.checkRestaurant(validatedRequest.id);
+        // return toRestaurantProfile(restaurant.user, restaurant.Contact!, restaurant.Address!);
     }
+
 }

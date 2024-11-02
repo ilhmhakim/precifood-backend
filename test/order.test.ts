@@ -7,7 +7,8 @@ describe('POST /api/order', () => {
     it('should create a new order', async () => {
         const response = await supertest(web)
             .post(`/api/consumers/orders/${12}`)
-            .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmM5MjYtMTcwMS03ZGQ0LTliZTQtMTlmZTZlNzQxOWFlIiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaWF0IjoxNzMwMTcyMzMyLCJleHAiOjE3MzAzNDUxMzJ9._2Q7qMrhs2Jx8DBtxAuWCqF8hCtm9KEBbGUEdZm1Kck`)
+            .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmM5MjYtMTcwMS03ZGQ0LTliZTQtMTlmZTZlNzQxOWFlIiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaWF0IjoxNzMwMzgwNTg3LCJleHAiOjE3MzA1NTMzODd9.5eo_JOXbVZo9dXomarUf8ItMV58P9v_rexmPuicGWhA`)
+
         logger.debug(response.body); // Ini untuk debugging (opsional)
         // expect(response.status).toBe(201); // Mengecek apakah status 201 (Created)
         // expect(response.body.data.id).toBeDefined(); // Mengecek apakah id didefinisikan
@@ -26,8 +27,9 @@ describe('POST /api/order', () => {
 describe('Mengakses riwayat order (GET)', () => {
     it('(+) (Konsumen) Dapat mengakses seluruh order yang telah dipesan ', async () => {
         const response = await supertest(web)
-            .get("/api/consumer/orders")
-            .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmM5MjYtMTcwMS03ZGQ0LTliZTQtMTlmZTZlNzQxOWFlIiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaWF0IjoxNzMwMTcyMzMyLCJleHAiOjE3MzAzNDUxMzJ9._2Q7qMrhs2Jx8DBtxAuWCqF8hCtm9KEBbGUEdZm1Kck`)
+            .get("/api/consumers/orders")
+            .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmM5MjYtMTcwMS03ZGQ0LTliZTQtMTlmZTZlNzQxOWFlIiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaWF0IjoxNzMwMzgwNTg3LCJleHAiOjE3MzA1NTMzODd9.5eo_JOXbVZo9dXomarUf8ItMV58P9v_rexmPuicGWhA`)
+
         logger.debug(response.body);
 
     });

@@ -2,67 +2,155 @@ import {z, ZodType} from "zod";
 
 export class UserValidation {
     static readonly REGISTERCONSUMER: ZodType = z.object({
-        name: z.string().min(1).max(255),
-        email: z.string().email(),
-        sex: z.string().min(1).max(10),
-        birth: z.string().min(1),
-        phone: z.string().min(1).max(20),
-        height: z.number().positive(),
-        weight: z.number().positive(),
-        no_history: z.boolean(),
-        diabetes: z.boolean(),
-        hypertension: z.boolean(),
-        cardiovascular: z.boolean(),
-        password: z.string().min(8),
-        password_confirmation: z.string().min(8)
+        name: z.string()
+            .trim()
+            .min(1, "Panjang nama minimal 1 karakter")
+            .max(255, "Panjang nama maksimal 255 karakter"),
+        email: z.string()
+            .trim()
+            .email("Format email tidak valid"),
+        sex: z.enum(["Laki-laki", "Perempuan"], {
+            errorMap: () => ({ message: "Jenis kelamin harus 'Laki-laki' atau 'Perempuan'" })
+        }),
+        birth: z.string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/, "Format tanggal lahir harus yyyy-mm-dd")
+            .refine(date => !isNaN(Date.parse(date)), "Tanggal lahir tidak valid"),
+        phone: z.string()
+            .trim()
+            .min(1, "Nomor telepon minimal 1 karakter")
+            .max(20, "Nomor telepon maksimal 20 karakter")
+            .regex(/^\+?\d+$/, "Nomor telepon harus berupa angka dan boleh diawali dengan '+'"),
+        height: z.number()
+            .positive("Tinggi badan harus bernilai positif"),
+        weight: z.number()
+            .positive("Berat badan harus bernilai positif"),
+        medical_history: z.enum(["no_history", "diabetes", "cardiovascular", "hypertension"], {
+            errorMap: () => ({ message: "Riwayat penyakit yang bisa diisi hanya 'no_history', 'diabetes', 'cardiovascular', 'hypertension'" })
+        }),
+        password: z.string()
+            .trim()
+            .min(8, "Password minimal 8 karakter tanpa spasi"),
+        password_confirmation: z.string()
+            .trim()
+            .min(8, "Password konfirmasi minimal 8 karakter tanpa spasi")
     });
 
     static readonly REGISTERRESTAURANT: ZodType = z.object({
-        name: z.string().min(1).max(255),
-        email: z.string().email(),
-        phone: z.string().min(1).max(20),
-        province: z.string().min(1).max(100),
-        city: z.string().min(1).max(100),
-        address_detail: z.string().min(1),
-        image_url: z.string().min(1),
-        password: z.string().min(8),
-        password_confirmation: z.string().min(8)
-    });
-
-    static readonly REGISTERADMIN: ZodType = z.object({
-        email: z.string().email(),
-        password: z.string().min(8),
-        password_confirmation: z.string().min(8)
+        name: z.string()
+            .trim()
+            .min(1, "Panjang nama minimal 1 karakter")
+            .max(255, "Panjang nama maksimal 255 karakter"),
+        email: z.string()
+            .trim()
+            .email("Format email tidak valid"),
+        phone: z.string()
+            .trim()
+            .min(1, "Nomor telepon minimal 1 karakter")
+            .max(20, "Nomor telepon maksimal 20 karakter"),
+        province: z.string()
+            .trim()
+            .min(1, "Panjang nama provinsi minimal 1 karakter")
+            .max(100, "Panjang nama provinsi maksimal 100 karakter"),
+        city: z.string()
+            .trim()
+            .min(1, "Panjang nama kota minimal 1 karakter")
+            .max(100, "Panjang nama kota maksimal 100 karakter"),
+        address_detail: z.string()
+            .trim()
+            .min(1, "Detail alamat minimal 1 karakter"),
+        image_url: z.string()
+            .trim()
+            .min(1, "URL gambar tidak boleh kosong"),
+        password: z.string()
+            .trim()
+            .min(8, "Password minimal 8 karakter"),
+        password_confirmation: z.string()
+            .trim()
+            .min(8, "Password konfirmasi minimal 8 karakter")
     });
 
     static readonly GETUSERPROFILE: ZodType = z.object({
-        id: z.string().min(38).max(38)
+        id: z.string()
+            .trim()
+            .min(38, "ID tidak valid")
+            .max(38, "ID tidak valid"),
     });
 
     static readonly UPDATECONSUMER: ZodType = z.object({
-        id: z.string().min(38, "ID tidak valid").max(38, "ID tidak valid"),
-        name: z.string().min(1).max(255).optional(),       // Optional field
-        email: z.string().email().optional(),              // Optional field
-        sex: z.string().min(1).max(10).optional(),         // Optional field
-        birth: z.string().min(1).optional(),               // Optional field
-        phone: z.string().min(1).max(20).optional(),       // Optional field
-        height: z.number().positive().optional(),          // Optional field
-        weight: z.number().positive().optional(),          // Optional field
-        no_history: z.boolean().optional(),                // Optional field
-        diabetes: z.boolean().optional(),                  // Optional field
-        hypertension: z.boolean().optional(),              // Optional field
-        cardiovascular: z.boolean().optional(),            // Optional field
+        id: z.string()
+            .trim()
+            .min(38, "ID tidak valid")
+            .max(38, "ID tidak valid"),
+        name: z.string()
+            .trim()
+            .min(1, "Panjang nama minimal 1 karakter")
+            .max(255, "Panjang nama maksimal 255 karakter")
+            .optional(),
+        email: z.string()
+            .trim()
+            .email("Format email tidak valid")
+            .optional(),
+        sex: z.enum(["Laki-laki", "Perempuan"], {
+            errorMap: () => ({ message: "Jenis kelamin harus 'Laki-laki' atau 'Perempuan'" })
+        }).optional(),
+        birth: z.string()
+            .trim()
+            .regex(/^\d{4}-\d{2}-\d{2}$/, "Format tanggal lahir harus yyyy-mm-dd")
+            .refine(date => !isNaN(Date.parse(date)), "Tanggal lahir tidak valid")
+            .optional(),
+        phone: z.string()
+            .trim()
+            .min(1, "Nomor telepon minimal 1 karakter")
+            .max(20, "Nomor telepon maksimal 20 karakter")
+            .regex(/^\+?\d+$/, "Nomor telepon harus berupa angka dan boleh diawali dengan '+'")
+            .optional(),
+        height: z.number()
+            .positive("Tinggi badan harus bernilai positif")
+            .optional(),
+        weight: z.number()
+            .positive("Berat badan harus bernilai positif")
+            .optional(),
+        medical_history: z.enum(["no_history", "diabetes", "cardiovascular", "hypertension"], {
+            errorMap: () => ({ message: "Riwayat penyakit yang bisa diisi hanya 'no_history', 'diabetes', 'cardiovascular', 'hypertension'" })
+        })
     });
 
     static readonly UPDATERESTAURANT: ZodType = z.object({
-        id: z.string().min(38, "ID tidak valid").max(38, "ID tidak valid"),
-        name: z.string().min(1).max(255).optional(),
-        email: z.string().email().optional(),
-        phone: z.string().min(1).max(20).optional(),
-        province: z.string().min(1).max(100).optional(),
-        city: z.string().min(1).max(100).optional(),
-        address_detail: z.string().min(1).optional(),
-        image: z.string().min(1).optional(),
+        id: z.string()
+            .trim()
+            .min(38, "ID tidak valid")
+            .max(38, "ID tidak valid"),
+        name: z.string()
+            .trim()
+            .min(1, "Panjang nama minimal 1 karakter")
+            .max(255, "Panjang nama maksimal 255 karakter")
+            .optional(),
+        email: z.string()
+            .trim()
+            .email("Format email tidak valid")
+            .optional(),
+        phone: z.string()
+            .trim()
+            .min(1, "Nomor telepon minimal 1 karakter")
+            .max(20, "Nomor telepon maksimal 20 karakter")
+            .optional(),
+        province: z.string()
+            .trim()
+            .min(1, "Panjang nama provinsi minimal 1 karakter")
+            .max(100, "Panjang nama provinsi maksimal 100 karakter")
+            .optional(),
+        city: z.string()
+            .trim()
+            .min(1, "Panjang nama kota minimal 1 karakter")
+            .max(100, "Panjang nama kota maksimal 100 karakter")
+            .optional(),
+        address_detail: z.string()
+            .trim()
+            .min(1, "Detail alamat minimal 1 karakter")
+            .optional(),
+        image_url: z.string()
+            .trim()
+            .min(1, "URL gambar tidak boleh kosong")
+            .optional(),
     });
-
 }

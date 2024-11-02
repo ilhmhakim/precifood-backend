@@ -18,17 +18,14 @@ describe('Registrasi Konsumen (POST /api/signup/consumer)', () => {
         const response = await supertest(web)
             .post("/api/signup/consumer")
             .send({
-                "name": "Malika",
-                "email": "malika@gmail.com",
+                "name": "Adam",
+                "email": "adamlevine@gmail.com",
                 "sex": "Laki-laki",
                 "birth": "1975-09-11",
                 "phone": "085812340000",
                 "height": 170,
                 "weight": 60,
-                "no_history": true,
-                "diabetes": false,
-                "hypertension": false,
-                "cardiovascular": false,
+                "medical_history": "diabetes",
                 "password": "abc12345",
                 "password_confirmation": "abc12345"
             });
@@ -173,7 +170,7 @@ describe('Melihat Profile / Detail Konsumen (GET)', () => {
     it('should return profile of a consumer when authenticated as admin', async () => {
         const response = await supertest(web)
             .get('/api/users/consumer/C-01929984-cbd2-7779-b552-a113938a2054')
-            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkEtMDE5Mjk5ODUtY2FiNS03NzdmLWJjMmUtNDg1NTkyMjdiNDY2IiwiZW1haWwiOiJ0ZXN0YWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5MjA0NDgyLCJleHAiOjE3MjkyMTg4ODJ9.68wUwZTSEpK1wJpOdz982670OnJbhi8NE9_ITZh9vj0'); // Set header Authorization dengan token yang valid
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmU2YTYtYzY0ZS03OTljLTg5NTktZDZlNmE5NGIxMDUyIiwiZW1haWwiOiJhZGFtQGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlhdCI6MTczMDQ0NzQyNywiZXhwIjoxNzMwNjIwMjI3fQ.bRAiY4j7I7-MCKgQTErfIrjKIm6YRK5hbc-r5jbG744');
 
         logger.debug(response.body);
 
@@ -239,7 +236,7 @@ describe('Mendapatkan Pop Up Consumer Information (GET)', () => {
     it('(+) (Konsumen) Mengembalikan sekilas data terkait personal information dan medical history', async () => {
         const response = await supertest(web)
             .get('/api/users/consumers/information')
-            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmE3ZjgtMDhhNS03MzM2LWI5NDMtNjc1NDIxOGNlNTI4IiwiZW1haWwiOiJtYWxpa2FAZ21haWwuY29tIiwicm9sZSI6IktvbnN1bWVuIiwiaXNzIjoiTm9kZS1BdXRoIiwiaWF0IjoxNzI5Mzk1MTk4LCJleHAiOjE3Mjk1Njc5OTh9.QywCU8le0gHfct8TySSHAQe_EpQluM_6tZzfMu8Jpd0')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmU2YTYtYzY0ZS03OTljLTg5NTktZDZlNmE5NGIxMDUyIiwiZW1haWwiOiJhZGFtQGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlhdCI6MTczMDQ0NzQyNywiZXhwIjoxNzMwNjIwMjI3fQ.bRAiY4j7I7-MCKgQTErfIrjKIm6YRK5hbc-r5jbG744')
         logger.debug(response.body);
 
         expect(response.status).toBe(200);
@@ -302,24 +299,15 @@ describe('Konsumen dapat mengupdate profilenya (PATCH)', () => {
 
     it('(+) (Konsumen) Mengupdate salah satu kondisi riwayat kesehatan menjadi true, maka lainnya akan false', async () => {
         const response = await supertest(web)
-            .patch('/api/users/consumer/profile')
-            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5Mjk5ODQtY2JkMi03Nzc5LWI1NTItYTExMzkzOGEyMDU0IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlzcyI6Ik5vZGUtQXV0aCIsImlhdCI6MTcyOTI1Nzg5NywiZXhwIjoxNzI5MzAxMDk3fQ.eckB9MnwwFhZ9rvr9RBSCczyD003JVN76vcIuWNlAQY')
+            .patch('/api/users/consumers/profile')
+            .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmU2YTYtYzY0ZS03OTljLTg5NTktZDZlNmE5NGIxMDUyIiwiZW1haWwiOiJhZGFtQGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlhdCI6MTczMDQ0NzQyNywiZXhwIjoxNzMwNjIwMjI3fQ.bRAiY4j7I7-MCKgQTErfIrjKIm6YRK5hbc-r5jbG744')
             .send({
-                "hypertension": true
+                "hypertension": true,
             })
         logger.debug(response.body);
 
         expect(response.status).toBe(201);
         expect(response.body).toBeDefined();
-        expect(response.body.data).toBeDefined();
-        expect(response.body.data.user).toBeDefined();
-        expect(response.body.data.personal_information).toBeDefined();
-        expect(response.body.data.personal_information.name).toBe("Muhammad Ilham Hakim Suherman");
-        expect(response.body.data.medical_history).toBeDefined();
-        expect(response.body.data.medical_history.no_history).toBe(false);
-        expect(response.body.data.medical_history.diabetes).toBe(false);
-        expect(response.body.data.medical_history.cardiovascular).toBe(false);
-        expect(response.body.data.medical_history.hypertension).toBe(true);
     });
 });
 

@@ -1,4 +1,4 @@
-import {User, Consumer, Restaurant, PersonalInformation, MedicalHistory, Contact, Address} from "@prisma/client";
+import {User, PersonalInformation, MedicalHistory, Contact, Address} from "@prisma/client";
 
 
 // Create (Register)
@@ -10,10 +10,11 @@ export type CreateConsumerRequest = {
     phone: string;
     height: number;
     weight: number;
-    no_history: boolean;
-    diabetes: boolean;
-    hypertension: boolean;
-    cardiovascular: boolean;
+    medical_history: string;
+    no_history?: boolean;
+    diabetes?: boolean;
+    hypertension?: boolean;
+    cardiovascular?: boolean;
     password: string;
     password_confirmation: string;
 }
@@ -47,8 +48,6 @@ export type GetUserProfileRequest = {
     id: string;
 }
 
-
-
 export type ConsumerProfileResponse = {
     user?: {
         id: string;
@@ -64,12 +63,7 @@ export type ConsumerProfileResponse = {
         weight: number;
         age: number;
     },
-    medical_history: {
-        no_history: boolean;
-        diabetes: boolean;
-        hypertension: boolean;
-        cardiovascular: boolean;
-    }
+    medical_history: string;
 }
 
 export type RestaurantProfileResponse = {
@@ -91,25 +85,12 @@ export type RestaurantProfileResponse = {
     }
 }
 
-export type AdminProfileResponse = {
-    user: {
-        id: string;
-        email: string;
-        registered_at: string;
-    }
-}
-
 export type ConsumerInfoResponse = {
     personal_information: {
         height: number;
         weight: number;
     },
-    medical_history: {
-        no_history: boolean;
-        diabetes: boolean;
-        hypertension: boolean;
-        cardiovascular: boolean;
-    }
+    medical_history: string;
 }
 
 
@@ -122,6 +103,7 @@ export type UpdateConsumerRequest = {
     phone?: string;
     height?: number;
     weight?: number;
+    medical_history?: string;
     no_history?: boolean;
     diabetes?: boolean;
     hypertension?: boolean;
@@ -129,7 +111,7 @@ export type UpdateConsumerRequest = {
 }
 
 
-export type UpdateRestaurantRequest = {
+export type  UpdateRestaurantRequest = {
     id: string;
     name?: string;
     email?: string;
@@ -146,23 +128,39 @@ export type AllUsersResponse = {
     email: string;
 }
 
-
 export function toConsumerInfo(personalInformation: PersonalInformation, medicalHistory: MedicalHistory): ConsumerInfoResponse {
+    // Menentukan status riwayat medis yang sesuai
+    let medicalHistoryStatus: string = "no_history";  // Default ke "no_history" jika semuanya `false`
+
+    if (medicalHistory.diabetes) {
+        medicalHistoryStatus = "diabetes";
+    } else if (medicalHistory.cardiovascular) {
+        medicalHistoryStatus = "cardiovascular";
+    } else if (medicalHistory.hypertension) {
+        medicalHistoryStatus = "hypertension";
+    }
+
     return {
         personal_information: {
             height: personalInformation.height,
             weight: personalInformation.weight
         },
-        medical_history: {
-            no_history: medicalHistory.no_history,
-            diabetes: medicalHistory.diabetes,
-            hypertension: medicalHistory.hypertension,
-            cardiovascular: medicalHistory.cardiovascular
-        }
+        medical_history: medicalHistoryStatus
     }
 }
 
 export function toConsumerProfileResponse(user: User, personalInformation: PersonalInformation, medicalHistory: MedicalHistory): ConsumerProfileResponse {
+    // Menentukan status riwayat medis yang sesuai
+    let medicalHistoryStatus: string = "no_history";  // Default ke "no_history" jika semuanya `false`
+
+    if (medicalHistory.diabetes) {
+        medicalHistoryStatus = "diabetes";
+    } else if (medicalHistory.cardiovascular) {
+        medicalHistoryStatus = "cardiovascular";
+    } else if (medicalHistory.hypertension) {
+        medicalHistoryStatus = "hypertension";
+    }
+
     return {
         user: {
             id: user.id,
@@ -178,13 +176,8 @@ export function toConsumerProfileResponse(user: User, personalInformation: Perso
             weight: personalInformation.weight,
             age: personalInformation.age
         },
-        medical_history: {
-            no_history: medicalHistory.no_history,
-            diabetes: medicalHistory.diabetes,
-            hypertension: medicalHistory.hypertension,
-            cardiovascular: medicalHistory.cardiovascular
-        }
-    }
+        medical_history: medicalHistoryStatus
+    };
 }
 
 export function toRestaurantProfile(user: User, contact: Contact, address: Address): RestaurantProfileResponse {

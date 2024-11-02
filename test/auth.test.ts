@@ -8,7 +8,7 @@ describe('POST /api/auth/login', () => {
         const response = await supertest(web)
             .post("/api/auth/login")
             .send({
-                "email": "malika@gmail.com",
+                "email": "adam@gmail.com",
                 "password": "abc12345",
             });
 
@@ -20,8 +20,8 @@ describe('POST /api/auth/login', () => {
         const response = await supertest(web)
             .post("/api/auth/login")
             .send({
-                "email": "testrestaurant2@gmail.com",
-                "password": "@bc12345",
+                "email": "restorantest@gmail.com",
+                "password": "abc12345",
             });
 
         logger.debug(response.body);

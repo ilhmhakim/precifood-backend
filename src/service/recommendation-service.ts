@@ -94,10 +94,6 @@ export class RecommendationService {
 
         // Simpan rekomendasi ke database
         await this.createRecommendations(data, request.restaurant_id, request.consumer_id);
-
-        const recommendation = await this.getRecommendation(recommendationRequest);
-
-        return recommendation;
     }
 
     static async createRecommendations(recommendations: any, restaurantId: string, consumerId: string) {
