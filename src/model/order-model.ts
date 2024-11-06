@@ -4,7 +4,7 @@ export type OrderResponse = {
     id: number;
     restaurant_name: string;
     total_price: number;
-    ordered_at: string;
+    ordered_at: number;
     status: string;
     description: string;
     order_detail?:
@@ -48,7 +48,7 @@ export function toAllOrderResponse(order: Order): OrderResponse {
         id: order.id,
         restaurant_name: order.restaurant_name,
         total_price: order.total_price,
-        ordered_at: order.ordered_at.toLocaleDateString(),
+        ordered_at: order.ordered_at.getTime(),
         status: order.status,
         description: order.description
     }
@@ -59,7 +59,7 @@ export function toOrderDetailResponse(order: Order, orderDetails: OrderDetail[])
         id: order.id,
         restaurant_name: order.restaurant_name,
         total_price: order.total_price,
-        ordered_at: order.ordered_at.toLocaleDateString(),
+        ordered_at: order.ordered_at.getTime(),
         status: order.status,
         description: order.description,
         order_detail: orderDetails.map((detail) => ({

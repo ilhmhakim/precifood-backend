@@ -21,7 +21,7 @@ export type RecommendationDetail = {
 export type RecommendationResponse = {
     restaurant_id: string;
     restaurant_name: string;
-    recommended_at: string;
+    recommended_at: number;
     recommendations: {
         id: number;
         rank: number;
@@ -68,7 +68,7 @@ export function toGetRecommendation(recommendation: Recommendation, recommendati
     return {
         restaurant_id: recommendation.restaurant_id,
         restaurant_name: recommendation.restaurant_name,
-        recommended_at: recommendation.recommended_at.toLocaleDateString(),
+        recommended_at: recommendation.recommended_at.getTime(),
         recommendations: recommendationLists.map(list => ({
             id: list.id,
             rank: list.rank,
