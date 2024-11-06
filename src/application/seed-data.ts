@@ -1,9 +1,9 @@
 import {v7 as uuid7} from "uuid";
 
 export const consumerSeed = {
-    "id": String(`C-${uuid7()}`),
-    "name": "Ilham Hakim",
-    "email": "ilhamhakim@gmail.com",
+    "id": "C-0192c926-1701-7dd4-9be4-19fe6e7419ae",
+    "name": "Malika",
+    "email": "malika@gmail.com",
     "sex": "Laki-laki",
     "birth": "2003-04-11",
     "phone": "085863190000",
@@ -18,7 +18,7 @@ export const consumerSeed = {
 }
 
 export const restaurantSeed = {
-    "id": String(`R-${uuid7()}`),
+    "id": "R-0192c857-35e6-7cc2-98da-46f0faf6f651",
     "name": "Restoran Karimata",
     "email": "restorankarimata@gmail.com",
     "phone": "085782887745",
