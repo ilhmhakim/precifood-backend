@@ -1,6 +1,8 @@
 import {Menu, Nutrition} from "@prisma/client";
+import {ResponseError} from "../error/response-error";
 
-export type MenuResponse = {
+
+export type AllMenusResponse = {
     id: number;
     name: string;
     price: number;
@@ -9,21 +11,32 @@ export type MenuResponse = {
     category: string;
     description: string;
     image_url: string;
-    nutrition?: {
-        weight_per_portion: number | null;
-        weight_with_bdd: number | null;
-        calory: number | null;
-        protein: number | null;
-        fat: number | null;
-        carbohydrate: number | null;
-        fiber: number | null;
-        natrium: number | null;
-        cholesterol: number | null;
-        sfa: number | null;
-        mufa: number | null;
-        pufa: number | null;
-    }
 }
+
+export type MenuDetailResponse = {
+    id: number;
+    name: string;
+    price: number;
+    status: string;
+    portion: number;
+    category: string;
+    description: string;
+    image_url: string;
+    nutrition: {
+        weight_per_portion?: number | string | null;
+        weight_with_bdd?: number | string | null;
+        calory?: number | string | null;
+        protein?: number | string | null;
+        fat?: number | string | null;
+        carbohydrate?: number | string | null;
+        fiber?: number | string | null;
+        natrium?: number | string | null;
+        cholesterol?: number | string | null;
+        sfa?: number | string | null;
+        mufa?: number | string | null;
+        pufa?: number | string | null;
+    };
+};
 
 export type CreateMenuRequest = {
     restaurant_id: string;
@@ -54,6 +67,7 @@ export type GetAllMenuRequest = {
 export type GetMenuDetailRequest = {
     restaurant_id: string;
     menu_id: number;
+    role: string;
 }
 
 export type DeleteMenuRequest = GetMenuDetailRequest;
@@ -107,7 +121,7 @@ export type UpdateMenuApprovalRequest = {
     status: string;
 }
 
-export function toMenuResponse(menu: Menu): MenuResponse {
+export function toAllMenusResponse(menu: Menu): AllMenusResponse {
     return {
         id: menu.id,
         name: menu.name,
@@ -120,8 +134,10 @@ export function toMenuResponse(menu: Menu): MenuResponse {
     }
 }
 
-export function toMenuDetailResponse(menu: Menu, nutrition: Nutrition): MenuResponse {
-    if (!nutrition) {
+export function toMenuDetailResponse(menu: Menu, nutrition: Nutrition | null, role: string): MenuDetailResponse {
+    const noValueMessage = "Nilai nutrisi belum dimasukkan";
+
+    if (role === "Konsumen") {
         return {
             id: menu.id,
             name: menu.name,
@@ -132,44 +148,40 @@ export function toMenuDetailResponse(menu: Menu, nutrition: Nutrition): MenuResp
             description: menu.description,
             image_url: menu.image_url,
             nutrition: {
-                weight_per_portion: null,
-                weight_with_bdd: null,
-                calory: null,
-                protein: null,
-                fat: null,
-                carbohydrate: null,
-                fiber: null,
-                natrium: null,
-                cholesterol: null,
-                sfa: null,
-                mufa: null,
-                pufa: null
+                calory: nutrition?.calory ?? noValueMessage,
+                protein: nutrition?.protein ? nutrition.protein.toNumber() : noValueMessage,
+                fat: nutrition?.fat ? nutrition.fat.toNumber() : noValueMessage,
+                carbohydrate: nutrition?.carbohydrate ? nutrition.carbohydrate.toNumber() : noValueMessage
             }
-        }
-    }
-
-    return {
-        id: menu.id,
-        name: menu.name,
-        status: menu.status,
-        price: menu.price,
-        portion: menu.portion,
-        category: menu.category,
-        description: menu.description,
-        image_url: menu.image_url,
-        nutrition: {
-            weight_per_portion: nutrition.weight_per_portion,
-            weight_with_bdd: nutrition.weight_with_bdd,
-            calory: nutrition.calory,
-            protein: nutrition.protein.toNumber(),
-            fat: nutrition.fat.toNumber(),
-            carbohydrate: nutrition.carbohydrate.toNumber(),
-            fiber: nutrition.fiber.toNumber(),
-            natrium: nutrition.natrium.toNumber(),
-            cholesterol: nutrition.cholesterol.toNumber(),
-            sfa: nutrition.sfa.toNumber(),
-            mufa: nutrition.mufa.toNumber(),
-            pufa: nutrition.pufa.toNumber()
-        }
+        };
+    } else if (role === "Admin" || role === "Restoran") {
+        return {
+            id: menu.id,
+            name: menu.name,
+            status: menu.status,
+            price: menu.price,
+            portion: menu.portion,
+            category: menu.category,
+            description: menu.description,
+            image_url: menu.image_url,
+            nutrition: {
+                weight_per_portion: nutrition?.weight_per_portion ?? noValueMessage,
+                weight_with_bdd: nutrition?.weight_with_bdd ?? noValueMessage,
+                calory: nutrition?.calory ?? noValueMessage,
+                protein: nutrition?.protein ? nutrition.protein.toNumber() : noValueMessage,
+                fat: nutrition?.fat ? nutrition.fat.toNumber() : noValueMessage,
+                carbohydrate: nutrition?.carbohydrate ? nutrition.carbohydrate.toNumber() : noValueMessage,
+                fiber: nutrition?.fiber ? nutrition.fiber.toNumber() : noValueMessage,
+                natrium: nutrition?.natrium ? nutrition.natrium.toNumber() : noValueMessage,
+                cholesterol: nutrition?.cholesterol ? nutrition.cholesterol.toNumber() : noValueMessage,
+                sfa: nutrition?.sfa ? nutrition.sfa.toNumber() : noValueMessage,
+                mufa: nutrition?.mufa ? nutrition.mufa.toNumber() : noValueMessage,
+                pufa: nutrition?.pufa ? nutrition.pufa.toNumber() : noValueMessage
+            }
+        };
+    } else {
+        throw new ResponseError(400, "Invalid request");
     }
 }
+
+

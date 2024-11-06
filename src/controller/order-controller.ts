@@ -1,8 +1,9 @@
 import {Request, Response, NextFunction, request} from "express";
 import {
+    CancelOrderRequest,
     CreateOrderRequest,
     GetAllOrdersRequest,
-    GetOrderDetailRequest
+    GetOrderDetailRequest, UpdateOrderRequest
 } from "../model/order-model";
 import {OrderService} from "../service/order-service";
 import {UserRequest} from "../type/user";
@@ -14,6 +15,7 @@ export class OrderController {
     static async createOrder(req: UserRequest, res: Response, next: NextFunction) {
         try {
             const request: CreateOrderRequest = {
+                consumer_id: String(req.user.id),
                 recommendation_id: Number(req.params.recommendationId)
             }
             const response = await OrderService.createOrder(request);
@@ -51,9 +53,42 @@ export class OrderController {
             };
 
             const response = await OrderService.getOrderDetail(request);
+
             res.status(200).json({
                 message: "Success!",
                 data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async updateOrderStatus(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const request: UpdateOrderRequest = {
+                consumer_id: req.user.id,
+                order_id: Number(req.params.orderId)
+            };
+
+            const response = await OrderService.updateOrderStatus(request);
+            res.status(200).json({
+                message: "Success!",
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async cancelOrder(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const request: CancelOrderRequest = {
+                consumer_id: req.user.id,
+                order_id: Number(req.params.orderId)
+            };
+
+            await OrderService.cancelOrder(request);
+            res.status(200).json({
+                message: "Success!",
             });
         } catch (e) {
             next(e);

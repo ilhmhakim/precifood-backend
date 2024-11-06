@@ -1,4 +1,4 @@
-import {z, ZodType} from "zod";
+import { z, ZodType } from "zod";
 
 export class UserValidation {
     static readonly REGISTERCONSUMER: ZodType = z.object({
@@ -19,7 +19,7 @@ export class UserValidation {
             .trim()
             .min(1, "Nomor telepon minimal 1 karakter")
             .max(20, "Nomor telepon maksimal 20 karakter")
-            .regex(/^\+?\d+$/, "Nomor telepon harus berupa angka dan boleh diawali dengan '+'"),
+            .regex(/^\+?\d{10,20}$/, "Nomor telepon harus berupa angka dan boleh diawali dengan '+'"),
         height: z.number()
             .positive("Tinggi badan harus bernilai positif"),
         weight: z.number()
@@ -46,7 +46,8 @@ export class UserValidation {
         phone: z.string()
             .trim()
             .min(1, "Nomor telepon minimal 1 karakter")
-            .max(20, "Nomor telepon maksimal 20 karakter"),
+            .max(20, "Nomor telepon maksimal 20 karakter")
+            .regex(/^\+?\d{10,20}$/, "Nomor telepon harus berupa angka dan boleh diawali dengan '+'"),
         province: z.string()
             .trim()
             .min(1, "Panjang nama provinsi minimal 1 karakter")
@@ -102,7 +103,7 @@ export class UserValidation {
             .trim()
             .min(1, "Nomor telepon minimal 1 karakter")
             .max(20, "Nomor telepon maksimal 20 karakter")
-            .regex(/^\+?\d+$/, "Nomor telepon harus berupa angka dan boleh diawali dengan '+'")
+            .regex(/^\+?\d{10,20}$/, "Nomor telepon harus berupa angka dan boleh diawali dengan '+'")
             .optional(),
         height: z.number()
             .positive("Tinggi badan harus bernilai positif")
@@ -133,6 +134,7 @@ export class UserValidation {
             .trim()
             .min(1, "Nomor telepon minimal 1 karakter")
             .max(20, "Nomor telepon maksimal 20 karakter")
+            .regex(/^\+?\d{10,20}$/, "Nomor telepon harus berupa angka dan boleh diawali dengan '+'")
             .optional(),
         province: z.string()
             .trim()

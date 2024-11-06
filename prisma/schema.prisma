@@ -8,16 +8,16 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// datasource db {
-//   provider = "postgresql"
-//   url      = env("DATABASE_URL")
-// }
-
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
+
+// datasource db {
+//   provider  = "postgresql"
+//   url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+//   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+// }
 
 // ENUM Type
 enum RoleName {
@@ -52,7 +52,7 @@ model User {
   // User dapat menjadi Restoran atau tidak
   restaurant    Restaurant?
   // User dapat menjadi Admin atau tidak
-  Admin         Admin?
+  admin         Admin?
 
   @@map("User")
 }
@@ -112,6 +112,7 @@ model Order {
   restaurant_id   String        @db.VarChar(38)
   restaurant_name String        @db.VarChar(255)
   total_price     Int           @db.Integer
+  status          String        @default("Unconfirmed") @db.VarChar(12)
   description     String        @db.Text
   ordered_at      DateTime      @default(now()) @db.Timestamp()
   OrderDetail     OrderDetail[]
@@ -127,6 +128,7 @@ model OrderDetail {
   menu_name     String @db.VarChar(255)
   menu_category String @db.VarChar(50)
   menu_price    Int    @db.Integer
+  menu_portion  Int    @db.Integer
 
   @@map("OrderDetail")
 }
@@ -157,8 +159,18 @@ model RecommendationList {
   recommendation           Recommendation             @relation(fields: [recommendation_id], references: [id], onDelete: Cascade)
   // 1 RecommendationList memiliki Many RecommendationListDetail (Ada 1 Set Menu terdiri dari 4 macam menu yang dihasilkan)
   RecommendationListDetail RecommendationListDetail[]
+  NutritionSummary         NutritionSummary?
 
   @@map("RecommendationList")
+}
+
+model NutritionSummary {
+  recommendation_list_id Int                @id @db.Integer
+  recommendation_list    RecommendationList @relation(fields: [recommendation_list_id], references: [id])
+  calory                 Int                @default(0) @db.Integer
+  protein                Decimal            @default(0.0) @db.Decimal(6, 1)
+  fat                    Decimal            @default(0.0) @db.Decimal(6, 1)
+  carbohydrate           Decimal            @default(0.0) @db.Decimal(6, 1)
 }
 
 model RecommendationListDetail {
@@ -217,55 +229,40 @@ model Address {
 
 // Model Menu dan turunannya
 model Menu {
-  id            Int          @id @default(autoincrement())
-  name          String       @db.VarChar(255)
-  category      String       @db.VarChar(50)
-  price         Int          @db.Integer
-  portion       Int          @db.Integer
-  description   String       @db.Text
-  image_url     String       @db.Text
-  status        String       @default("Waiting") @db.VarChar(50)
-  updated_at    DateTime     @updatedAt @db.Timestamp(0)
+  id            Int        @id @default(autoincrement())
+  name          String     @db.VarChar(255)
+  category      String     @db.VarChar(50)
+  price         Int        @db.Integer
+  portion       Int        @db.Integer
+  description   String     @db.Text
+  image_url     String     @db.Text
+  status        String     @default("Waiting") @db.VarChar(50)
+  updated_at    DateTime   @updatedAt @db.Timestamp(0)
   // Setiap menu dimiliki 1 Restoran spesifik
-  restaurant_id String       @db.VarChar(38)
-  restaurant    Restaurant   @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: Cascade)
-  // 1 Menu memiliki/tersusun atas banyak Ingredient
-  Ingredient    Ingredient[]
+  restaurant_id String     @db.VarChar(38)
+  restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: Cascade)
   // 1 Menu memiliki 1 detail Nutrition (1 to 1)
   Nutrition     Nutrition?
 
   @@map("Menu")
 }
 
-model Ingredient {
-  id          Int    @id @default(autoincrement())
-  name        String @db.VarChar(255)
-  quantity    Int    @db.Integer
-  mass        Float  @db.DoublePrecision
-  description String @db.Text
-  // Many Ingredient digunakan untuk menyusun 1 Menu
-  menu_id     Int    @db.Integer
-  menu        Menu   @relation(fields: [menu_id], references: [id], onDelete: Cascade)
-
-  @@map("Ingredient")
-}
-
 model Nutrition {
   menu_id            Int     @id @db.Integer
   // 1 Nutrition dimiliki 1 Menu spesifik (1 to 1)
   menu               Menu    @relation(fields: [menu_id], references: [id], onDelete: Cascade)
-  weight_per_portion Int     @db.Integer
-  weight_with_bdd    Int     @db.Integer
-  calory             Int     @db.Integer
-  protein            Decimal @db.Decimal(6, 1)
-  fat                Decimal @db.Decimal(6, 1)
-  carbohydrate       Decimal @db.Decimal(6, 1)
-  fiber              Decimal @db.Decimal(6, 1)
-  natrium            Decimal @db.Decimal(6, 2)
-  cholesterol        Decimal @db.Decimal(6, 2)
-  sfa                Decimal @db.Decimal(6, 1)
-  mufa               Decimal @db.Decimal(6, 1)
-  pufa               Decimal @db.Decimal(6, 1)
+  weight_per_portion Int     @default(0) @db.Integer
+  weight_with_bdd    Int     @default(0) @db.Integer
+  calory             Int     @default(0) @db.Integer
+  protein            Decimal @default(0.0) @db.Decimal(6, 1)
+  fat                Decimal @default(0.0) @db.Decimal(6, 1)
+  carbohydrate       Decimal @default(0.0) @db.Decimal(6, 1)
+  fiber              Decimal @default(0.0) @db.Decimal(6, 1)
+  natrium            Decimal @default(0.00) @db.Decimal(6, 2)
+  cholesterol        Decimal @default(0.00) @db.Decimal(6, 2)
+  sfa                Decimal @default(0.0) @db.Decimal(6, 1)
+  mufa               Decimal @default(0.0) @db.Decimal(6, 1)
+  pufa               Decimal @default(0.0) @db.Decimal(6, 1)
 
   @@map("Nutrition")
 }

@@ -35,7 +35,7 @@ privateRouter.get("/api/users/restaurants/:restaurantId([a-zA-Z0-9_-]+)", author
 
 // Menu Module
 // @ts-ignore
-privateRouter.post("/api/restaurants/menu", authorizeMiddleware(Roles.Restaurant), MenuController.createMenu);
+privateRouter.post("/api/restaurants/menu", authorizeMiddleware(Roles.Restaurant), multerMiddleware, MenuController.createMenu);
 // @ts-ignore
 privateRouter.get("/api/restaurants/menus", authorizeMiddleware(Roles.Restaurant), MenuController.getAllRestaurantMenu);
 // @ts-ignore
@@ -43,7 +43,7 @@ privateRouter.get("/api/restaurants/menus/search", authorizeMiddleware(Roles.Res
 // @ts-ignore
 privateRouter.get("/api/restaurants/menus/:menuId(\\d+)", authorizeMiddleware(Roles.Restaurant), MenuController.getMenuDetail);
 // @ts-ignore
-privateRouter.patch("/api/restaurants/menus/:menuId(\\d+)", authorizeMiddleware(Roles.Restaurant), MenuController.updateMenu);
+privateRouter.patch("/api/restaurants/menus/:menuId(\\d+)", authorizeMiddleware(Roles.Restaurant), multerMiddleware, MenuController.updateMenu);
 // @ts-ignore
 privateRouter.delete("/api/restaurants/menus/:menuId(\\d+)", authorizeMiddleware(Roles.Restaurant), MenuController.deleteMenu);
 // @ts-ignore
@@ -57,7 +57,7 @@ privateRouter.post("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/menus/:menuId
 // @ts-ignore
 privateRouter.patch("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/menus/:menuId(\\d+)/nutrition", authorizeMiddleware(Roles.Admin), MenuController.updateMenuNutrition);
 // @ts-ignore
-privateRouter.patch("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/menus/:menuId(\\d+)/status", authorizeMiddleware(Roles.Admin), MenuController.updateMenuApproval);
+privateRouter.put("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/menus/:menuId(\\d+)/status", authorizeMiddleware(Roles.Admin), MenuController.updateMenuApproval);
 
 
 // Order Module
@@ -67,6 +67,10 @@ privateRouter.patch("/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/menus/:menuI
 privateRouter.get("/api/consumers/orders", authorizeMiddleware(Roles.Consumer), OrderController.getAllOrder);
 // @ts-ignore
 privateRouter.get("/api/consumers/orders/:orderId(\\d+)", authorizeMiddleware(Roles.Consumer), OrderController.getOrderDetail);
+// @ts-ignore
+privateRouter.put("/api/consumers/orders/:orderId(\\d+)/status", authorizeMiddleware(Roles.Consumer), OrderController.updateOrderStatus);
+// @ts-ignore
+privateRouter.delete("/api/consumers/orders/:orderId(\\d+)", authorizeMiddleware(Roles.Consumer), OrderController.cancelOrder);
 
 // Notification Module
 // @ts-ignore

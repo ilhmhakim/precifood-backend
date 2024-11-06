@@ -10,15 +10,23 @@ import {
 } from "../model/menu-model";
 import {MenuService} from "../service/menu-service";
 import {UserRequest} from "../type/user";
+import {ImageUploaderService} from "../service/image-uploader-service";
 
 export class MenuController {
     static async createMenu(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const request: CreateMenuRequest = req.body as CreateMenuRequest;
-            request.restaurant_id = req.user.id;
+            const file = req.file;
+            const imageUrl = await ImageUploaderService.uploadImage(file, "menu-images");
+
+            const request: CreateMenuRequest = {
+                ...req.body,
+                restaurant_id: req.user.id,
+                image_url: imageUrl
+            } as CreateMenuRequest;
+
             const response = await MenuService.createMenu(request);
             res.status(201).json({
-                message: "Menu berhasil ditambahkan, notifikasi terkirim kepada admin",
+                message: "Success!",
                 data: response
             });
         } catch (e) {
@@ -28,13 +36,22 @@ export class MenuController {
 
     static async updateMenu(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const request: UpdateMenuRequest = req.body as UpdateMenuRequest;
-            request.restaurant_id = String(req.user.id);
-            request.menu_id = Number(req.params.menuId);
-            const response = await MenuService.updateMenu(request);
+            let imageUrl;
+            if(req.file){
+                imageUrl = await ImageUploaderService.uploadImage(req.file, "menu-images");
+            }
+
+            const request: UpdateMenuRequest = {
+                ...req.body,
+                restaurant_id: String(req.user.id),
+                menu_id: Number(req.params.menuId),
+                image_url: imageUrl || req.body.image_url,
+            };
+
+            await MenuService.updateMenu(request);
+
             res.status(201).json({
-                message: "Menu berhasil ditambahkan, notifikasi terkirim kepada admin",
-                data: response
+                message: "Success!"
             });
         } catch (e) {
             next(e);
@@ -46,10 +63,11 @@ export class MenuController {
             const request: DeleteMenuRequest = req.body as DeleteMenuRequest;
             request.restaurant_id = String(req.user.id);
             request.menu_id = Number(req.params.menuId);
-            const response = await MenuService.deleteMenu(request);
+
+            await MenuService.deleteMenu(request);
+
             res.status(200).json({
-                message: "Menu berhasil dihapus",
-                data: response
+                message: "Success!"
             });
         } catch (e) {
             next(e);
@@ -61,10 +79,11 @@ export class MenuController {
             const request: CreateMenuNutritionRequest = req.body as CreateMenuNutritionRequest;
             request.restaurant_id = String(req.params.restaurantId);
             request.menu_id = Number(req.params.menuId);
-            const response = await MenuService.createMenuNutrition(request);
+
+            await MenuService.createMenuNutrition(request);
+
             res.status(201).json({
-                message: "Nutrisi menu berhasil ditambahkan",
-                data: response
+                message: "Success!",
             });
         } catch (e) {
             next(e);
@@ -76,10 +95,11 @@ export class MenuController {
             const request: UpdateMenuNutritionRequest = req.body as UpdateMenuNutritionRequest;
             request.restaurant_id = String(req.params.restaurantId);
             request.menu_id = Number(req.params.menuId);
-            const response = await MenuService.updateMenuNutrition(request);
+
+            await MenuService.updateMenuNutrition(request);
+
             res.status(201).json({
-                message: "Nutrisi menu berhasil diupdate",
-                data: response
+                message: "Success!"
             });
         } catch (e) {
             next(e);
@@ -91,10 +111,11 @@ export class MenuController {
             const request: UpdateMenuApprovalRequest = req.body as UpdateMenuApprovalRequest;
             request.restaurant_id = String(req.params.restaurantId);
             request.menu_id = Number(req.params.menuId);
-            const response = await MenuService.updateMenuApproval(request);
+
+            await MenuService.updateMenuApproval(request);
+
             res.status(201).json({
-                message: "Status menu berhasil diupdate",
-                data: response
+                message: "Success!",
             });
         } catch (e) {
             next(e);
@@ -131,6 +152,7 @@ export class MenuController {
             const request: GetMenuDetailRequest = {
                 restaurant_id: requestRestaurantId,
                 menu_id: requestMenuId,
+                role: requestRole
             };
 
             const response = await MenuService.getMenuDetail(request);

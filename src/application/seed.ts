@@ -105,7 +105,11 @@ export async function Seed(req: Request, res: Response, next: NextFunction) {
                 id: String(adminSeed.id),
                 email: adminSeed.email,
                 password: await bcrypt.hash(adminSeed.password, 10),
-                role: "Admin"
+                role: "Admin",
+                admin: {
+                    create: {}
+                }
+
             }
         });
 

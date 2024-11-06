@@ -1,5 +1,4 @@
-import {Recommendation, RecommendationList, RecommendationListDetail} from "@prisma/client";
-import {number} from "zod";
+import {NutritionSummary, Recommendation, RecommendationList, RecommendationListDetail} from "@prisma/client";
 
 export type RecommendationDetail = {
     rekomendasi: string;
@@ -36,8 +35,14 @@ export type RecommendationResponse = {
 
 export type RecommendationDetailResponse = {
     total_price: number;
+    nutrition_summary: {
+        calory: number;
+        protein: number;
+        fat: number;
+        carbohydrate: number;
+    };
     recommendations: Array<{
-        id: number;
+        menu_id: number;
         name: string;
         category: string;
         portion: number;
@@ -53,13 +58,9 @@ export type GetRecommendationRequest = {
     restaurant_id: string;
 }
 
-export type GetRecommendationListRequest = {
-    restaurant_id: string;
-    recommendation_id: number;
-}
-
-
 export type GetRecommendationListDetailRequest = {
+    restaurant_id: string;
+    consumer_id: string;
     recommendation_id: number;
 }
 
@@ -82,14 +83,17 @@ export function toGetRecommendation(recommendation: Recommendation, recommendati
 
 
 // Fungsi untuk mengonversi ke RecommendationDetailResponse
-export function toGetRecommendationDetail(
-    recommendationList: RecommendationList,
-    recommendationDetails: RecommendationListDetail[]
-): RecommendationDetailResponse {
+export function toGetRecommendationDetail(recommendationList: RecommendationList, nutritionSummary: NutritionSummary, recommendationDetails: RecommendationListDetail[]): RecommendationDetailResponse {
     return {
         total_price: recommendationList.total_price,
+        nutrition_summary: {
+            calory: nutritionSummary.calory,
+            protein: nutritionSummary.protein.toNumber(),
+            fat: nutritionSummary.carbohydrate.toNumber(),
+            carbohydrate: nutritionSummary.carbohydrate.toNumber()
+        },
         recommendations: recommendationDetails.map(detail => ({
-            id: detail.menu_id,
+            menu_id: detail.menu_id,
             name: detail.menu_name,
             category: detail.menu_category,
             portion: detail.menu_portion,

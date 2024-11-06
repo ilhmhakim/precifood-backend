@@ -11,14 +11,22 @@ import {Validation} from "../validation/validation";
 import {RecommendationValidation} from "../validation/recommendation-validation";
 
 export class RecommendationService {
-    static async getRecommendation(request: GetRecommendationRequest) {
-        const requestRecommendation = Validation.validate(RecommendationValidation.GETRECOMMENDATION, request);
-
-        // Mencari rekomendasi berdasarkan restaurant_id dan consumer_id
+    // Untuk menampilkan 10 set rekomendasi menu pada suatu restoran
+    static async checkRecommendationForSpecificRestaurantandConsumer(restaurantId: string, consumerId: string) {
         const recommendation = await prismaClient.recommendation.findFirst({
             where: {
-                restaurant_id: requestRecommendation.restaurant_id,
-                consumer_id: requestRecommendation.consumer_id,
+                restaurant_id: restaurantId,
+                consumer_id: consumerId,
+            },
+            include: {
+                RecommendationList: {
+                    include: {
+                        RecommendationListDetail: true
+                    },
+                    orderBy: {
+                        rank: 'asc'
+                    }
+                }
             },
             orderBy: {
                 recommended_at: "desc"
@@ -29,44 +37,51 @@ export class RecommendationService {
             throw new ResponseError(404, "Tidak ditemukan rekomendasi, silahkan generate rekomendasi baru");
         }
 
-        // Mengambil RecommendationList dan meng-include RecommendationListDetail di dalamnya
-        const recommendationLists = await prismaClient.recommendationList.findMany({
+        return recommendation;
+    }
+
+    static async checkRecommendationDetail(recommendationListId: number, consumerId: string) {
+        // Cari recommendation list berdasarkan id dan cocokkan juga dengan consumer_id
+        const recommendationList = await prismaClient.recommendationList.findFirst({
             where: {
-                recommendation_id: recommendation.id
+                id: recommendationListId,
+                recommendation: {
+                    consumer_id: consumerId, // Pastikan hanya mengambil jika consumer_id cocok
+                },
             },
             include: {
-                RecommendationListDetail: true // Meng-include RecommendationListDetail untuk akses langsung
-            },
-            orderBy: {
-                rank: 'asc'
+                recommendation: true,
+                NutritionSummary: true,
+                RecommendationListDetail: true,
             }
         });
 
-        // Menggunakan toGetRecommendation untuk mengembalikan hasil
-        return toGetRecommendation(recommendation, recommendationLists);
+        // Jika tidak ditemukan, lemparkan error karena bukan milik pengguna atau tidak ada
+        if (!recommendationList) {
+            throw new ResponseError(404, "Recommendation tidak ditemukan");
+        }
+
+        return recommendationList;
+    }
+
+    // Untuk menampilkan 10 set rekomendasi menu pada suatu restoran
+    static async getRecommendation(request: GetRecommendationRequest) {
+        const requestRecommendation = Validation.validate(RecommendationValidation.GETRECOMMENDATION, request);
+        const recommendation = await this.checkRecommendationForSpecificRestaurantandConsumer(requestRecommendation.restaurant_id, requestRecommendation.consumer_id);
+        return toGetRecommendation(recommendation, recommendation.RecommendationList!);
     }
 
     // Fungsi utama untuk mendapatkan rekomendasi detail
     static async getRecommendationListDetail(request: GetRecommendationListDetailRequest): Promise<RecommendationDetailResponse> {
-        // Mendapatkan semua detail rekomendasi berdasarkan ID rekomendasi
-        const recommendationListDetails = await prismaClient.recommendationListDetail.findMany({
-            where: {
-                recommendation_list_id: request.recommendation_id
-            },
-            include: {
-                recommendation_list: true
-            }
-        });
+        const requestRecommendation = Validation.validate(RecommendationValidation.GETRECOMMENDATION, request);
+        // Menggunakan `checkRecommendationForSpecificRestaurantandConsumer` untuk mengambil semua data
+        await this.checkRecommendationForSpecificRestaurantandConsumer(requestRecommendation.restaurant_id, requestRecommendation.consumer_id);
 
-        if (recommendationListDetails.length === 0) {
-            throw new Error("Recommendation list not found");
-        }
-
-        // Ambil recommendation_list untuk mengambil total_price
-        const recommendationList = recommendationListDetails[0].recommendation_list;
+        // Gunakan fungsi checkRecommendationDetail untuk mendapatkan data recommendation list dan detailnya
+        const recommendationList = await this.checkRecommendationDetail(requestRecommendation.recommendation_id, requestRecommendation.consumer_id);
 
         // Mengembalikan response dalam bentuk yang diinginkan
-        return toGetRecommendationDetail(recommendationList, recommendationListDetails);
+        return toGetRecommendationDetail(recommendationList, recommendationList.NutritionSummary!, recommendationList.RecommendationListDetail);
     }
 
 
@@ -78,7 +93,7 @@ export class RecommendationService {
             restaurantId: recommendationRequest.restaurant_id,
         };
 
-        const response = await fetch('https://precifood-model.et.r.appspot.com/get_menu', {
+        const response = await fetch('http://127.0.0.1:5000/get_menu', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -94,6 +109,8 @@ export class RecommendationService {
 
         // Simpan rekomendasi ke database
         await this.createRecommendations(data, request.restaurant_id, request.consumer_id);
+
+        await this.getRecommendation(recommendationRequest);
     }
 
     static async createRecommendations(recommendations: any, restaurantId: string, consumerId: string) {
@@ -103,7 +120,7 @@ export class RecommendationService {
             data: {
                 consumer_id: consumerId,
                 restaurant_id: restaurantId,
-                restaurant_name: restaurant.contact.name
+                restaurant_name: restaurant.Contact!.name
             },
             include: {
                 RecommendationList: true
@@ -133,46 +150,54 @@ export class RecommendationService {
             data: {
                 recommendation_id: recommendationId,
                 rank: i + 1,
-                description: `${menuOne.menu.name}, ${menuTwo.menu.name}, ${menuThree.menu.name}, ${menuFour.menu.name}`,
-                total_price: menuOne.menu.price + menuTwo.menu.price + menuThree.menu.price + menuFour.menu.price,
+                description: `${menuOne.name}, ${menuTwo.name}, ${menuThree.name}, ${menuFour.name}`,
+                total_price: menuOne.price + menuTwo.price + menuThree.price + menuFour.price,
+                NutritionSummary: {
+                    create: {
+                        calory: recommendationDetail.calory,
+                        protein: recommendationDetail.protein,
+                        fat: recommendationDetail.fat,
+                        carbohydrate: recommendationDetail.carbohydrate
+                    }
+                },
                 RecommendationListDetail: {
                     createMany: {
                         data: [
                             {
-                                menu_id: menuOne.menu.id,
-                                menu_name: menuOne.menu.name,
-                                menu_category: menuOne.menu.category,
-                                menu_portion: menuOne.menu.portion,
-                                menu_price: menuOne.menu.price,
-                                menu_description: menuOne.menu.description,
-                                image_url: menuOne.menu.image_url
+                                menu_id: menuOne.id,
+                                menu_name: menuOne.name,
+                                menu_category: menuOne.category,
+                                menu_portion: menuOne.portion,
+                                menu_price: menuOne.price,
+                                menu_description: menuOne.description,
+                                image_url: menuOne.image_url
                             },
                             {
-                                menu_id: menuTwo.menu.id,
-                                menu_name: menuTwo.menu.name,
-                                menu_category: menuTwo.menu.category,
-                                menu_portion: menuTwo.menu.portion,
-                                menu_price: menuTwo.menu.price,
-                                menu_description: menuTwo.menu.description,
-                                image_url: menuTwo.menu.image_url
+                                menu_id: menuTwo.id,
+                                menu_name: menuTwo.name,
+                                menu_category: menuTwo.category,
+                                menu_portion: menuTwo.portion,
+                                menu_price: menuTwo.price,
+                                menu_description: menuTwo.description,
+                                image_url: menuTwo.image_url
                             },
                             {
-                                menu_id: menuThree.menu.id,
-                                menu_name: menuThree.menu.name,
-                                menu_category: menuThree.menu.category,
-                                menu_portion: menuThree.menu.portion,
-                                menu_price: menuThree.menu.price,
-                                menu_description: menuThree.menu.description,
-                                image_url: menuThree.menu.image_url
+                                menu_id: menuThree.id,
+                                menu_name: menuThree.name,
+                                menu_category: menuThree.category,
+                                menu_portion: menuThree.portion,
+                                menu_price: menuThree.price,
+                                menu_description: menuThree.description,
+                                image_url: menuThree.image_url
                             },
                             {
-                                menu_id: menuFour.menu.id,
-                                menu_name: menuFour.menu.name,
-                                menu_category: menuFour.menu.category,
-                                menu_portion: menuFour.menu.portion,
-                                menu_price: menuFour.menu.price,
-                                menu_description: menuFour.menu.description,
-                                image_url: menuFour.menu.image_url
+                                menu_id: menuFour.id,
+                                menu_name: menuFour.name,
+                                menu_category: menuFour.category,
+                                menu_portion: menuFour.portion,
+                                menu_price: menuFour.price,
+                                menu_description: menuFour.description,
+                                image_url: menuFour.image_url
                             }
                         ]
                     }
