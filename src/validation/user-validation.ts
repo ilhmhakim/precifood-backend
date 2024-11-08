@@ -113,7 +113,7 @@ export class UserValidation {
             .optional(),
         medical_history: z.enum(["no_history", "diabetes", "cardiovascular", "hypertension"], {
             errorMap: () => ({ message: "Riwayat penyakit yang bisa diisi hanya 'no_history', 'diabetes', 'cardiovascular', 'hypertension'" })
-        })
+        }).optional()
     });
 
     static readonly UPDATERESTAURANT: ZodType = z.object({

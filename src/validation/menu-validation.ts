@@ -41,10 +41,10 @@ export class MenuValidation {
         }).optional(),
         price: z.string().transform((val) => parseInt(val, 10)).refine(val => !isNaN(val) && val > 0, {
             message: "Harga harus bernilai positif dan berupa angka"
-        }),
+        }).optional(),
         portion: z.string().transform((val) => parseInt(val, 10)).refine(val => !isNaN(val) && val > 0, {
             message: "Porsi harus bernilai positif dan berupa angka"
-        }),
+        }).optional(),
         description: z.string().trim().min(1).optional(),
         image_url: z.string().trim().min(1).optional()
     });
@@ -93,7 +93,7 @@ export class MenuValidation {
         restaurant_id: z.string().trim().min(38, "ID restoran tidak valid").max(38, "ID restoran tidak valid"),
         menu_id: z.number().positive("Menu ID harus bernilai positif"),
         weight_per_portion: z.number().positive().optional(),
-        weight_with_bdd: z.number().positive("Berat dengan BDD harus bernilai positif"),
+        weight_with_bdd: z.number().positive("Berat dengan BDD harus bernilai positif").optional(),
         calory: z.number().positive().optional(),
         protein: z.number().positive().refine(val => /^\d+(\.\d{1,2})?$/.test(val.toString()), {
             message: "Protein harus memiliki maksimal 1 atau 2 angka di belakang koma"
