@@ -8,7 +8,7 @@ export class UserValidation {
             .max(255, "Panjang nama maksimal 255 karakter"),
         email: z.string()
             .trim()
-            .email("Format email tidak valid"),
+            .email({ message: "Format email tidak valid" }),
         sex: z.enum(["Laki-laki", "Perempuan"], {
             errorMap: () => ({ message: "Jenis kelamin harus 'Laki-laki' atau 'Perempuan'" })
         }),

@@ -1,6 +1,16 @@
 import { z, ZodType } from 'zod';
 
 export class RecommendationValidation {
+    static readonly GENERATERECOMMENDATION: ZodType = z.object({
+        token: z.string(),
+        consumer_id: z.string()
+            .trim()
+            .length(38, "ID tidak valid"),
+        restaurant_id: z.string()
+            .trim()
+            .length(38, "ID tidak valid"),
+    });
+
     static readonly GETRECOMMENDATION: ZodType = z.object({
         consumer_id: z.string()
             .trim()

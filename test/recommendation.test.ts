@@ -5,8 +5,8 @@ import { logger } from "../src/application/logging";
 describe('Mendapatkan rekomendasi pada model (GET)', () => {
     it('(+) (Konsumen) Dapat mengakses seluruh order yang telah dipesan ', async () => {
         const response = await supertest(web)
-            .post("/api/restaurants/R-0192c857-35e6-7cc2-98da-46f0faf6f651/recommendations")
-            .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmM4NTctMzVlNi03Y2MyLTk4ZGEtM2Q3NmY4Mjc5NDE2IiwiZW1haWwiOiJpbGhhbWhha2ltQGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlhdCI6MTcyOTkzODEwMCwiZXhwIjoxNzMwMTEwOTAwfQ.yLhlqkeTAx6gNOkWXA5VDAyd09LKRs2Xln-_FmCLNhQ`)
+            .post("/api/restaurants/R-0192fb09-19e1-7cce-a0d9-2dbe193045e9/recommendations")
+            .set("Authorization", `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkMtMDE5MmZiMDktMTllMS03Y2NlLWEwZDktMjM1YmE3NDUyN2JjIiwiZW1haWwiOiJpbGhhbWhha2ltQGdtYWlsLmNvbSIsInJvbGUiOiJLb25zdW1lbiIsImlhdCI6MTczMTM5ODg3NywiZXhwIjoxNzMxNTcxNjc3fQ.ASVrMVRSvVZ6s3RFu9KmqkX8vyq_zLgYxXmzcczBWyY`)
         logger.debug(response.body);
         expect(response.body.message).toBeDefined();
     }, 10000000); // Menambahkan timeout 10 detik

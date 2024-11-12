@@ -52,6 +52,11 @@ export type RecommendationDetailResponse = {
     }>;
 };
 
+export type GenerateRecommendationRequest = {
+    token: string;
+    consumer_id: string;
+    restaurant_id: string;
+}
 
 export type GetRecommendationRequest = {
     consumer_id: string;

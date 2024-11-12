@@ -1,16 +1,28 @@
 import {UserRequest} from "../type/user";
 import {Response, NextFunction} from "express";
-import {GetRecommendationListDetailRequest, GetRecommendationRequest} from "../model/recommendation-model";
+import {
+    GenerateRecommendationRequest,
+    GetRecommendationListDetailRequest,
+    GetRecommendationRequest
+} from "../model/recommendation-model";
 import {MenuService} from "../service/menu-service";
 import {RecommendationService} from "../service/recommendation-service";
+import {ResponseError} from "../error/response-error";
 
 export class RecommendationController {
     static async getRecommendationFromModel(req: UserRequest, res: Response, next: NextFunction) {
+        const isGenerating = await RecommendationService.checkGenerateStatus(req.user.id);
+
+        if (isGenerating?.is_generating === true) {
+            return next(new ResponseError(400, "Generate rekomendasi sedang dalam proses"));
+        }
+
         try {
-            const request: GetRecommendationRequest = {
-                consumer_id: req.user.id,
+            const request: GenerateRecommendationRequest = {
+                token: req.headers["authorization"] as string,
+                consumer_id: String(req.user.id),
                 restaurant_id: req.params.restaurantId
-            }
+            };
 
             res.status(200).json({
                 message: "Generate rekomendasi berhasil! Silahkan untuk merefresh halaman rekomendasi menu setelah 5 menit",
@@ -24,9 +36,10 @@ export class RecommendationController {
                 }
             });
         } catch (e) {
-            next(e);
+            next(e); // Pastikan kesalahan diteruskan ke middleware error
         }
     }
+
 
     static async getRecommendation(req: UserRequest, res: Response, next: NextFunction) {
         try {

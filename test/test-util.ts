@@ -1,6 +1,4 @@
 import {prismaClient} from "../src/application/database";
-import bcrypt from "bcrypt";
-import {Address, Contact, User} from "@prisma/client";
 
 export class UserTest {
     static async delete() {
@@ -10,4 +8,44 @@ export class UserTest {
             }
         })
     }
+
 }
+
+export class AuthTest {
+    static async loginConsumer() {
+
+    }
+
+    static async loginRestaurant() {
+
+    }
+
+    static async loginAdmin() {
+
+    }
+
+    static async updateEmail() {
+
+    }
+
+    static async updatePassword() {
+
+    }
+}
+
+export class MenuTest {
+
+}
+
+export class RecommendationTest {
+
+}
+
+export class OrderTest {
+
+}
+
+export class NotificationTest {
+
+}
+

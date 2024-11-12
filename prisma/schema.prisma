@@ -8,16 +8,16 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// datasource db {
-//   provider = "postgresql"
-//   url      = env("DATABASE_URL")
-// }
-
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
+
+// datasource db {
+//   provider  = "postgresql"
+//   url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+//   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+// }
 
 // ENUM Type
 enum RoleName {
@@ -62,6 +62,8 @@ model Consumer {
   // Consumer memiliki id yang sama dengan User's id (1 to 1)
   consumer_id         String               @id @db.VarChar(38)
   user                User                 @relation(fields: [consumer_id], references: [id], onDelete: Cascade)
+  is_generating       Boolean              @default(false)
+  generator_error     String?              @db.Text
   // Hubungan antara PersonalInformation dan Consumer adalah 1 to 1
   PersonalInformation PersonalInformation?
   // Hubungan antara MedicalHistory dan Consumer adalah 1 to 1
