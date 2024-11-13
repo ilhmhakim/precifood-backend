@@ -1,4 +1,4 @@
-import {NutritionSummary, Recommendation, RecommendationList, RecommendationListDetail} from "@prisma/client";
+import {Consumer, NutritionSummary, Recommendation, RecommendationList, RecommendationListDetail} from "@prisma/client";
 
 export type RecommendationDetail = {
     rekomendasi: string;
@@ -22,6 +22,10 @@ export type RecommendationResponse = {
     restaurant_id: string;
     restaurant_name: string;
     recommended_at: number;
+    status: {
+        is_generating: boolean;
+        generator_error: string | null;
+    }
     recommendations: {
         id: number;
         rank: number;
@@ -69,11 +73,15 @@ export type GetRecommendationListDetailRequest = {
     recommendation_id: number;
 }
 
-export function toGetRecommendation(recommendation: Recommendation, recommendationLists: (RecommendationList & { RecommendationListDetail: RecommendationListDetail[] })[]): RecommendationResponse {
+export function toGetRecommendation(status: Consumer, recommendation: Recommendation, recommendationLists: (RecommendationList & { RecommendationListDetail: RecommendationListDetail[] })[]): RecommendationResponse {
     return {
         restaurant_id: recommendation.restaurant_id,
         restaurant_name: recommendation.restaurant_name,
         recommended_at: recommendation.recommended_at.getTime(),
+        status: {
+            is_generating: status.is_generating,
+            generator_error: status.generator_error
+        },
         recommendations: recommendationLists.map(list => ({
             id: list.id,
             rank: list.rank,

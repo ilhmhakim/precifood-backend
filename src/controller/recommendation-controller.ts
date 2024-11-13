@@ -8,6 +8,7 @@ import {
 import {MenuService} from "../service/menu-service";
 import {RecommendationService} from "../service/recommendation-service";
 import {ResponseError} from "../error/response-error";
+import {prismaClient} from "../application/database";
 
 export class RecommendationController {
     static async getRecommendationFromModel(req: UserRequest, res: Response, next: NextFunction) {
@@ -36,7 +37,13 @@ export class RecommendationController {
                 }
             });
         } catch (e) {
-            next(e); // Pastikan kesalahan diteruskan ke middleware error
+            await prismaClient.consumer.update({
+                where: { consumer_id: String(req.user.id) },
+                data: {
+                    generator_error: String(e), // Menyimpan pesan error
+                    is_generating: false, // Mengatur status is_generating menjadi false
+                }
+            });
         }
     }
 
