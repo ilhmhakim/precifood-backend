@@ -109,7 +109,7 @@ export class RecommendationService {
             // Update is_generating menjadi true
             await prismaClient.consumer.update({
                 where: { consumer_id: recommendationRequest.consumer_id },
-                data: { is_generating: true }
+                data: { is_generating: true, generator_error: null }
             });
 
             const payload = {
