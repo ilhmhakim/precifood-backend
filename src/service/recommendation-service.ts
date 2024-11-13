@@ -4,7 +4,7 @@ import {
     GetRecommendationListDetailRequest,
     GetRecommendationRequest,
     RecommendationDetail, RecommendationDetailResponse,
-    toGetRecommendation, toGetRecommendationDetail
+    toGetRecommendation, toGetRecommendationDetail, toGetRecommendationNone
 } from "../model/recommendation-model";
 import { ResponseError } from "../error/response-error";
 import { MenuService } from "./menu-service";
@@ -46,9 +46,9 @@ export class RecommendationService {
             }
         });
 
-        if (!recommendation) {
-            throw new ResponseError(404, "Tidak ditemukan rekomendasi, silahkan generate rekomendasi baru");
-        }
+        // if (!recommendation) {
+        //     throw new ResponseError(404, "Tidak ditemukan rekomendasi, silahkan generate rekomendasi baru");
+        // }
 
         return recommendation;
     }
@@ -83,6 +83,10 @@ export class RecommendationService {
         const recommendation = await this.checkRecommendationForSpecificRestaurantandConsumer(requestRecommendation.restaurant_id, requestRecommendation.consumer_id);
         const status = await this.checkGenerateStatus(requestRecommendation.consumer_id);
 
+        if(!recommendation){
+            return toGetRecommendationNone(status!);
+        }
+
         return toGetRecommendation(status!, recommendation, recommendation.RecommendationList!);
     }
 
@@ -116,7 +120,7 @@ export class RecommendationService {
                 restaurantId: recommendationRequest.restaurant_id,
             };
 
-            const response = await fetch('http://127.0.0.1:5000/generate-recommendation', {
+            const response = await fetch('https://precifood-model.et.r.appspot.com/generate-recommendation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

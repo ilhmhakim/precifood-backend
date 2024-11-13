@@ -18,8 +18,8 @@ describe('Registrasi Konsumen (POST /api/signup/consumer)', () => {
         const response = await supertest(web)
             .post("/api/signup/consumer")
             .send({
-                "name": "Malika",
-                "email": "malika",
+                "name": "Adam Malik",
+                "email": "adammaliks@gmail.com",
                 "sex": "Laki-laki",
                 "birth": "1975-09-11",
                 "phone": "085812340000",

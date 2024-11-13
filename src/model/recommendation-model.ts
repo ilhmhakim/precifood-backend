@@ -1,4 +1,5 @@
 import {Consumer, NutritionSummary, Recommendation, RecommendationList, RecommendationListDetail} from "@prisma/client";
+import {boolean, string} from "zod";
 
 export type RecommendationDetail = {
     rekomendasi: string;
@@ -71,6 +72,24 @@ export type GetRecommendationListDetailRequest = {
     restaurant_id: string;
     consumer_id: string;
     recommendation_id: number;
+}
+
+export type RecommendationNoneResponse = {
+    status: {
+        is_generating: boolean;
+        generator_error: string | null;
+    };
+    errors: string;
+}
+
+export function toGetRecommendationNone(status: Consumer): RecommendationNoneResponse {
+    return {
+        status: {
+            is_generating: status.is_generating,
+            generator_error: status.generator_error
+        },
+        errors: "Tidak ditemukan rekomendasi, silahkan generate rekomendasi baru"
+    }
 }
 
 export function toGetRecommendation(status: Consumer, recommendation: Recommendation, recommendationLists: (RecommendationList & { RecommendationListDetail: RecommendationListDetail[] })[]): RecommendationResponse {
