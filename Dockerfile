@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with npm ci for reproducible builds
+RUN npm ci
 
 # Copy the rest of the application code
 COPY . .
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production stage
-FROM node:20-alpine
+FROM node:20-alpine AS production
 
 # Set working directory
 WORKDIR /app
@@ -26,11 +26,11 @@ WORKDIR /app
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
 
-# Install production dependencies
-RUN npm install --only=production
+# Install only production dependencies
+RUN npm ci --only=production
 
 # Expose the application port
 EXPOSE 8000
 
 # Run the application
-CMD ["npm", "run", "start"]
+CMD ["npm", "start"]
