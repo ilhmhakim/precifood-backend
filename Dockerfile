@@ -33,4 +33,4 @@ RUN npm install --only=production
 EXPOSE 8000
 
 # Run the application
-CMD ["node", "run", "start"]
+CMD ["npm", "run", "start"]
