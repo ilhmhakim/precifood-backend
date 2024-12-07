@@ -105,6 +105,11 @@ export class RecommendationService {
 
     static async getRecommendationFromModel(request: GenerateRecommendationRequest) {
         const recommendationRequest = Validation.validate(RecommendationValidation.GENERATERECOMMENDATION, request);
+        const status = await this.checkGenerateStatus(recommendationRequest.consumer_id);
+
+        if(status!.is_generating === true) {
+            throw new ResponseError(400, "Rekomendasi sedang digenerate")
+        }
 
         try {
             // Cek restoran dengan memanggil checkRestaurant
@@ -120,7 +125,7 @@ export class RecommendationService {
                 restaurantId: recommendationRequest.restaurant_id,
             };
 
-            const response = await fetch('https://precifood-model.et.r.appspot.com/generate-recommendation', {
+            const response = await fetch('https://model-api-117488712642.asia-southeast2.run.app/generate-recommendation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -129,7 +134,7 @@ export class RecommendationService {
                 body: JSON.stringify(payload),
             });
 
-            if (!response.ok) {
+            if (response.status !== 200) {
                 const error = new Error('Terjadi kegagalan pada generate model. Silahkan generate ulang!');
                 error.name = 'ModelGenerationError';
 

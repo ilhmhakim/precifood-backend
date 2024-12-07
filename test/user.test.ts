@@ -18,8 +18,8 @@ describe('Registrasi Konsumen (POST /api/signup/consumer)', () => {
         const response = await supertest(web)
             .post("/api/signup/consumer")
             .send({
-                "name": "Adam Malik",
-                "email": "adammaliks@gmail.com",
+                "name": "Fix",
+                "email": "testfix@gmail.com",
                 "sex": "Laki-laki",
                 "birth": "1975-09-11",
                 "phone": "085812340000",
@@ -88,8 +88,8 @@ describe('Registrasi Konsumen (POST /api/signup/consumer)', () => {
         const response = await supertest(web)
             .post("/api/signup/consumer")
             .send({
-                "name": "John Doe",
-                "email": "testconsumer@gmail.com",
+                "name": "Fix",
+                "email": "testfix@gmail.com",
                 "sex": "Laki-laki",
                 "birth": "1975-09-22",
                 "phone": "085812340000",
@@ -100,7 +100,7 @@ describe('Registrasi Konsumen (POST /api/signup/consumer)', () => {
                 "hypertension": false,
                 "cardiovascular": false,
                 "password": "@bc12345",
-                "password_confirmation": "bac12345"
+                "password_confirmation": "abc12345"
             });
 
         logger.debug(response.body);
