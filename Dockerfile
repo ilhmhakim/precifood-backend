@@ -1,35 +1,38 @@
-# Gunakan node:20 sebagai base image
-FROM node:20
+# Stage 1: Build Stage
+FROM node:20 AS build
 
 # Set working directory
 WORKDIR /app
 
-# Salin package.json dan package-lock.json
-COPY package*.json ./
+# Salin package.json dan package-lock.json dari folder precifood-backend ke dalam image
+COPY precifood-backend/package*.json ./
 
-# Install dependencies dengan npm ci untuk build yang lebih konsisten
-RUN npm ci
+# Install dependencies
+RUN npm install --production=false
 
-# Salin folder prisma dan file lainnya (pastikan file .env ada di sini jika diperlukan)
-COPY prisma ./prisma
+# Salin seluruh kode aplikasi dari folder precifood-backend
+COPY precifood-backend/ .
 
-# Salin file .env untuk memastikan variabel lingkungan tersedia
-COPY .env .env
-
-# Jalankan prisma generate untuk membangun Prisma Client
-RUN npx prisma generate
-
-# Salin seluruh kode aplikasi
-COPY . .
-
-# Bangun aplikasi TypeScript
+# Build aplikasi TypeScript
 RUN npm run build
 
-# Install dependencies untuk produksi
-RUN npm ci --only=production
+# Stage 2: Production Stage
+FROM node:20 AS production
+
+# Set working directory
+WORKDIR /app
+
+# Salin dependencies dari build stage
+COPY --from=build /app/node_modules /app/node_modules
+
+# Salin aplikasi yang sudah dibangun
+COPY --from=build /app/dist /app/dist
+
+# Salin file .env jika diperlukan
+COPY precifood-backend/.env .env
 
 # Expose port aplikasi
 EXPOSE 8000
 
 # Jalankan aplikasi
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]
