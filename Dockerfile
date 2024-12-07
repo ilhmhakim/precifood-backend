@@ -30,7 +30,7 @@ COPY --from=builder /app/dist ./dist
 RUN npm install --only=production
 
 # Expose the application port
-EXPOSE 3000
+EXPOSE 8000
 
 # Run the application
 CMD ["node", "run", "start"]
