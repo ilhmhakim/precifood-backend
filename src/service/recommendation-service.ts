@@ -122,10 +122,10 @@ export class RecommendationService {
             });
 
             const payload = {
-                restaurantId: recommendationRequest.restaurant_id,
+                restaurant_id: recommendationRequest.restaurant_id,
             };
 
-            const response = await fetch('https://model-api-117488712642.asia-southeast2.run.app/generate-recommendation', {
+            const response = await fetch('http://0.0.0.0:5000/generate-recommendation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
