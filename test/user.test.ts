@@ -117,7 +117,7 @@ describe('Registrasi Restoran (POST /api/signup/restaurant)', () => {
         const response = await supertest(web)
             .post('/api/signup/restaurant')
             .send({
-                "name": "Restoran Karimata",
+                "name": "Restoran Test",
                 "email": "testrestaurant2@gmail.com",
                 "phone": "085231004040",
                 "province": "Jawa Barat",

@@ -15,7 +15,7 @@ export const issueRefreshToken = (user: UserPayload): string => {
 export const authorizeMiddleware = function (roles: string[] = []) {
     if (!Array.isArray(roles)) roles = [roles];
 
-    return (req: UserRequest, res: Response, next: NextFunction) => {
+    return async (req: UserRequest, res: Response, next: NextFunction) => {
         function sendError(msg: string, statusCode: number = 403) {
             return res.status(statusCode).json({ errors: msg });
         }
