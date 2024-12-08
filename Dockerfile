@@ -1,38 +1,47 @@
 # Stage 1: Build Stage
-FROM node:20 AS build
+FROM node:20-alpine AS build
 
-# Set working directory
+# Set working directory di dalam container
 WORKDIR /app
 
-# Salin package.json dan package-lock.json dari folder precifood-backend ke dalam image
-COPY precifood-backend/package*.json ./
+# Salin package.json dan package-lock.json ke dalam container
+COPY app/package*.json ./
 
-# Install dependencies
+# Install dependencies (termasuk dev dependencies untuk build)
 RUN npm install --production=false
 
-# Salin seluruh kode aplikasi dari folder precifood-backend
-COPY precifood-backend/ .
+# Salin seluruh kode aplikasi dari folder app ke dalam container
+COPY app/ ./
+
+# Jalankan prisma generate untuk generate Prisma client
+RUN npx prisma generate
 
 # Build aplikasi TypeScript
 RUN npm run build
 
 # Stage 2: Production Stage
-FROM node:20 AS production
+FROM node:20-alpine AS production
 
-# Set working directory
+# Set working directory di dalam container
 WORKDIR /app
 
-# Salin dependencies dari build stage
+# Salin package.json dan package-lock.json ke dalam image produksi
+COPY app/package*.json ./
+
+# Salin prisma dari build stage
+COPY --from=build /app/prisma ./
+
+# Salin node_modules dari build stage
 COPY --from=build /app/node_modules /app/node_modules
 
-# Salin aplikasi yang sudah dibangun
+# Salin hasil build (dist) dari build stage
 COPY --from=build /app/dist /app/dist
 
-# Salin file .env jika diperlukan
-COPY precifood-backend/.env .env
+# Salin file .env dari folder app ke dalam container
+COPY app/.env .env
 
 # Expose port aplikasi
 EXPOSE 8000
 
-# Jalankan aplikasi
+# Jalankan aplikasi di stage produksi
 CMD ["npm", "run", "start"]
