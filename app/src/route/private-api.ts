@@ -15,9 +15,9 @@ export const privateRouter = express.Router();
 // @ts-ignore
 privateRouter.get("/api/users/consumers", authorizeMiddleware(Roles.Admin), UserController.getAllUserConsumer);
 // @ts-ignore
-privateRouter.get("/api/users/restaurants", authorizeMiddleware(Roles.Admin), UserController.getAllUserRestaurant);
+privateRouter.get("/api/users/restaurants", authorizeMiddleware(Roles.AdminAndConsumer), UserController.getAllUserRestaurant);
 // @ts-ignore
-privateRouter.get("/api/users/consumers/profile", authorizeMiddleware(Roles.Consumer), UserController.getProfileConsumer);4
+privateRouter.get("/api/users/consumers/profile", authorizeMiddleware(Roles.Consumer), UserController.getProfileConsumer);
 // @ts-ignore
 privateRouter.patch("/api/users/consumers/profile", authorizeMiddleware(Roles.Consumer), UserController.updateConsumer);
 // @ts-ignore
@@ -76,7 +76,7 @@ privateRouter.delete("/api/consumers/orders/:orderId(\\d+)", authorizeMiddleware
 // @ts-ignore
 privateRouter.get("/api/notifications", authorizeMiddleware(Roles.Admin), NotificationController.getNotification);
 // @ts-ignore
-privateRouter.patch("/api/notifications/:notificationId(\\d+)", authorizeMiddleware(Roles.Admin), NotificationController.updateNotificationRead);
+privateRouter.put("/api/notifications/:notificationId(\\d+)", authorizeMiddleware(Roles.Admin), NotificationController.updateNotificationRead);
 
 // Recommendation Module
 // @ts-ignore
