@@ -112,7 +112,7 @@ export class UserService {
         });
 
         if (totalUserWithSameEmail !== 0) {
-            throw new ResponseError(400, "Email telah digunakan pengguna lain");
+            throw new ResponseError(409, "Email telah digunakan pengguna lain");
         }
 
         if (registerConsumerRequest.password !== registerConsumerRequest.password_confirmation) {
@@ -186,11 +186,11 @@ export class UserService {
         });
 
         if (totalUserWithSameEmail != 0) {
-            throw new ResponseError(400, "Email is already taken");
+            throw new ResponseError(409, "Email is already taken");
         }
 
         if (registerRestaurantRequest.password != registerRestaurantRequest.password_confirmation) {
-            throw new ResponseError(400, "Password and Password Confirmation are not the same");
+            throw new ResponseError(400, "Password dan konfirmasi password tidak sama");
         }
 
         registerRestaurantRequest.password = await bcrypt.hash(registerRestaurantRequest.password, 10);
@@ -429,8 +429,8 @@ export class UserService {
                 },
             },
         });
-        // const restaurant = await this.checkRestaurant(validatedRequest.id);
-        // return toRestaurantProfile(restaurant.user, restaurant.Contact!, restaurant.Address!);
+        const restaurant = await this.checkRestaurant(validatedRequest.id);
+        return toRestaurantProfile(restaurant.user, restaurant.Contact!, restaurant.Address!);
     }
 
 }

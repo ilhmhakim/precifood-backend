@@ -126,6 +126,7 @@ export type AllUsersResponse = {
     id: string;
     name: string;
     email: string;
+    phone: string;
 }
 
 export function toConsumerInfo(personalInformation: PersonalInformation, medicalHistory: MedicalHistory): ConsumerInfoResponse {
@@ -205,7 +206,8 @@ export function toAllConsumers(user: User, personalInformation: PersonalInformat
     return {
         id: user.id,
         name: personalInformation.name,
-        email: user.email
+        email: user.email,
+        phone: personalInformation.phone
     }
 }
 
@@ -213,7 +215,8 @@ export function toAllRestaurant(user: User, contact: Contact): AllUsersResponse 
     return {
         id: user.id,
         name: contact.name,
-        email: user.email
+        email: user.email,
+        phone: contact.phone
     }
 }
 

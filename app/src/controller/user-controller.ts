@@ -137,7 +137,7 @@ export class UserController {
             const request:UpdateConsumerRequest = req.body as UpdateConsumerRequest;
             request.id = String(req.user.id);
             const response = await UserService.updateConsumer(request);
-            res.status(201).json({
+            res.status(200).json({
                 message: "Success!",
                 data: response
             });
@@ -160,9 +160,11 @@ export class UserController {
                 image_url: imageUrl || req.body.image_url, // Hanya update jika imageUrl ada
             };
 
-            await UserService.updateRestaurant(request);
+            const response = await UserService.updateRestaurant(request);
+
             res.status(200).json({
-                message: "Success!"
+                message: "Success!",
+                data: response
             });
         } catch (e) {
             next(e);
