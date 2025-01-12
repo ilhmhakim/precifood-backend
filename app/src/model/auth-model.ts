@@ -1,6 +1,7 @@
 import {User} from "@prisma/client";
 
 export type UserLoginResponse = {
+    role: string;
     access_token: string;
     refresh_token: string | null;
 }
@@ -26,8 +27,9 @@ export type UpdatePasswordRequest = {
     password_confirmation: string;
 }
 
-export function toUserLoginResponse(accessToken: string, user: User): UserLoginResponse {
+export function toUserLoginResponse(accessToken: string, user: User, userRole: string): UserLoginResponse {
     return {
+        role: userRole,
         access_token: accessToken,
         refresh_token: user.token
     }

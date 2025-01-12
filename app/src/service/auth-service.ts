@@ -24,6 +24,10 @@ export class AuthService {
             where: { email: loginRequest.email }
         });
 
+        if (!user?.email) {
+            throw new ResponseError(404, "Registrasi terlebih dahulu");
+        }
+
         if (!user || !(await bcrypt.compare(loginRequest.password, user.password))) {
             throw new ResponseError(401, "Email atau password salah");
         }
@@ -37,7 +41,7 @@ export class AuthService {
             data: { token: refreshToken }
         });
 
-        return toUserLoginResponse(accessToken, userToken);
+        return toUserLoginResponse(accessToken, userToken, user.role);
     }
 
     static async refreshToken(request: RefreshTokenRequest): Promise<UserRefreshAccessTokenResponse> {
@@ -68,6 +72,16 @@ export class AuthService {
             }
         });
 
+        const totalUserWithSameEmail = await prismaClient.user.count({
+            where: {
+                email: requestUpdateEmail.new_email
+            }
+        });
+
+        if (totalUserWithSameEmail !== 0) {
+            throw new ResponseError(409, "Email baru telah digunakan oleh pengguna lain");
+        }
+
         if (!(await bcrypt.compare(requestUpdateEmail.password, user!.password))) {
             throw new ResponseError(400, "Password invalid");
         }
@@ -96,7 +110,7 @@ export class AuthService {
         }
 
         if (requestUpdatePassword.new_password != requestUpdatePassword.password_confirmation) {
-            throw new ResponseError(400, "Password baru dan password konfirmasi tidak sama");
+            throw new ResponseError(400, "Password baru dan konfirmasi password tidak sama");
         }
 
         requestUpdatePassword.new_password = await bcrypt.hash(requestUpdatePassword.new_password, 10);
