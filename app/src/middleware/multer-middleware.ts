@@ -4,7 +4,7 @@ import { ResponseError } from "../error/response-error";
 export const multerMiddleware = multer({
     storage: multer.memoryStorage(), // Menyimpan file di memori
     limits: {
-        fileSize: 10 * 1024 * 1024, // Batas ukuran file maksimal 5MB
+        fileSize: 5 * 1024 * 1024, // Batas ukuran file maksimal 5 MB
     },
     fileFilter(_, file: Express.Multer.File, callback: multer.FileFilterCallback) {
         console.log("File received in multer middleware:", file.originalname);
