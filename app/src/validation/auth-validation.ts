@@ -39,7 +39,7 @@ export class AuthValidation {
             .min(8, "Password minimal 8 karakter tanpa spasi"),
         new_password: z.string()
             .trim()
-            .min(8, "Password minimal 8 karakter tanpa spasi"),
+            .min(8, "Password baru minimal 8 karakter tanpa spasi"),
         password_confirmation: z.string()
             .trim()
             .min(8, "Password konfirmasi minimal 8 karakter tanpa spasi")
