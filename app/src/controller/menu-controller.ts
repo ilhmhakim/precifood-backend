@@ -24,10 +24,10 @@ export class MenuController {
                 image_url: imageUrl
             } as CreateMenuRequest;
 
-            const response = await MenuService.createMenu(request);
+            await MenuService.createMenu(request);
+
             res.status(201).json({
                 message: "Success!",
-                data: response
             });
         } catch (e) {
             next(e);
@@ -50,7 +50,7 @@ export class MenuController {
 
             await MenuService.updateMenu(request);
 
-            res.status(201).json({
+            res.status(200).json({
                 message: "Success!"
             });
         } catch (e) {
@@ -98,7 +98,7 @@ export class MenuController {
 
             await MenuService.updateMenuNutrition(request);
 
-            res.status(201).json({
+            res.status(200).json({
                 message: "Success!"
             });
         } catch (e) {
@@ -114,7 +114,7 @@ export class MenuController {
 
             await MenuService.updateMenuApproval(request);
 
-            res.status(201).json({
+            res.status(200).json({
                 message: "Success!",
             });
         } catch (e) {
@@ -193,6 +193,4 @@ export class MenuController {
             next(e);
         }
     }
-
-
 }

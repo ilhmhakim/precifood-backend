@@ -137,7 +137,7 @@ export function toAllMenusResponse(menu: Menu): AllMenusResponse {
 export function toMenuDetailResponse(menu: Menu, nutrition: Nutrition | null, role: string): MenuDetailResponse {
     const noValueMessage = "Nilai nutrisi belum dimasukkan";
 
-    if (role === "Konsumen") {
+    if (role === "Konsumen" || role === "Restoran") {
         return {
             id: menu.id,
             name: menu.name,
@@ -154,7 +154,7 @@ export function toMenuDetailResponse(menu: Menu, nutrition: Nutrition | null, ro
                 carbohydrate: nutrition?.carbohydrate ? nutrition.carbohydrate.toNumber() : noValueMessage
             }
         };
-    } else if (role === "Admin" || role === "Restoran") {
+    } else if (role === "Admin") {
         return {
             id: menu.id,
             name: menu.name,

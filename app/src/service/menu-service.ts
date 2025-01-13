@@ -80,9 +80,7 @@ export class MenuService {
                     menu_name: createMenuRequest.name
                 }
             });
-            // return toMenuResponse(menu);
         });
-        // return menuResponse;
     }
 
     static async updateMenu(request: UpdateMenuRequest) {
@@ -103,8 +101,6 @@ export class MenuService {
                 image_url: updateMenuRequest.image_url,
             }
         });
-
-        // return toMenuResponse(menu);
     }
 
     static async deleteMenu(request: DeleteMenuRequest) {
@@ -112,18 +108,17 @@ export class MenuService {
         await this.checkRestaurantExist(deleteRequest.restaurant_id);
         await this.checkMenuExist(deleteRequest.menu_id, deleteRequest.restaurant_id);
 
-        const menu = await prismaClient.menu.delete({
+        await prismaClient.menu.delete({
            where: {
                id: deleteRequest.menu_id,
                restaurant_id: deleteRequest.restaurant_id,
            }
         });
-        // return toMenuResponse(menu);
     }
 
     static async createMenuNutrition(request: CreateMenuNutritionRequest) {
         const createMenuNutritionRequest = Validation.validate(MenuValidation.CREATEMENUNUTRITION, request);
-        const menu = await this.checkMenuExist(createMenuNutritionRequest.menu_id, createMenuNutritionRequest.restaurant_id);
+        await this.checkMenuExist(createMenuNutritionRequest.menu_id, createMenuNutritionRequest.restaurant_id);
 
         await prismaClient.nutrition.create({
             data: {
@@ -142,15 +137,13 @@ export class MenuService {
                 pufa: new Decimal(createMenuNutritionRequest.pufa),
             }
         });
-
-        // return toMenuDetailResponse(menu, nutrition);
     }
 
     static async updateMenuNutrition(request: UpdateMenuNutritionRequest) {
         const updateMenuNutritionRequest: UpdateMenuNutritionRequest = Validation.validate(MenuValidation.UPDATEMENUNUTRITION, request);
-        const checkMenuExist = await this.checkMenuExist(updateMenuNutritionRequest.menu_id, updateMenuNutritionRequest.restaurant_id);
+        await this.checkMenuExist(updateMenuNutritionRequest.menu_id, updateMenuNutritionRequest.restaurant_id);
 
-        const nutrition = await prismaClient.nutrition.update({
+        await prismaClient.nutrition.update({
             where: {
                 menu_id: updateMenuNutritionRequest.menu_id
             },
@@ -169,14 +162,12 @@ export class MenuService {
                 pufa: updateMenuNutritionRequest.pufa
             }
         });
-
-        // return toMenuDetailResponse(checkMenuExist.menu, nutrition);
     }
 
     static async updateMenuApproval(request: UpdateMenuApprovalRequest) {
         const updateMenuApprovalRequest = Validation.validate(MenuValidation.UPDATEMENUAPPROVAL, request);
 
-        const menu = await prismaClient.menu.update({
+        await prismaClient.menu.update({
             where: {
                 id: updateMenuApprovalRequest.menu_id,
             },
@@ -184,8 +175,6 @@ export class MenuService {
                 status: updateMenuApprovalRequest.status
             }
         });
-
-        // return toMenuResponse(menu!);
     }
 
     static async getAllRestaurantMenu(request: GetAllMenuRequest): Promise<Array<AllMenusResponse>> {
