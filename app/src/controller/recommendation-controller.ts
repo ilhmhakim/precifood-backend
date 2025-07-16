@@ -40,8 +40,8 @@ export class RecommendationController {
             await prismaClient.consumer.update({
                 where: { consumer_id: String(req.user.id) },
                 data: {
-                    generator_error: String(e), // Menyimpan pesan error
-                    is_generating: false, // Mengatur status is_generating menjadi false
+                    generator_error: String(e),
+                    is_generating: false,
                 }
             });
         }

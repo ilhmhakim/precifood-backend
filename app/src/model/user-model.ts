@@ -220,6 +220,13 @@ export function toAllRestaurant(user: User, contact: Contact): AllUsersResponse 
     }
 }
 
+export function toAllRestaurantsPublic(contact: Contact): any {
+    return {
+        id: contact.restaurant_id,
+        name: contact.name,
+    }
+}
+
 
 
 

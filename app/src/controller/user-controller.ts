@@ -171,4 +171,16 @@ export class UserController {
         }
     }
 
+    static async getAllRestaurantPublic(req: Request, res: Response, next: NextFunction) {
+        try {
+            const response = await UserService.getAllRestaurantPublic();
+            res.status(200).json({
+                message: "Success!",
+                data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
 }

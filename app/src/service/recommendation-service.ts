@@ -125,8 +125,8 @@ export class RecommendationService {
                 restaurant_id: recommendationRequest.restaurant_id,
             };
 
-            const response = await fetch('http://0.0.0.0:5000/generate-recommendation', {
-                method: 'POST',
+            const response = await fetch(`${process.env.MODEL_URL}/generate-recommendation`, {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': recommendationRequest.token,

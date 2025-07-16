@@ -23,8 +23,8 @@ export class NotificationController {
 
             await NotificationService.updateNotificationRead(request);
 
-            return res.status(201).json({
-                message: "Notification telah dibaca",
+            return res.status(200).json({
+                message: "Success!",
             });
         } catch (e) {
             next(e);

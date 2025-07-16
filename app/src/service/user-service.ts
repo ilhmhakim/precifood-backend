@@ -7,7 +7,7 @@ import {
     GetUserProfileRequest,
     RestaurantProfileResponse,
     toAllConsumers,
-    toAllRestaurant,
+    toAllRestaurant, toAllRestaurantsPublic,
     toConsumerInfo,
     toConsumerProfileResponse,
     toRestaurantProfile,
@@ -433,4 +433,10 @@ export class UserService {
         return toRestaurantProfile(restaurant.user, restaurant.Contact!, restaurant.Address!);
     }
 
+
+    static async getAllRestaurantPublic() {
+        const restaurants = await prismaClient.contact.findMany();
+        // Mapping data ke dalam bentuk yang diinginkan
+        return restaurants.map(restaurant => toAllRestaurantsPublic(restaurant));
+    }
 }
