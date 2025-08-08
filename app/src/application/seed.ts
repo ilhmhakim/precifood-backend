@@ -1,3 +1,4 @@
+import { ResponseError } from '../error/response-error';
 import { prismaClient } from './database';
 import { adminSeed, consumerSeed, menuSeed, restaurantSeed } from './seed-data';
 import bcrypt from 'bcrypt';
@@ -5,6 +6,16 @@ import bcrypt from 'bcrypt';
 import { NextFunction, Request, Response } from 'express';
 
 export async function Seed(req: Request, res: Response, next: NextFunction) {
+  if (process.env.NODE_ENV !== 'development') {
+    next(
+      new ResponseError(
+        403,
+        'Seeds endpoint is only available in development mode.'
+      )
+    );
+    return;
+  }
+
   try {
     // Seed Konsumen
     const consumer = await prismaClient.user.create({
