@@ -1,12 +1,12 @@
+import { prismaClient } from '../application/database';
+import { ResponseError } from '../error/response-error';
 import {
     NotificationResponse,
     toNotificationResponse,
     UpdateNotificationReadRequest,
 } from '../model/notification-model';
-import { prismaClient } from '../application/database';
-import { ResponseError } from '../error/response-error';
-import { Validation } from '../validation/validation';
 import { NotificationValidation } from '../validation/notification-validation';
+import { Validation } from '../validation/validation';
 
 export class NotificationService {
     static async getNotification(): Promise<Array<NotificationResponse>> {

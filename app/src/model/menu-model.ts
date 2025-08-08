@@ -1,5 +1,5 @@
-import { Menu, Nutrition } from '@prisma/client';
 import { ResponseError } from '../error/response-error';
+import { Menu, Nutrition } from '@prisma/client';
 
 export type AllMenusResponse = {
     id: number;

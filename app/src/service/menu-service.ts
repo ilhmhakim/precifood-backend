@@ -1,3 +1,5 @@
+import { prismaClient } from '../application/database';
+import { ResponseError } from '../error/response-error';
 import {
     CreateMenuNutritionRequest,
     CreateMenuRequest,
@@ -13,10 +15,8 @@ import {
     UpdateMenuRequest,
     AllMenusResponse,
 } from '../model/menu-model';
-import { Validation } from '../validation/validation';
 import { MenuValidation } from '../validation/menu-validation';
-import { prismaClient } from '../application/database';
-import { ResponseError } from '../error/response-error';
+import { Validation } from '../validation/validation';
 import { Decimal } from '@prisma/client/runtime/library';
 
 export class MenuService {

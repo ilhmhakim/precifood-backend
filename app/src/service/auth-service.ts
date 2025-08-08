@@ -1,17 +1,11 @@
 // src/service/auth-service.ts
 import { prismaClient } from '../application/database';
-import { LoginUserRequest } from '../model/user-model';
-import { Validation } from '../validation/validation';
-import { ResponseError } from '../error/response-error';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { jwtRefresh, jwtSecret } from '../config/jwt';
+import { ResponseError } from '../error/response-error';
 import {
     issueAccessToken,
     issueRefreshToken,
 } from '../middleware/auth-middleware';
-import { UserPayload } from '../type/user';
-import { AuthValidation } from '../validation/auth-validation';
 import {
     RefreshTokenRequest,
     toUserLoginResponse,
@@ -21,6 +15,12 @@ import {
     UserLoginResponse,
     UserRefreshAccessTokenResponse,
 } from '../model/auth-model';
+import { LoginUserRequest } from '../model/user-model';
+import { UserPayload } from '../type/user';
+import { AuthValidation } from '../validation/auth-validation';
+import { Validation } from '../validation/validation';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export class AuthService {
     static async login(request: LoginUserRequest): Promise<UserLoginResponse> {

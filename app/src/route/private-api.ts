@@ -1,13 +1,13 @@
-import express from 'express';
+import { AuthController } from '../controller/auth-controller';
+import { MenuController } from '../controller/menu-controller';
+import { NotificationController } from '../controller/notification-controller';
+import { OrderController } from '../controller/order-controller';
+import { RecommendationController } from '../controller/recommendation-controller';
 import { UserController } from '../controller/user-controller';
 import { authorizeMiddleware } from '../middleware/auth-middleware';
-import { MenuController } from '../controller/menu-controller';
-import { OrderController } from '../controller/order-controller';
-import { NotificationController } from '../controller/notification-controller';
-import { Roles } from '../type/role';
-import { RecommendationController } from '../controller/recommendation-controller';
-import { AuthController } from '../controller/auth-controller';
 import { multerMiddleware } from '../middleware/multer-middleware';
+import { Roles } from '../type/role';
+import express from 'express';
 
 export const privateRouter = express.Router();
 

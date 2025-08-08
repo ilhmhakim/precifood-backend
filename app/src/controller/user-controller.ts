@@ -1,4 +1,3 @@
-import { Request, Response, NextFunction, request } from 'express';
 import {
     CreateAdminRequest,
     CreateConsumerRequest,
@@ -7,9 +6,10 @@ import {
     UpdateConsumerRequest,
     UpdateRestaurantRequest,
 } from '../model/user-model';
+import { ImageUploaderService } from '../service/image-uploader-service';
 import { UserService } from '../service/user-service';
 import { UserRequest } from '../type/user';
-import { ImageUploaderService } from '../service/image-uploader-service';
+import { Request, Response, NextFunction, request } from 'express';
 
 export class UserController {
     static async registerConsumer(

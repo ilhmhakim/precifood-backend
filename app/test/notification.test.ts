@@ -1,6 +1,6 @@
-import supertest from 'supertest';
-import { web } from '../src/application/web';
 import { logger } from '../src/application/logging';
+import { web } from '../src/application/web';
+import supertest from 'supertest';
 
 describe('Notification Test', () => {
     it('should get all notifications', async () => {

@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { NotificationService } from '../service/notification-service';
 import { UpdateNotificationReadRequest } from '../model/notification-model';
+import { NotificationService } from '../service/notification-service';
+import { Request, Response, NextFunction } from 'express';
 
 export class NotificationController {
     static async getNotification(

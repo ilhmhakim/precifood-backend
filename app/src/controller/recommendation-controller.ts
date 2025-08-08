@@ -1,5 +1,5 @@
-import { UserRequest } from '../type/user';
-import { Response, NextFunction } from 'express';
+import { prismaClient } from '../application/database';
+import { ResponseError } from '../error/response-error';
 import {
     GenerateRecommendationRequest,
     GetRecommendationListDetailRequest,
@@ -7,8 +7,8 @@ import {
 } from '../model/recommendation-model';
 import { MenuService } from '../service/menu-service';
 import { RecommendationService } from '../service/recommendation-service';
-import { ResponseError } from '../error/response-error';
-import { prismaClient } from '../application/database';
+import { UserRequest } from '../type/user';
+import { Response, NextFunction } from 'express';
 
 export class RecommendationController {
     static async getRecommendationFromModel(

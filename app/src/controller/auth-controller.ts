@@ -1,13 +1,13 @@
 // src/controller/auth-controller.ts
-import { Request, Response, NextFunction } from 'express';
-import { AuthService } from '../service/auth-service';
-import { UserRequest } from '../type/user';
 import {
     RefreshTokenRequest,
     UpdateEmailRequest,
     UpdatePasswordRequest,
 } from '../model/auth-model';
+import { AuthService } from '../service/auth-service';
 import { UserService } from '../service/user-service';
+import { UserRequest } from '../type/user';
+import { Request, Response, NextFunction } from 'express';
 
 export class AuthController {
     static async login(req: Request, res: Response, next: NextFunction) {

@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
 import { prismaClient } from './database';
-import { consumerSeed, restaurantSeed, menuSeed, adminSeed } from './seed-data';
-import bcrypt from 'bcrypt'; // Pastikan menuSeed di-import
+import { adminSeed, consumerSeed, menuSeed, restaurantSeed } from './seed-data';
+import bcrypt from 'bcrypt';
+// Pastikan menuSeed di-import
+import { NextFunction, Request, Response } from 'express';
 
 export async function Seed(req: Request, res: Response, next: NextFunction) {
     try {

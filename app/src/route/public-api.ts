@@ -1,8 +1,8 @@
-import express from 'express';
-import { UserController } from '../controller/user-controller';
-import { AuthController } from '../controller/auth-controller';
-import { multerMiddleware } from '../middleware/multer-middleware';
 import { Seed } from '../application/seed';
+import { AuthController } from '../controller/auth-controller';
+import { UserController } from '../controller/user-controller';
+import { multerMiddleware } from '../middleware/multer-middleware';
+import express from 'express';
 
 export const publicRouter = express.Router();
 publicRouter.post('/api/seeds', Seed);

@@ -1,8 +1,8 @@
 // src/middleware/auth-middleware.ts
-import jwt from 'jsonwebtoken';
-import { Response, NextFunction } from 'express';
 import { jwtRefresh, jwtSecret } from '../config/jwt';
 import { UserPayload, UserRequest } from '../type/user';
+import { Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 
 export const issueAccessToken = (user: UserPayload): string => {
     return jwt.sign(user, jwtSecret.secret!, jwtSecret.options);

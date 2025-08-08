@@ -1,3 +1,5 @@
+import { prismaClient } from '../application/database';
+import { ResponseError } from '../error/response-error';
 import {
     AllUsersResponse,
     ConsumerInfoResponse,
@@ -15,10 +17,8 @@ import {
     UpdateConsumerRequest,
     UpdateRestaurantRequest,
 } from '../model/user-model';
-import { Validation } from '../validation/validation';
 import { UserValidation } from '../validation/user-validation';
-import { prismaClient } from '../application/database';
-import { ResponseError } from '../error/response-error';
+import { Validation } from '../validation/validation';
 import bcrypt from 'bcrypt';
 import { v7 as uuid7 } from 'uuid';
 

@@ -1,5 +1,5 @@
-import multer from 'multer';
 import { ResponseError } from '../error/response-error';
+import multer from 'multer';
 
 export const multerMiddleware = multer({
     storage: multer.memoryStorage(), // Menyimpan file di memori

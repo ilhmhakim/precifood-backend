@@ -1,7 +1,7 @@
-import { Response, Request, NextFunction } from 'express';
-import { ZodError } from 'zod';
 import { ResponseError } from '../error/response-error';
+import { Response, Request, NextFunction } from 'express';
 import multer from 'multer';
+import { ZodError } from 'zod';
 
 export const errorMiddleware = async (
     error: Error,

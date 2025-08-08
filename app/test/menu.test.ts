@@ -1,7 +1,7 @@
+import { logger } from '../src/application/logging';
+import { web } from '../src/application/web';
 import { UserTest } from './test-util';
 import supertest from 'supertest';
-import { web } from '../src/application/web';
-import { logger } from '../src/application/logging';
 
 describe('Membuat menu oleh restoran (POST)', () => {
     // Kasus berhasil

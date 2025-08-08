@@ -1,8 +1,8 @@
-import express from 'express';
-import { publicRouter } from '../route/public-api';
 import { errorMiddleware } from '../middleware/error-middleware';
-import cors from 'cors';
 import { privateRouter } from '../route/private-api';
+import { publicRouter } from '../route/public-api';
+import cors from 'cors';
+import express from 'express';
 
 export const web = express();
 
