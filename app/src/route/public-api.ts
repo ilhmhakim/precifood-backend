@@ -9,9 +9,9 @@ publicRouter.post('/api/seeds', Seed);
 // User Module
 publicRouter.post('/api/signup/consumer', UserController.registerConsumer);
 publicRouter.post(
-    '/api/signup/restaurant',
-    multerMiddleware,
-    UserController.registerRestaurant
+  '/api/signup/restaurant',
+  multerMiddleware,
+  UserController.registerRestaurant
 );
 publicRouter.get('/api/list/restaurant', UserController.getAllRestaurantPublic);
 // Auth Module

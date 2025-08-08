@@ -1,25 +1,25 @@
 import { prismaClient } from '../src/application/database';
 
 export class UserTest {
-    static async delete() {
-        await prismaClient.user.deleteMany({
-            where: {
-                email: 'test',
-            },
-        });
-    }
+  static async delete() {
+    await prismaClient.user.deleteMany({
+      where: {
+        email: 'test',
+      },
+    });
+  }
 }
 
 export class AuthTest {
-    static async loginConsumer() {}
+  static async loginConsumer() {}
 
-    static async loginRestaurant() {}
+  static async loginRestaurant() {}
 
-    static async loginAdmin() {}
+  static async loginAdmin() {}
 
-    static async updateEmail() {}
+  static async updateEmail() {}
 
-    static async updatePassword() {}
+  static async updatePassword() {}
 }
 
 export class MenuTest {}
