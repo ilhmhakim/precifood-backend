@@ -7,7 +7,8 @@
     "test": "jest",
     "build": "rimraf ./dist && tsc",
     "start": "node dist/main.js",
-    "prisma:generate": "npx prisma generate"
+    "prisma:generate": "npx prisma generate",
+    "format": "prettier --write ."
   },
   "jest": {
     "transform": {
@@ -48,6 +49,7 @@
     "@types/uuid": "^10.0.0",
     "babel-jest": "^29.7.0",
     "jest": "^29.7.0",
+    "prettier": "^3.6.2",
     "prisma": "^5.20.0",
     "supertest": "^7.0.0",
     "typescript": "^5.6.2"
