@@ -7,37 +7,36 @@ import {
     GetUserProfileRequest,
     RestaurantProfileResponse,
     toAllConsumers,
-    toAllRestaurant, toAllRestaurantsPublic,
+    toAllRestaurant,
+    toAllRestaurantsPublic,
     toConsumerInfo,
     toConsumerProfileResponse,
     toRestaurantProfile,
     UpdateConsumerRequest,
     UpdateRestaurantRequest,
-
-} from "../model/user-model";
-import {Validation} from "../validation/validation";
-import {UserValidation} from "../validation/user-validation";
-import {prismaClient} from "../application/database";
-import {ResponseError} from "../error/response-error";
-import bcrypt from "bcrypt";
-import {v7 as uuid7} from "uuid";
-
+} from '../model/user-model';
+import { Validation } from '../validation/validation';
+import { UserValidation } from '../validation/user-validation';
+import { prismaClient } from '../application/database';
+import { ResponseError } from '../error/response-error';
+import bcrypt from 'bcrypt';
+import { v7 as uuid7 } from 'uuid';
 
 export class UserService {
     static async checkConsumer(consumerId: string) {
         const consumer = await prismaClient.consumer.findFirst({
             where: {
-                consumer_id: consumerId
+                consumer_id: consumerId,
             },
             include: {
                 user: true,
                 PersonalInformation: true,
-                MedicalHistory: true
+                MedicalHistory: true,
             },
         });
 
         if (!consumer) {
-            throw new ResponseError(404, "Konsumen tidak ditemukan");
+            throw new ResponseError(404, 'Konsumen tidak ditemukan');
         }
 
         return consumer;
@@ -46,17 +45,17 @@ export class UserService {
     static async checkRestaurant(restaurantId: string) {
         const restaurant = await prismaClient.restaurant.findFirst({
             where: {
-                restaurant_id: restaurantId
+                restaurant_id: restaurantId,
             },
             include: {
                 user: true,
                 Contact: true,
-                Address: true
-            }
+                Address: true,
+            },
         });
 
         if (!restaurant) {
-            throw new ResponseError(404, "Restoran tidak ditemukan");
+            throw new ResponseError(404, 'Restoran tidak ditemukan');
         }
 
         return restaurant;
@@ -73,13 +72,16 @@ export class UserService {
             const calculatedAge = await this.calculateAge(birthDate);
 
             // Jika hari ini ulang tahun, perbarui umur di database
-            if (today.getMonth() === birthDate.getMonth() && today.getDate() === birthDate.getDate()) {
+            if (
+                today.getMonth() === birthDate.getMonth() &&
+                today.getDate() === birthDate.getDate()
+            ) {
                 await prismaClient.personalInformation.update({
                     where: {
-                        consumer_id: consumer.consumer_id
+                        consumer_id: consumer.consumer_id,
                     },
                     data: {
-                        age: calculatedAge
+                        age: calculatedAge,
                     },
                 });
             }
@@ -93,7 +95,8 @@ export class UserService {
         // Check if the birthdate has occurred this year
         const isBirthdayPassed =
             today.getMonth() > birthDate.getMonth() ||
-            (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+            (today.getMonth() === birthDate.getMonth() &&
+                today.getDate() >= birthDate.getDate());
 
         if (!isBirthdayPassed) {
             age--; // Birthday has not occurred yet this year, adjust the age
@@ -103,39 +106,51 @@ export class UserService {
     }
 
     static async registerConsumer(request: CreateConsumerRequest) {
-        const registerConsumerRequest = Validation.validate(UserValidation.REGISTERCONSUMER, request);
+        const registerConsumerRequest = Validation.validate(
+            UserValidation.REGISTERCONSUMER,
+            request
+        );
 
         const totalUserWithSameEmail = await prismaClient.user.count({
             where: {
-                email: registerConsumerRequest.email
-            }
+                email: registerConsumerRequest.email,
+            },
         });
 
         if (totalUserWithSameEmail !== 0) {
-            throw new ResponseError(409, "Email telah digunakan pengguna lain");
+            throw new ResponseError(409, 'Email telah digunakan pengguna lain');
         }
 
-        if (registerConsumerRequest.password !== registerConsumerRequest.password_confirmation) {
-            throw new ResponseError(400, "Password dan konfirmasi password tidak sama");
+        if (
+            registerConsumerRequest.password !==
+            registerConsumerRequest.password_confirmation
+        ) {
+            throw new ResponseError(
+                400,
+                'Password dan konfirmasi password tidak sama'
+            );
         }
 
-        if(registerConsumerRequest.medical_history == "no_history"){
+        if (registerConsumerRequest.medical_history == 'no_history') {
             registerConsumerRequest.no_history = true;
         }
 
-        if(registerConsumerRequest.medical_history == "diabetes"){
+        if (registerConsumerRequest.medical_history == 'diabetes') {
             registerConsumerRequest.diabetes = true;
         }
 
-        if(registerConsumerRequest.medical_history == "cardiovascular"){
+        if (registerConsumerRequest.medical_history == 'cardiovascular') {
             registerConsumerRequest.cardiovascular = true;
         }
 
-        if(registerConsumerRequest.medical_history == "hypertension"){
+        if (registerConsumerRequest.medical_history == 'hypertension') {
             registerConsumerRequest.hypertension = true;
         }
 
-        registerConsumerRequest.password = await bcrypt.hash(registerConsumerRequest.password, 10);
+        registerConsumerRequest.password = await bcrypt.hash(
+            registerConsumerRequest.password,
+            10
+        );
 
         const birth = new Date(registerConsumerRequest.birth);
         const age = Number(await this.calculateAge(birth));
@@ -147,7 +162,7 @@ export class UserService {
                 id: consumer_id,
                 email: registerConsumerRequest.email,
                 password: registerConsumerRequest.password,
-                role: "Konsumen",
+                role: 'Konsumen',
                 consumer: {
                     create: {
                         PersonalInformation: {
@@ -159,41 +174,54 @@ export class UserService {
                                 age: age,
                                 birth: birth,
                                 phone: registerConsumerRequest.phone,
-                            }
+                            },
                         },
                         MedicalHistory: {
                             create: {
                                 no_history: registerConsumerRequest.no_history,
                                 diabetes: registerConsumerRequest.diabetes,
-                                hypertension: registerConsumerRequest.hypertension,
-                                cardiovascular: registerConsumerRequest.cardiovascular,
-                            }
-                        }
-                    }
-                }
-            }
+                                hypertension:
+                                    registerConsumerRequest.hypertension,
+                                cardiovascular:
+                                    registerConsumerRequest.cardiovascular,
+                            },
+                        },
+                    },
+                },
+            },
         });
     }
 
-
     static async registerRestaurant(request: CreateRestaurantRequest) {
-        const registerRestaurantRequest = Validation.validate(UserValidation.REGISTERRESTAURANT, request);
+        const registerRestaurantRequest = Validation.validate(
+            UserValidation.REGISTERRESTAURANT,
+            request
+        );
 
         const totalUserWithSameEmail = await prismaClient.user.count({
             where: {
-                email: registerRestaurantRequest.email
-            }
+                email: registerRestaurantRequest.email,
+            },
         });
 
         if (totalUserWithSameEmail != 0) {
-            throw new ResponseError(409, "Email is already taken");
+            throw new ResponseError(409, 'Email is already taken');
         }
 
-        if (registerRestaurantRequest.password != registerRestaurantRequest.password_confirmation) {
-            throw new ResponseError(400, "Password dan konfirmasi password tidak sama");
+        if (
+            registerRestaurantRequest.password !=
+            registerRestaurantRequest.password_confirmation
+        ) {
+            throw new ResponseError(
+                400,
+                'Password dan konfirmasi password tidak sama'
+            );
         }
 
-        registerRestaurantRequest.password = await bcrypt.hash(registerRestaurantRequest.password, 10);
+        registerRestaurantRequest.password = await bcrypt.hash(
+            registerRestaurantRequest.password,
+            10
+        );
 
         const restaurant_id = String(`R-${uuid7()}`);
 
@@ -202,7 +230,7 @@ export class UserService {
                 id: restaurant_id, // ID yang sama digunakan untuk User dan Restaurant
                 email: registerRestaurantRequest.email,
                 password: registerRestaurantRequest.password,
-                role: "Restoran", // Sesuai dengan role yang sudah ditentukan
+                role: 'Restoran', // Sesuai dengan role yang sudah ditentukan
                 restaurant: {
                     create: {
                         // Buat data untuk Contact
@@ -211,7 +239,7 @@ export class UserService {
                                 name: registerRestaurantRequest.name,
                                 email: registerRestaurantRequest.email,
                                 phone: registerRestaurantRequest.phone,
-                            }
+                            },
                         },
 
                         // Buat data untuk Address
@@ -219,41 +247,70 @@ export class UserService {
                             create: {
                                 province: registerRestaurantRequest.province,
                                 city: registerRestaurantRequest.city,
-                                address_detail: registerRestaurantRequest.address_detail,
+                                address_detail:
+                                    registerRestaurantRequest.address_detail,
                                 image_url: registerRestaurantRequest.image_url,
-                            }
-                        }
-                    }
-                }
-            }
+                            },
+                        },
+                    },
+                },
+            },
         });
     }
 
     // Mendapatkan detail spesifik user
-    static async getProfileConsumer(request: GetUserProfileRequest): Promise<ConsumerProfileResponse> {
-        const requestProfileConsumer = Validation.validate(UserValidation.GETUSERPROFILE, request);
+    static async getProfileConsumer(
+        request: GetUserProfileRequest
+    ): Promise<ConsumerProfileResponse> {
+        const requestProfileConsumer = Validation.validate(
+            UserValidation.GETUSERPROFILE,
+            request
+        );
 
-        const consumer = await this.checkConsumer(requestProfileConsumer.id)
+        const consumer = await this.checkConsumer(requestProfileConsumer.id);
 
-        return toConsumerProfileResponse(consumer.user, consumer.PersonalInformation!, consumer.MedicalHistory!);
+        return toConsumerProfileResponse(
+            consumer.user,
+            consumer.PersonalInformation!,
+            consumer.MedicalHistory!
+        );
     }
 
-    static async getProfileRestaurant(request: GetUserProfileRequest): Promise<RestaurantProfileResponse> {
-        const requestProfileRestaurant = Validation.validate(UserValidation.GETUSERPROFILE, request);
+    static async getProfileRestaurant(
+        request: GetUserProfileRequest
+    ): Promise<RestaurantProfileResponse> {
+        const requestProfileRestaurant = Validation.validate(
+            UserValidation.GETUSERPROFILE,
+            request
+        );
 
-        const restaurant = await this.checkRestaurant(requestProfileRestaurant.id);
+        const restaurant = await this.checkRestaurant(
+            requestProfileRestaurant.id
+        );
 
-        return toRestaurantProfile(restaurant.user, restaurant.Contact!, restaurant.Address!);
+        return toRestaurantProfile(
+            restaurant.user,
+            restaurant.Contact!,
+            restaurant.Address!
+        );
     }
 
-    static async getInfoConsumer(request: GetUserProfileRequest): Promise<ConsumerInfoResponse> {
-        const requestInfoConsumer = Validation.validate(UserValidation.GETUSERPROFILE, request);
+    static async getInfoConsumer(
+        request: GetUserProfileRequest
+    ): Promise<ConsumerInfoResponse> {
+        const requestInfoConsumer = Validation.validate(
+            UserValidation.GETUSERPROFILE,
+            request
+        );
 
         await this.updateConsumerAge(requestInfoConsumer.id);
 
-        const consumer = await this.checkConsumer(requestInfoConsumer.id)
+        const consumer = await this.checkConsumer(requestInfoConsumer.id);
 
-        return toConsumerInfo(consumer.PersonalInformation!, consumer.MedicalHistory!);
+        return toConsumerInfo(
+            consumer.PersonalInformation!,
+            consumer.MedicalHistory!
+        );
     }
 
     static async getAllUserConsumer(): Promise<Array<AllUsersResponse>> {
@@ -273,7 +330,7 @@ export class UserService {
         });
 
         if (!users || users.length === 0) {
-            throw new ResponseError(404, "Tidak ada akun konsumen");
+            throw new ResponseError(404, 'Tidak ada akun konsumen');
         }
 
         // Mapping data dengan fungsi toAllConsumers
@@ -282,7 +339,10 @@ export class UserService {
             if (personalInformation) {
                 return toAllConsumers(user, personalInformation); // Memetakan ke AllUsersResponse menggunakan toAllConsumers
             } else {
-                throw new ResponseError(404, `PersonalInformation tidak ditemukan untuk user ${user.id}`);
+                throw new ResponseError(
+                    404,
+                    `PersonalInformation tidak ditemukan untuk user ${user.id}`
+                );
             }
         });
     }
@@ -304,7 +364,7 @@ export class UserService {
         });
 
         if (!users || users.length === 0) {
-            throw new ResponseError(404, "Tidak ditemukan akun restoran");
+            throw new ResponseError(404, 'Tidak ditemukan akun restoran');
         }
 
         // Mapping data ke dalam bentuk yang diinginkan
@@ -313,45 +373,60 @@ export class UserService {
             if (contact) {
                 return toAllRestaurant(user, contact); // Memetakan ke AllUsersResponse menggunakan toAllConsumers
             } else {
-                throw new ResponseError(404, `Kontak tidak ditemukan untuk user ${user.id}`);
+                throw new ResponseError(
+                    404,
+                    `Kontak tidak ditemukan untuk user ${user.id}`
+                );
             }
         });
     }
 
-    static async updateConsumer(request: UpdateConsumerRequest): Promise<ConsumerProfileResponse> {
-        const requestUpdateConsumer: UpdateConsumerRequest = Validation.validate(UserValidation.UPDATECONSUMER, request);
+    static async updateConsumer(
+        request: UpdateConsumerRequest
+    ): Promise<ConsumerProfileResponse> {
+        const requestUpdateConsumer: UpdateConsumerRequest =
+            Validation.validate(UserValidation.UPDATECONSUMER, request);
 
-        const { no_history, diabetes, hypertension, cardiovascular } = requestUpdateConsumer;
+        const { no_history, diabetes, hypertension, cardiovascular } =
+            requestUpdateConsumer;
 
         // Validasi hanya satu kondisi true
-        const trueCount = [no_history, diabetes, hypertension, cardiovascular].filter(Boolean).length;
+        const trueCount = [
+            no_history,
+            diabetes,
+            hypertension,
+            cardiovascular,
+        ].filter(Boolean).length;
 
         if (trueCount > 1) {
-            throw new ResponseError(400, "Hanya satu dari no_history, diabetes, hypertension, atau cardiovascular yang boleh bernilai true");
+            throw new ResponseError(
+                400,
+                'Hanya satu dari no_history, diabetes, hypertension, atau cardiovascular yang boleh bernilai true'
+            );
         }
 
-        if(requestUpdateConsumer.medical_history == "no_history"){
+        if (requestUpdateConsumer.medical_history == 'no_history') {
             requestUpdateConsumer.no_history = true;
             requestUpdateConsumer.diabetes = false;
             requestUpdateConsumer.hypertension = false;
             requestUpdateConsumer.cardiovascular = false;
         }
 
-        if(requestUpdateConsumer.medical_history == "diabetes"){
+        if (requestUpdateConsumer.medical_history == 'diabetes') {
             requestUpdateConsumer.diabetes = true;
             requestUpdateConsumer.no_history = false;
             requestUpdateConsumer.hypertension = false;
             requestUpdateConsumer.cardiovascular = false;
         }
 
-        if(requestUpdateConsumer.medical_history == "cardiovascular"){
+        if (requestUpdateConsumer.medical_history == 'cardiovascular') {
             requestUpdateConsumer.cardiovascular = true;
             requestUpdateConsumer.no_history = false;
             requestUpdateConsumer.diabetes = false;
             requestUpdateConsumer.hypertension = false;
         }
 
-        if(requestUpdateConsumer.medical_history == "hypertension"){
+        if (requestUpdateConsumer.medical_history == 'hypertension') {
             requestUpdateConsumer.hypertension = true;
             requestUpdateConsumer.no_history = false;
             requestUpdateConsumer.diabetes = false;
@@ -388,22 +463,31 @@ export class UserService {
                             update: {
                                 no_history: requestUpdateConsumer.no_history,
                                 diabetes: requestUpdateConsumer.diabetes,
-                                hypertension: requestUpdateConsumer.hypertension,
-                                cardiovascular: requestUpdateConsumer.cardiovascular,
+                                hypertension:
+                                    requestUpdateConsumer.hypertension,
+                                cardiovascular:
+                                    requestUpdateConsumer.cardiovascular,
                             },
                         },
                     },
                 },
-            }
+            },
         });
 
-        const consumer = await this.checkConsumer(requestUpdateConsumer.id)
+        const consumer = await this.checkConsumer(requestUpdateConsumer.id);
 
-        return toConsumerProfileResponse(consumer.user, consumer.PersonalInformation!, consumer.MedicalHistory!);
+        return toConsumerProfileResponse(
+            consumer.user,
+            consumer.PersonalInformation!,
+            consumer.MedicalHistory!
+        );
     }
 
     static async updateRestaurant(request: UpdateRestaurantRequest) {
-        const validatedRequest = Validation.validate(UserValidation.UPDATERESTAURANT, request);
+        const validatedRequest = Validation.validate(
+            UserValidation.UPDATERESTAURANT,
+            request
+        );
 
         await prismaClient.user.update({
             where: { id: validatedRequest.id },
@@ -412,17 +496,32 @@ export class UserService {
                     update: {
                         Contact: {
                             update: {
-                                ...(validatedRequest.name && { name: validatedRequest.name }),
-                                ...(validatedRequest.email && { email: validatedRequest.email }),
-                                ...(validatedRequest.phone && { phone: validatedRequest.phone }),
+                                ...(validatedRequest.name && {
+                                    name: validatedRequest.name,
+                                }),
+                                ...(validatedRequest.email && {
+                                    email: validatedRequest.email,
+                                }),
+                                ...(validatedRequest.phone && {
+                                    phone: validatedRequest.phone,
+                                }),
                             },
                         },
                         Address: {
                             update: {
-                                ...(validatedRequest.province && { province: validatedRequest.province }),
-                                ...(validatedRequest.city && { city: validatedRequest.city }),
-                                ...(validatedRequest.address_detail && { address_detail: validatedRequest.address_detail }),
-                                ...(validatedRequest.image_url && { image_url: validatedRequest.image_url }),
+                                ...(validatedRequest.province && {
+                                    province: validatedRequest.province,
+                                }),
+                                ...(validatedRequest.city && {
+                                    city: validatedRequest.city,
+                                }),
+                                ...(validatedRequest.address_detail && {
+                                    address_detail:
+                                        validatedRequest.address_detail,
+                                }),
+                                ...(validatedRequest.image_url && {
+                                    image_url: validatedRequest.image_url,
+                                }),
                             },
                         },
                     },
@@ -430,13 +529,18 @@ export class UserService {
             },
         });
         const restaurant = await this.checkRestaurant(validatedRequest.id);
-        return toRestaurantProfile(restaurant.user, restaurant.Contact!, restaurant.Address!);
+        return toRestaurantProfile(
+            restaurant.user,
+            restaurant.Contact!,
+            restaurant.Address!
+        );
     }
-
 
     static async getAllRestaurantPublic() {
         const restaurants = await prismaClient.contact.findMany();
         // Mapping data ke dalam bentuk yang diinginkan
-        return restaurants.map(restaurant => toAllRestaurantsPublic(restaurant));
+        return restaurants.map((restaurant) =>
+            toAllRestaurantsPublic(restaurant)
+        );
     }
 }

@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from "express";
-import { prismaClient } from "./database";
-import {consumerSeed, restaurantSeed, menuSeed, adminSeed} from "./seed-data";
-import bcrypt from "bcrypt"; // Pastikan menuSeed di-import
+import { Request, Response, NextFunction } from 'express';
+import { prismaClient } from './database';
+import { consumerSeed, restaurantSeed, menuSeed, adminSeed } from './seed-data';
+import bcrypt from 'bcrypt'; // Pastikan menuSeed di-import
 
 export async function Seed(req: Request, res: Response, next: NextFunction) {
     try {
@@ -11,7 +11,7 @@ export async function Seed(req: Request, res: Response, next: NextFunction) {
                 id: String(consumerSeed.id),
                 email: consumerSeed.email,
                 password: await bcrypt.hash(consumerSeed.password, 10),
-                role: "Konsumen",
+                role: 'Konsumen',
                 consumer: {
                     create: {
                         PersonalInformation: {
@@ -22,20 +22,20 @@ export async function Seed(req: Request, res: Response, next: NextFunction) {
                                 height: consumerSeed.height,
                                 age: 21,
                                 birth: new Date(consumerSeed.birth),
-                                phone: consumerSeed.phone
-                            }
+                                phone: consumerSeed.phone,
+                            },
                         },
                         MedicalHistory: {
                             create: {
                                 no_history: consumerSeed.no_history,
                                 diabetes: consumerSeed.diabetes,
                                 hypertension: consumerSeed.hypertension,
-                                cardiovascular: consumerSeed.cardiovascular
-                            }
-                        }
-                    }
-                }
-            }
+                                cardiovascular: consumerSeed.cardiovascular,
+                            },
+                        },
+                    },
+                },
+            },
         });
 
         // Seed Restoran
@@ -44,7 +44,7 @@ export async function Seed(req: Request, res: Response, next: NextFunction) {
                 id: String(restaurantSeed.id),
                 email: restaurantSeed.email,
                 password: await bcrypt.hash(restaurantSeed.password, 10),
-                role: "Restoran",
+                role: 'Restoran',
                 restaurant: {
                     create: {
                         Contact: {
@@ -52,19 +52,19 @@ export async function Seed(req: Request, res: Response, next: NextFunction) {
                                 name: restaurantSeed.name,
                                 email: restaurantSeed.email,
                                 phone: restaurantSeed.phone,
-                            }
+                            },
                         },
                         Address: {
                             create: {
                                 province: restaurantSeed.province,
                                 city: restaurantSeed.city,
                                 address_detail: restaurantSeed.address_detail,
-                                image_url: restaurantSeed.image_url
-                            }
-                        }
-                    }
-                }
-            }
+                                image_url: restaurantSeed.image_url,
+                            },
+                        },
+                    },
+                },
+            },
         });
 
         // Seed Menu untuk Restoran
@@ -92,10 +92,10 @@ export async function Seed(req: Request, res: Response, next: NextFunction) {
                             cholesterol: menu.cholesterol,
                             mufa: menu.mufa,
                             pufa: menu.pufa,
-                            sfa: menu.sfa
-                        }
-                    }
-                }
+                            sfa: menu.sfa,
+                        },
+                    },
+                },
             });
         }
 
@@ -105,18 +105,16 @@ export async function Seed(req: Request, res: Response, next: NextFunction) {
                 id: String(adminSeed.id),
                 email: adminSeed.email,
                 password: await bcrypt.hash(adminSeed.password, 10),
-                role: "Admin",
+                role: 'Admin',
                 admin: {
-                    create: {}
-                }
-
-            }
+                    create: {},
+                },
+            },
         });
 
         res.status(200).json({
-            message: "Seed data has been successfully added!"
+            message: 'Seed data has been successfully added!',
         });
-
     } catch (e) {
         next(e);
     }

@@ -1,5 +1,11 @@
-import {Consumer, NutritionSummary, Recommendation, RecommendationList, RecommendationListDetail} from "@prisma/client";
-import {boolean, string} from "zod";
+import {
+    Consumer,
+    NutritionSummary,
+    Recommendation,
+    RecommendationList,
+    RecommendationListDetail,
+} from '@prisma/client';
+import { boolean, string } from 'zod';
 
 export type RecommendationDetail = {
     rekomendasi: string;
@@ -17,7 +23,7 @@ export type RecommendationDetail = {
     pufa: number;
     sfa: number;
     fitness: number;
-}
+};
 
 export type RecommendationResponse = {
     restaurant_id: string;
@@ -26,17 +32,17 @@ export type RecommendationResponse = {
     status: {
         is_generating: boolean;
         generator_error: string | null;
-    }
+    };
     recommendations: {
         id: number;
         rank: number;
         description: string;
         total_price: number;
         image_url: {
-            url: string
+            url: string;
         }[];
     }[];
-}
+};
 
 export type RecommendationDetailResponse = {
     total_price: number;
@@ -61,18 +67,18 @@ export type GenerateRecommendationRequest = {
     token: string;
     consumer_id: string;
     restaurant_id: string;
-}
+};
 
 export type GetRecommendationRequest = {
     consumer_id: string;
     restaurant_id: string;
-}
+};
 
 export type GetRecommendationListDetailRequest = {
     restaurant_id: string;
     consumer_id: string;
     recommendation_id: number;
-}
+};
 
 export type RecommendationNoneResponse = {
     status: {
@@ -80,59 +86,69 @@ export type RecommendationNoneResponse = {
         generator_error: string | null;
     };
     errors: string;
-}
+};
 
-export function toGetRecommendationNone(status: Consumer): RecommendationNoneResponse {
+export function toGetRecommendationNone(
+    status: Consumer
+): RecommendationNoneResponse {
     return {
         status: {
             is_generating: status.is_generating,
-            generator_error: status.generator_error
+            generator_error: status.generator_error,
         },
-        errors: "Tidak ditemukan rekomendasi, silahkan generate rekomendasi baru"
-    }
+        errors: 'Tidak ditemukan rekomendasi, silahkan generate rekomendasi baru',
+    };
 }
 
-export function toGetRecommendation(status: Consumer, recommendation: Recommendation, recommendationLists: (RecommendationList & { RecommendationListDetail: RecommendationListDetail[] })[]): RecommendationResponse {
+export function toGetRecommendation(
+    status: Consumer,
+    recommendation: Recommendation,
+    recommendationLists: (RecommendationList & {
+        RecommendationListDetail: RecommendationListDetail[];
+    })[]
+): RecommendationResponse {
     return {
         restaurant_id: recommendation.restaurant_id,
         restaurant_name: recommendation.restaurant_name,
         recommended_at: recommendation.recommended_at.getTime(),
         status: {
             is_generating: status.is_generating,
-            generator_error: status.generator_error
+            generator_error: status.generator_error,
         },
-        recommendations: recommendationLists.map(list => ({
+        recommendations: recommendationLists.map((list) => ({
             id: list.id,
             rank: list.rank,
             description: list.description,
             total_price: list.total_price,
-            image_url: list.RecommendationListDetail.map(detail => ({
-                url: detail.image_url
-            }))
-        }))
+            image_url: list.RecommendationListDetail.map((detail) => ({
+                url: detail.image_url,
+            })),
+        })),
     };
 }
 
-
 // Fungsi untuk mengonversi ke RecommendationDetailResponse
-export function toGetRecommendationDetail(recommendationList: RecommendationList, nutritionSummary: NutritionSummary, recommendationDetails: RecommendationListDetail[]): RecommendationDetailResponse {
+export function toGetRecommendationDetail(
+    recommendationList: RecommendationList,
+    nutritionSummary: NutritionSummary,
+    recommendationDetails: RecommendationListDetail[]
+): RecommendationDetailResponse {
     return {
         total_price: recommendationList.total_price,
         nutrition_summary: {
             calory: nutritionSummary.calory,
             protein: nutritionSummary.protein.toNumber(),
             fat: nutritionSummary.carbohydrate.toNumber(),
-            carbohydrate: nutritionSummary.carbohydrate.toNumber()
+            carbohydrate: nutritionSummary.carbohydrate.toNumber(),
         },
-        recommendations: recommendationDetails.map(detail => ({
+        recommendations: recommendationDetails.map((detail) => ({
             menu_id: detail.menu_id,
             name: detail.menu_name,
             category: detail.menu_category,
             portion: detail.menu_portion,
             price: detail.menu_price,
             description: detail.menu_description,
-            image_url: detail.image_url
-        }))
+            image_url: detail.image_url,
+        })),
     };
 }
-

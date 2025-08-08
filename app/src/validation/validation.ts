@@ -1,4 +1,4 @@
-import {ZodType} from "zod";
+import { ZodType } from 'zod';
 
 export class Validation {
     static validate<T>(schema: ZodType, data: T): T {
