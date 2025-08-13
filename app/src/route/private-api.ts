@@ -125,6 +125,11 @@ privateRouter.put(
   authorizeMiddleware(Roles.Admin),
   MenuController.updateMenuApproval
 );
+privateRouter.put(
+  '/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/menus/:menuId(\\d+)/recipe',
+  authorizeMiddleware(Roles.Restaurant),
+  MenuController.setMenuRecipe
+);
 
 // Order Module
 privateRouter.post(

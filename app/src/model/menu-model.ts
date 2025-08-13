@@ -120,6 +120,18 @@ export type UpdateMenuApprovalRequest = {
   status: string;
 };
 
+export type RecipeItemInput = {
+  item_id: number;
+  item_type: 'bahan' | 'bumbu';
+  quantity_grams: number;
+};
+
+export type SetMenuRecipeRequest = {
+  restaurant_id: string;
+  menu_id: number;
+  items: RecipeItemInput[];
+};
+
 export function toAllMenusResponse(menu: Menu): AllMenusResponse {
   return {
     id: menu.id,
