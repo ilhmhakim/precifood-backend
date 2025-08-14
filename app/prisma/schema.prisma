@@ -39,6 +39,11 @@ enum MenuStatus {
   Rejected
 }
 
+enum RecipeItemType {
+  bahan
+  bumbu
+}
+
 // Model User
 model User {
   id            String      @id @db.VarChar(38)
@@ -245,6 +250,9 @@ model Menu {
   restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: Cascade)
   // 1 Menu memiliki 1 detail Nutrition (1 to 1)
   Nutrition     Nutrition?
+  // 1 Menu memiliki Many Recipe (1 to Many)
+  // Recipe adalah bahan atau bumbu yang digunakan untuk membuat menu tersebut
+  Recipe        Recipe[]
 
   @@map("Menu")
 }
@@ -284,4 +292,64 @@ model Notification {
   menu_id         Int     @db.Integer
   menu_name       String  @db.VarChar(255)
   is_read         Boolean @default(false)
+}
+
+model MasterBahan {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique @db.VarChar(255)
+  type         String   @db.VarChar(50)
+  // per 100g 
+  bdd          Int      @default(100) @db.Integer
+  calory       Float
+  protein      Decimal  @default(0.0) @db.Decimal(6, 1)
+  fat          Decimal  @default(0.0) @db.Decimal(6, 1)
+  carbohydrate Decimal  @default(0.0) @db.Decimal(6, 1)
+  fiber        Decimal  @default(0.0) @db.Decimal(6, 1)
+  natrium      Decimal  @default(0.0) @db.Decimal(6, 2)
+  cholesterol  Decimal  @default(0.0) @db.Decimal(6, 2)
+  sfa          Decimal  @default(0.0) @db.Decimal(6, 1)
+  mufa         Decimal  @default(0.0) @db.Decimal(6, 1)
+  pufa         Decimal  @default(0.0) @db.Decimal(6, 1)
+  created_at   DateTime @default(now()) @db.Timestamp()
+  updated_at   DateTime @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("MasterBahan")
+}
+
+model MasterBumbu {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique @db.VarChar(255)
+  cooking_type String?  @db.VarChar(50) // this willl be use enum in the future
+  // per 100g
+  bdd          Int      @default(100) @db.Integer
+  calory       Float
+  protein      Decimal  @default(0.0) @db.Decimal(6, 1)
+  fat          Decimal  @default(0.0) @db.Decimal(6, 1)
+  carbohydrate Decimal  @default(0.0) @db.Decimal(6, 1)
+  fiber        Decimal  @default(0.0) @db.Decimal(6, 1)
+  natrium      Decimal  @default(0.0) @db.Decimal(6, 2)
+  cholesterol  Decimal  @default(0.0) @db.Decimal(6, 2)
+  sfa          Decimal  @default(0.0) @db.Decimal(6, 1)
+  mufa         Decimal  @default(0.0) @db.Decimal(6, 1)
+  pufa         Decimal  @default(0.0) @db.Decimal(6, 1)
+  created_at   DateTime @default(now()) @db.Timestamp()
+  updated_at   DateTime @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("MasterBumbu")
+}
+
+model Recipe {
+  id        Int            @id @default(autoincrement())
+  menu_id   Int
+  item_id   Int // either from MasterBahan or MasterBumbu
+  item_type RecipeItemType
+
+  quantity_grams Float
+
+  created_at DateTime @default(now()) @db.Timestamp()
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(0)
+  Menu       Menu     @relation(fields: [menu_id], references: [id])
+
+  @@index([menu_id])
+  @@map("Recipe")
 }

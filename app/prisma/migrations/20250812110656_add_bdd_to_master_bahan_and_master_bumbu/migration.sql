@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "MasterBahan" ADD COLUMN     "bdd" INTEGER NOT NULL DEFAULT 100;
+
+-- AlterTable
+ALTER TABLE "MasterBumbu" ADD COLUMN     "bdd" INTEGER NOT NULL DEFAULT 100;

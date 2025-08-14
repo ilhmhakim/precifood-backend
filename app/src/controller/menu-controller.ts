@@ -5,14 +5,16 @@ import {
   GetAllMenuRequest,
   GetMenuDetailRequest,
   SearchMenuRequest,
+  SetMenuRecipeRequest,
   UpdateMenuApprovalRequest,
   UpdateMenuNutritionRequest,
   UpdateMenuRequest,
 } from '../model/menu-model';
 import { ImageUploaderService } from '../service/image-uploader-service';
 import { MenuService } from '../service/menu-service';
+import { RecipeService } from '../service/recipe-service';
 import { UserRequest } from '../type/user';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Response } from 'express';
 
 export class MenuController {
   static async createMenu(req: UserRequest, res: Response, next: NextFunction) {
@@ -230,6 +232,21 @@ export class MenuController {
         message: 'Success!',
         data: response,
       });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async setMenuRecipe(req: any, res: any, next: any) {
+    try {
+      const payload: SetMenuRecipeRequest = {
+        restaurant_id: String(req.params.restaurantId),
+        menu_id: Number(req.params.menuId),
+        items: req.body.items ?? [],
+      } as SetMenuRecipeRequest;
+
+      await RecipeService.setMenuRecipe(payload);
+      res.status(200).json({ message: 'Success!' });
     } catch (e) {
       next(e);
     }
