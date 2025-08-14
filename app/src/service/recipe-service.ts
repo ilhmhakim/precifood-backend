@@ -7,6 +7,30 @@ import { MenuService } from './menu-service';
 import { Prisma, RecipeItemType } from '@prisma/client';
 
 export class RecipeService {
+  static async checkIfItemExists(
+    itemId: number,
+    itemType: RecipeItemType
+  ): Promise<boolean> {
+    if (itemType === RecipeItemType.bahan) {
+      const item = await prismaClient.masterBahan.findUnique({
+        where: { id: itemId },
+      });
+      if (item) {
+        return true;
+      }
+      throw new ResponseError(404, `ID ${itemId} not found in Master Bahan`);
+    } else if (itemType === RecipeItemType.bumbu) {
+      const item = await prismaClient.masterBumbu.findUnique({
+        where: { id: itemId },
+      });
+      if (item) {
+        return true;
+      }
+      throw new ResponseError(404, `ID ${itemId} not found in Master Bumbu`);
+    }
+    throw new ResponseError(400, `Unknown item type ${itemType}`);
+  }
+
   static async recalculateNutritionInternal(
     prisma: Prisma.TransactionClient,
     menuId: number
@@ -136,34 +160,12 @@ export class RecipeService {
 
     await MenuService.checkMenuExist(payload.menu_id, payload.restaurant_id);
 
-    // TODO: refactor this to new static RecipeService method checkIfItemExists
     try {
-      for (const item of payload.items) {
-        let checkItem;
-        if (item.item_type === RecipeItemType.bahan) {
-          checkItem = await prismaClient.masterBahan.findUnique({
-            where: { id: item.item_id },
-          });
-
-          if (!checkItem) {
-            throw new ResponseError(
-              404,
-              `Bahan dengan ID ${item.item_id} tidak ditemukan`
-            );
-          }
-        } else if (item.item_type === RecipeItemType.bumbu) {
-          checkItem = await prismaClient.masterBumbu.findUnique({
-            where: { id: item.item_id },
-          });
-
-          if (!checkItem) {
-            throw new ResponseError(
-              404,
-              `Bumbu dengan ID ${item.item_id} tidak ditemukan`
-            );
-          }
-        }
-      }
+      await Promise.all(
+        payload.items.map((item) =>
+          this.checkIfItemExists(item.item_id, item.item_type)
+        )
+      );
     } catch (error) {
       if (error instanceof Error) {
         throw new ResponseError(404, error.message);
