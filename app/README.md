@@ -28,9 +28,8 @@ npx prisma migrate dev
 
 npx prisma generate
 
-npm run build
-
-npm run start
+npm run dev (for development hot reload)
+npm run build && npm run start
 
 POST {{baseUrl}}/api/seeds to seeds database (development only)
 POST {{baseUrl}}/api/seeds/master-bahan-bumbu to seeds master bahan and bumbu (development only)
