@@ -159,12 +159,6 @@ export class RecipeService {
 
     await MenuService.checkMenuExist(payload.menu_id, payload.restaurant_id);
 
-    // set to zero if items : []
-    if (payload.items.length === 0) {
-      await this.upsertNutritionZero(prismaClient, payload.menu_id);
-      return;
-    }
-
     try {
       await Promise.all(
         payload.items.map((item) =>
