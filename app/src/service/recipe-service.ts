@@ -73,7 +73,6 @@ export class RecipeService {
     const bumbuMap = new Map(masterBumbu.map((m) => [m.id, m]));
 
     let calory = 0;
-    let bdd = 0;
     let protein: Prisma.Decimal = new Prisma.Decimal(0);
     let fat: Prisma.Decimal = new Prisma.Decimal(0);
     let carbohydrate: Prisma.Decimal = new Prisma.Decimal(0);
@@ -124,8 +123,8 @@ export class RecipeService {
     }
 
     // Round as per Nutrition precision (macros 1dp, some 2dp)
-    const r1 = (n: number) => Math.round(n * 10) / 10;
-    const r2 = (n: number) => Math.round(n * 100) / 100;
+    const r1 = (n: number) => Math.ceil(n * 10) / 10;
+    const r2 = (n: number) => Math.ceil(n * 100) / 100;
 
     const data = {
       weight_per_portion: Math.round(totalWeightInGram),
@@ -160,6 +159,12 @@ export class RecipeService {
 
     await MenuService.checkMenuExist(payload.menu_id, payload.restaurant_id);
 
+    // set to zero if items : []
+    if (payload.items.length === 0) {
+      await this.upsertNutritionZero(prismaClient, payload.menu_id);
+      return;
+    }
+
     try {
       await Promise.all(
         payload.items.map((item) =>
@@ -174,10 +179,7 @@ export class RecipeService {
       }
     }
 
-    // TODO: refactor this to better algorithm
-    // delete existing recipe for that menu
-    // then insert new recipe
-    // finally recalculate the nutrition of that menu
+    // TODO: refactor this to better algorithm and performance
     await prismaClient.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.recipe.deleteMany({
         where: {
@@ -205,7 +207,6 @@ export class RecipeService {
     menuId: number
   ): Promise<void> {
     const zeros = {
-      bdd: 0,
       weight_per_portion: 0,
       weight_with_bdd: 0,
       calory: 0,
