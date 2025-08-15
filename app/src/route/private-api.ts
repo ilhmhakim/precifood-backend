@@ -3,6 +3,7 @@
 // but it works fine in runtime and build, so I just ignore the type checking for now
 import { AuthController } from '../controller/auth-controller';
 import { MasterBahanController } from '../controller/master-bahan-controller';
+import { MasterBahanTypeController } from '../controller/master-bahan-type-controller';
 import { MasterBumbuController } from '../controller/master-bumbu-controller';
 import { MenuController } from '../controller/menu-controller';
 import { NotificationController } from '../controller/notification-controller';
@@ -62,6 +63,13 @@ privateRouter.get(
   '/api/users/restaurants/:restaurantId([a-zA-Z0-9_-]+)',
   authorizeMiddleware(Roles.AdminAndConsumer),
   UserController.getProfileRestaurant
+);
+
+// Master Bahan Type Module
+privateRouter.get(
+  '/api/master-bahan-types',
+  authorizeMiddleware(Roles.Restaurant),
+  MasterBahanTypeController.getAll
 );
 
 // Master Bahan Module

@@ -7,11 +7,10 @@ export class MasterBahanValidation {
       .trim()
       .min(1, 'Nama bahan minimal 1 karakter')
       .max(255, 'Nama bahan maksimal 255 karakter'),
-    type: z
-      .string({ required_error: 'Tipe bahan harus diisi' })
-      .trim()
-      .min(1, 'Tipe bahan minimal 1 karakter')
-      .max(50, 'Tipe bahan maksimal 50 karakter'),
+    type_id: z
+      .number({ required_error: 'ID tipe bahan harus diisi' })
+      .int('ID tipe bahan harus berupa bilangan bulat')
+      .positive('ID tipe bahan harus bernilai positif'),
     bdd: z
       .number({ required_error: 'BDD harus diisi' })
       .int()
@@ -88,11 +87,10 @@ export class MasterBahanValidation {
       .min(1, 'Nama bahan minimal 1 karakter')
       .max(255, 'Nama bahan maksimal 255 karakter')
       .optional(),
-    type: z
-      .string()
-      .trim()
-      .min(1, 'Tipe bahan minimal 1 karakter')
-      .max(50, 'Tipe bahan maksimal 50 karakter')
+    type_id: z
+      .number()
+      .int('ID tipe bahan harus berupa bilangan bulat')
+      .positive('ID tipe bahan harus bernilai positif')
       .optional(),
     bdd: z
       .number()

@@ -1,8 +1,8 @@
-import { MasterBahan } from '@prisma/client';
+import { MasterBahan, MasterBahanType } from '@prisma/client';
 
 export type CreateMasterBahanRequest = {
   name: string;
-  type: string;
+  type_id: number;
   bdd: number;
   calory: number;
   protein: number;
@@ -19,7 +19,7 @@ export type CreateMasterBahanRequest = {
 export type UpdateMasterBahanRequest = {
   id: number;
   name?: string;
-  type?: string;
+  type_id?: number;
   bdd?: number;
   calory?: number;
   protein?: number;
@@ -44,7 +44,8 @@ export type DeleteMasterBahanRequest = {
 export type MasterBahanResponse = {
   id: number;
   name: string;
-  type: string;
+  type_id: number;
+  type_name: string;
   bdd: number;
   calory: number;
   protein: number;
@@ -61,12 +62,13 @@ export type MasterBahanResponse = {
 };
 
 export function toMasterBahanResponse(
-  masterBahan: MasterBahan
+  masterBahan: MasterBahan & { type: MasterBahanType }
 ): MasterBahanResponse {
   return {
     id: masterBahan.id,
     name: masterBahan.name,
-    type: masterBahan.type,
+    type_id: masterBahan.type_id,
+    type_name: masterBahan.type.name,
     bdd: masterBahan.bdd,
     calory: Number(masterBahan.calory),
     protein: Number(masterBahan.protein),
