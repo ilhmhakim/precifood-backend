@@ -2,6 +2,8 @@
 // note (AghnatHs): ts-nocheck because it has an "No overload matches this call." errors in authorizeMiddleware
 // but it works fine in runtime and build, so I just ignore the type checking for now
 import { AuthController } from '../controller/auth-controller';
+import { MasterBahanController } from '../controller/master-bahan-controller';
+import { MasterBumbuController } from '../controller/master-bumbu-controller';
 import { MenuController } from '../controller/menu-controller';
 import { NotificationController } from '../controller/notification-controller';
 import { OrderController } from '../controller/order-controller';
@@ -60,6 +62,60 @@ privateRouter.get(
   '/api/users/restaurants/:restaurantId([a-zA-Z0-9_-]+)',
   authorizeMiddleware(Roles.AdminAndConsumer),
   UserController.getProfileRestaurant
+);
+
+// Master Bahan Module
+privateRouter.post(
+  '/api/master-bahan',
+  authorizeMiddleware(Roles.Restaurant),
+  MasterBahanController.create
+);
+privateRouter.get(
+  '/api/master-bahan',
+  authorizeMiddleware(Roles.Restaurant),
+  MasterBahanController.getAll
+);
+privateRouter.get(
+  '/api/master-bahan/:id(\\d+)',
+  authorizeMiddleware(Roles.Restaurant),
+  MasterBahanController.get
+);
+privateRouter.put(
+  '/api/master-bahan/:id(\\d+)',
+  authorizeMiddleware(Roles.Restaurant),
+  MasterBahanController.update
+);
+privateRouter.delete(
+  '/api/master-bahan/:id(\\d+)',
+  authorizeMiddleware(Roles.Restaurant),
+  MasterBahanController.delete
+);
+
+// Master Bumbu Module
+privateRouter.post(
+  '/api/master-bumbu',
+  authorizeMiddleware(Roles.Restaurant),
+  MasterBumbuController.create
+);
+privateRouter.get(
+  '/api/master-bumbu',
+  authorizeMiddleware(Roles.Restaurant),
+  MasterBumbuController.getAll
+);
+privateRouter.get(
+  '/api/master-bumbu/:id(\\d+)',
+  authorizeMiddleware(Roles.Restaurant),
+  MasterBumbuController.get
+);
+privateRouter.put(
+  '/api/master-bumbu/:id(\\d+)',
+  authorizeMiddleware(Roles.Restaurant),
+  MasterBumbuController.update
+);
+privateRouter.delete(
+  '/api/master-bumbu/:id(\\d+)',
+  authorizeMiddleware(Roles.Restaurant),
+  MasterBumbuController.delete
 );
 
 // Menu Module
