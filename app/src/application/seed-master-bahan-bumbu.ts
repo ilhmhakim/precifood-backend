@@ -17,10 +17,29 @@ export async function SeedMasterBahanBumbu(
   }
 
   try {
+    const typeData = [
+      { name: 'Utama' },
+      { name: 'Pelengkap' },
+      { name: 'Dasar' },
+    ];
+
+    for (const type of typeData) {
+      await prismaClient.masterBahanType.upsert({
+        where: { name: type.name },
+        update: {},
+        create: { name: type.name },
+      });
+    }
+
+    const types = await prismaClient.masterBahanType.findMany();
+    const typeMap = new Map(
+      types.map((type) => [type.name.toLowerCase(), type.id])
+    );
+
     const masterBahanData = [
       {
         name: 'Ayam',
-        type: 'utama',
+        type_id: typeMap.get('utama') || 1,
         bdd: 58,
         calory: 298,
         protein: 18.2,
@@ -35,7 +54,7 @@ export async function SeedMasterBahanBumbu(
       },
       {
         name: 'Ikan Patin',
-        type: 'utama',
+        type_id: typeMap.get('utama') || 1,
         bdd: 80,
         calory: 132,
         protein: 17,
@@ -50,7 +69,7 @@ export async function SeedMasterBahanBumbu(
       },
       {
         name: 'Minyak Goreng',
-        type: 'pelengkap',
+        type_id: typeMap.get('pelengkap') || 2,
         bdd: 100,
         calory: 884,
         protein: 0,

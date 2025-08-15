@@ -294,24 +294,33 @@ model Notification {
   is_read         Boolean @default(false)
 }
 
+model MasterBahanType {
+  id     Int           @id @default(autoincrement())
+  name   String        @unique @db.VarChar(50)
+  bahans MasterBahan[]
+
+  @@map("MasterBahanType")
+}
+
 model MasterBahan {
-  id           Int      @id @default(autoincrement())
-  name         String   @unique @db.VarChar(255)
-  type         String   @db.VarChar(50)
+  id           Int             @id @default(autoincrement())
+  name         String          @unique @db.VarChar(255)
+  type_id      Int
+  type         MasterBahanType @relation(fields: [type_id], references: [id])
   // per 100g 
-  bdd          Int      @default(100) @db.Integer
-  calory       Decimal  @default(0.0)
-  protein      Decimal  @default(0.0)
-  fat          Decimal  @default(0.0)
-  carbohydrate Decimal  @default(0.0)
-  fiber        Decimal  @default(0.0)
-  natrium      Decimal  @default(0.0)
-  cholesterol  Decimal  @default(0.0)
-  sfa          Decimal  @default(0.0)
-  mufa         Decimal  @default(0.0)
-  pufa         Decimal  @default(0.0)
-  created_at   DateTime @default(now()) @db.Timestamp()
-  updated_at   DateTime @default(now()) @updatedAt @db.Timestamp(0)
+  bdd          Int             @default(100) @db.Integer
+  calory       Decimal         @default(0.0)
+  protein      Decimal         @default(0.0)
+  fat          Decimal         @default(0.0)
+  carbohydrate Decimal         @default(0.0)
+  fiber        Decimal         @default(0.0)
+  natrium      Decimal         @default(0.0)
+  cholesterol  Decimal         @default(0.0)
+  sfa          Decimal         @default(0.0)
+  mufa         Decimal         @default(0.0)
+  pufa         Decimal         @default(0.0)
+  created_at   DateTime        @default(now()) @db.Timestamp()
+  updated_at   DateTime        @default(now()) @updatedAt @db.Timestamp(0)
 
   @@map("MasterBahan")
 }

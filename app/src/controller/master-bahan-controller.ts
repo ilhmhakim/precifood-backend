@@ -50,7 +50,7 @@ export class MasterBahanController {
         await MasterBahanService.getMasterBahan(request);
 
       res.status(200).json({
-        message: `Berhasil mendapatkan bahan ${response.id} ${response.name} ${response.type}`,
+        message: `Berhasil mendapatkan bahan ${response.id} ${response.name} ${response.type_name}`,
         data: response,
       });
     } catch (error) {

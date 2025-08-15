@@ -10,7 +10,7 @@ import {
 } from '../model/master-bahan-model';
 import { MasterBahanValidation } from '../validation/master-bahan-validation';
 import { Validation } from '../validation/validation';
-import { MasterBahan } from '@prisma/client';
+import { MasterBahan, Prisma } from '@prisma/client';
 
 export class MasterBahanService {
   static async checkIfBahanExists(id: number): Promise<boolean> {
@@ -22,16 +22,24 @@ export class MasterBahanService {
     return !!bahan;
   }
 
-  static async checkIfBahanExistsByNameAndType(
+  static async checkIfBahanExistsByNameAndTypeId(
     name: string,
-    type: string
-  ): Promise<boolean> {
-    const bahan: MasterBahan | null = await prismaClient.masterBahan.findUnique(
-      {
-        where: { name, type },
-      }
-    );
-    return !!bahan;
+    type_id: number
+  ): Promise<Prisma.MasterBahanGetPayload<{ include: { type: true } }> | null> {
+    const bahan = await prismaClient.masterBahan.findFirst({
+      where: { name, type_id },
+      include: {
+        type: true,
+      },
+    });
+    return bahan;
+  }
+
+  static async checkIfBahanTypeExists(id: number): Promise<boolean> {
+    const bahanType = await prismaClient.masterBahanType.findUnique({
+      where: { id },
+    });
+    return !!bahanType;
   }
 
   static async createNewBahan(
@@ -42,31 +50,46 @@ export class MasterBahanService {
       request
     );
 
-    const existingBahan: boolean = await this.checkIfBahanExistsByNameAndType(
+    // Check if type_id exists
+    const typeExists = await this.checkIfBahanTypeExists(
+      createBahanRequest.type_id
+    );
+    if (!typeExists) {
+      throw new ResponseError(
+        404,
+        `Tipe bahan dengan ID ${createBahanRequest.type_id} tidak ditemukan`
+      );
+    }
+
+    const existingBahan = await this.checkIfBahanExistsByNameAndTypeId(
       createBahanRequest.name,
-      createBahanRequest.type
+      createBahanRequest.type_id
     );
 
     if (existingBahan) {
       throw new ResponseError(
         409,
-        `Bahan dengan nama "${createBahanRequest.name}" dan tipe "${createBahanRequest.type}" sudah ada`
+        `Bahan dengan nama "${createBahanRequest.name}" dengan tipe ${existingBahan.type.name} sudah ada`
       );
     }
 
-    const masterBahan: MasterBahan = await prismaClient.masterBahan.create({
+    const masterBahan = await prismaClient.masterBahan.create({
       data: createBahanRequest,
+      include: {
+        type: true,
+      },
     });
 
     return toMasterBahanResponse(masterBahan);
   }
 
   static async getAllMasterBahan(): Promise<Array<MasterBahanResponse>> {
-    const masterBahans: MasterBahan[] = await prismaClient.masterBahan.findMany(
-      {
-        orderBy: { name: 'asc' },
-      }
-    );
+    const masterBahans = await prismaClient.masterBahan.findMany({
+      orderBy: { name: 'asc' },
+      include: {
+        type: true,
+      },
+    });
 
     return masterBahans.map((masterBahan) =>
       toMasterBahanResponse(masterBahan)
@@ -81,10 +104,12 @@ export class MasterBahanService {
       request
     );
 
-    const masterBahan: MasterBahan | null =
-      await prismaClient.masterBahan.findUnique({
-        where: { id: getMasterBahanRequest.id },
-      });
+    const masterBahan = await prismaClient.masterBahan.findUnique({
+      where: { id: getMasterBahanRequest.id },
+      include: {
+        type: true,
+      },
+    });
 
     if (!masterBahan) {
       throw new ResponseError(
@@ -104,9 +129,7 @@ export class MasterBahanService {
       request
     );
 
-    const isExist: Boolean = await this.checkIfBahanExists(
-      updateMasterBahanRequest.id
-    );
+    const isExist = await this.checkIfBahanExists(updateMasterBahanRequest.id);
     if (!isExist) {
       throw new ResponseError(
         404,
@@ -114,53 +137,65 @@ export class MasterBahanService {
       );
     }
 
-    if (updateMasterBahanRequest.name || updateMasterBahanRequest.type) {
-      const existingBahan: MasterBahan | null =
-        await prismaClient.masterBahan.findFirst({
-          where: {
-            AND: [
-              { id: { not: updateMasterBahanRequest.id } },
-              {
-                OR: [
-                  {
-                    name: updateMasterBahanRequest.name,
-                    type: updateMasterBahanRequest.type,
-                  },
-                ],
-              },
-            ],
-          },
-        });
-
-      if (existingBahan) {
+    if (updateMasterBahanRequest.type_id) {
+      const typeExists = await this.checkIfBahanTypeExists(
+        updateMasterBahanRequest.type_id
+      );
+      if (!typeExists) {
         throw new ResponseError(
-          409,
-          `Bahan dengan nama "${updateMasterBahanRequest.name}" dan tipe "${updateMasterBahanRequest.type}" sudah ada`
+          404,
+          `Tipe bahan dengan ID ${updateMasterBahanRequest.type_id} tidak ditemukan`
         );
       }
     }
 
-    const updatedMasterBahan: MasterBahan =
-      await prismaClient.masterBahan.update({
+    if (updateMasterBahanRequest.name || updateMasterBahanRequest.type_id) {
+      const existingBahan = await prismaClient.masterBahan.findFirst({
         where: {
-          id: updateMasterBahanRequest.id,
+          AND: [
+            { id: { not: updateMasterBahanRequest.id } },
+            {
+              name: updateMasterBahanRequest.name ?? undefined,
+              type_id: updateMasterBahanRequest.type_id ?? undefined,
+            },
+          ],
         },
-        data: {
-          name: updateMasterBahanRequest.name,
-          type: updateMasterBahanRequest.type,
-          bdd: updateMasterBahanRequest.bdd,
-          calory: updateMasterBahanRequest.calory,
-          protein: updateMasterBahanRequest.protein,
-          fat: updateMasterBahanRequest.fat,
-          carbohydrate: updateMasterBahanRequest.carbohydrate,
-          fiber: updateMasterBahanRequest.fiber,
-          natrium: updateMasterBahanRequest.natrium,
-          cholesterol: updateMasterBahanRequest.cholesterol,
-          sfa: updateMasterBahanRequest.sfa,
-          mufa: updateMasterBahanRequest.mufa,
-          pufa: updateMasterBahanRequest.pufa,
+        include: {
+          type: true,
         },
       });
+
+      if (existingBahan) {
+        throw new ResponseError(
+          409,
+          `Bahan dengan nama "${updateMasterBahanRequest.name}" dengan tipe ${existingBahan.type.name} sudah ada`
+        );
+      }
+    }
+
+    const updatedMasterBahan = await prismaClient.masterBahan.update({
+      where: {
+        id: updateMasterBahanRequest.id,
+      },
+      data: {
+        name: updateMasterBahanRequest.name,
+        type_id: updateMasterBahanRequest.type_id,
+        bdd: updateMasterBahanRequest.bdd,
+        calory: updateMasterBahanRequest.calory,
+        protein: updateMasterBahanRequest.protein,
+        fat: updateMasterBahanRequest.fat,
+        carbohydrate: updateMasterBahanRequest.carbohydrate,
+        fiber: updateMasterBahanRequest.fiber,
+        natrium: updateMasterBahanRequest.natrium,
+        cholesterol: updateMasterBahanRequest.cholesterol,
+        sfa: updateMasterBahanRequest.sfa,
+        mufa: updateMasterBahanRequest.mufa,
+        pufa: updateMasterBahanRequest.pufa,
+      },
+      include: {
+        type: true,
+      },
+    });
 
     return toMasterBahanResponse(updatedMasterBahan);
   }
