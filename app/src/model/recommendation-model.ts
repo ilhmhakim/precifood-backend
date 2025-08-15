@@ -5,7 +5,6 @@ import {
   RecommendationList,
   RecommendationListDetail,
 } from '@prisma/client';
-import { boolean, string } from 'zod';
 
 export type RecommendationDetail = {
   rekomendasi: string;
@@ -136,7 +135,7 @@ export function toGetRecommendationDetail(
   return {
     total_price: recommendationList.total_price,
     nutrition_summary: {
-      calory: nutritionSummary.calory,
+      calory: nutritionSummary.calory.toNumber(),
       protein: nutritionSummary.protein.toNumber(),
       fat: nutritionSummary.carbohydrate.toNumber(),
       carbohydrate: nutritionSummary.carbohydrate.toNumber(),

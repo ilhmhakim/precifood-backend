@@ -1,4 +1,5 @@
 import { prismaClient } from '../application/database';
+import { logger } from '../application/logging';
 import { ResponseError } from '../error/response-error';
 import { SetMenuRecipeRequest } from '../model/menu-model';
 import { RecipeValidation } from '../validation/recipe-validation';
@@ -72,7 +73,7 @@ export class RecipeService {
     const bahanMap = new Map(masterBahan.map((m) => [m.id, m]));
     const bumbuMap = new Map(masterBumbu.map((m) => [m.id, m]));
 
-    let calory = 0;
+    let calory: Prisma.Decimal = new Prisma.Decimal(0);
     let protein: Prisma.Decimal = new Prisma.Decimal(0);
     let fat: Prisma.Decimal = new Prisma.Decimal(0);
     let carbohydrate: Prisma.Decimal = new Prisma.Decimal(0);
@@ -89,10 +90,17 @@ export class RecipeService {
     const addFrom = (quantity: number, m: any) => {
       if (!m) return;
 
-      const factor = (m.bdd / 100) * (quantity / 100);
-      totalWeightInGram += quantity;
+      const factor = new Prisma.Decimal(m.bdd)
+        .div(100)
+        .times(new Prisma.Decimal(quantity).div(100));
 
-      calory += (m.calory as number) * factor;
+      totalWeightInGram = new Prisma.Decimal(totalWeightInGram)
+        .plus(quantity)
+        .toNumber();
+
+      calory = new Prisma.Decimal(calory).plus(
+        new Prisma.Decimal(m.calory).times(factor)
+      );
 
       protein = protein.plus(new Prisma.Decimal(m.protein).times(factor));
       fat = fat.plus(new Prisma.Decimal(m.fat).times(factor));
@@ -107,6 +115,10 @@ export class RecipeService {
       sfa = sfa.plus(new Prisma.Decimal(m.sfa).times(factor));
       mufa = mufa.plus(new Prisma.Decimal(m.mufa).times(factor));
       pufa = pufa.plus(new Prisma.Decimal(m.pufa).times(factor));
+
+      logger.info(
+        `Adding ${quantity}g of ${m.name} to nutrition: calory=${calory}, protein=${protein}, fat=${fat}, carbohydrate=${carbohydrate}, fiber=${fiber}, natrium=${natrium}, cholesterol=${cholesterol}, sfa=${sfa}, mufa=${mufa}, pufa=${pufa}`
+      );
     };
 
     for (const r of recipes) {
@@ -122,24 +134,24 @@ export class RecipeService {
       }
     }
 
-    // Round as per Nutrition precision (macros 1dp, some 2dp)
-    const r1 = (n: number) => Math.ceil(n * 10) / 10;
-    const r2 = (n: number) => Math.ceil(n * 100) / 100;
-
     const data = {
       weight_per_portion: Math.round(totalWeightInGram),
       weight_with_bdd: Math.round(totalWeightInGram),
-      calory: Math.round(calory),
-      protein: new Prisma.Decimal(r1(protein.toNumber())),
-      fat: new Prisma.Decimal(r1(fat.toNumber())),
-      carbohydrate: new Prisma.Decimal(r1(carbohydrate.toNumber())),
-      fiber: new Prisma.Decimal(r1(fiber.toNumber())),
-      natrium: new Prisma.Decimal(r2(natrium.toNumber())),
-      cholesterol: new Prisma.Decimal(r2(cholesterol.toNumber())),
-      sfa: new Prisma.Decimal(r1(sfa.toNumber())),
-      mufa: new Prisma.Decimal(r1(mufa.toNumber())),
-      pufa: new Prisma.Decimal(r1(pufa.toNumber())),
+      calory: new Prisma.Decimal(calory.toNumber()),
+      protein: new Prisma.Decimal(protein.toNumber()),
+      fat: new Prisma.Decimal(fat.toNumber()),
+      carbohydrate: new Prisma.Decimal(carbohydrate.toNumber()),
+      fiber: new Prisma.Decimal(fiber.toNumber()),
+      natrium: new Prisma.Decimal(natrium.toNumber()),
+      cholesterol: new Prisma.Decimal(cholesterol.toNumber()),
+      sfa: new Prisma.Decimal(sfa.toNumber()),
+      mufa: new Prisma.Decimal(mufa.toNumber()),
+      pufa: new Prisma.Decimal(pufa.toNumber()),
     };
+
+    logger.info(
+      `Recalculated nutrition for menu_id ${menuId}: ${JSON.stringify(data)}`
+    );
 
     const isNutritionExisting = await prisma.nutrition.findUnique({
       where: { menu_id: menuId },

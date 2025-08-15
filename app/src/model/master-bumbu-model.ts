@@ -68,7 +68,7 @@ export function toMasterBumbuResponse(
     name: masterBumbu.name,
     cooking_type: masterBumbu.cooking_type,
     bdd: masterBumbu.bdd,
-    calory: masterBumbu.calory,
+    calory: Number(masterBumbu.calory),
     protein: Number(masterBumbu.protein),
     fat: Number(masterBumbu.fat),
     carbohydrate: Number(masterBumbu.carbohydrate),

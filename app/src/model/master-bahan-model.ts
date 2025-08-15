@@ -68,7 +68,7 @@ export function toMasterBahanResponse(
     name: masterBahan.name,
     type: masterBahan.type,
     bdd: masterBahan.bdd,
-    calory: masterBahan.calory,
+    calory: Number(masterBahan.calory),
     protein: Number(masterBahan.protein),
     fat: Number(masterBahan.fat),
     carbohydrate: Number(masterBahan.carbohydrate),
