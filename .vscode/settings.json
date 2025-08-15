@@ -12,5 +12,8 @@
   },
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "files.watcherExclude": {
+    "**/target": true
   }
 }
