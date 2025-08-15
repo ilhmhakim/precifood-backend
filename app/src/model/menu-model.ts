@@ -163,7 +163,9 @@ export function toMenuDetailResponse(
       description: menu.description,
       image_url: menu.image_url,
       nutrition: {
-        calory: nutrition?.calory ?? noValueMessage,
+        calory: nutrition?.calory
+          ? nutrition.calory.toNumber()
+          : noValueMessage,
         protein: nutrition?.protein
           ? nutrition.protein.toNumber()
           : noValueMessage,
@@ -186,7 +188,9 @@ export function toMenuDetailResponse(
       nutrition: {
         weight_per_portion: nutrition?.weight_per_portion ?? noValueMessage,
         weight_with_bdd: nutrition?.weight_with_bdd ?? noValueMessage,
-        calory: nutrition?.calory ?? noValueMessage,
+        calory: nutrition?.calory
+          ? nutrition.calory.toNumber()
+          : noValueMessage,
         protein: nutrition?.protein
           ? nutrition.protein.toNumber()
           : noValueMessage,

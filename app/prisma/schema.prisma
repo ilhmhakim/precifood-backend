@@ -174,7 +174,7 @@ model RecommendationList {
 model NutritionSummary {
   recommendation_list_id Int                @id @db.Integer
   recommendation_list    RecommendationList @relation(fields: [recommendation_list_id], references: [id])
-  calory                 Int                @default(0) @db.Integer
+  calory                 Decimal            @default(0.0) @db.Decimal(6, 1)
   protein                Decimal            @default(0.0) @db.Decimal(6, 1)
   fat                    Decimal            @default(0.0) @db.Decimal(6, 1)
   carbohydrate           Decimal            @default(0.0) @db.Decimal(6, 1)
@@ -263,7 +263,7 @@ model Nutrition {
   menu               Menu    @relation(fields: [menu_id], references: [id], onDelete: Cascade)
   weight_per_portion Int     @default(0) @db.Integer
   weight_with_bdd    Int     @default(0) @db.Integer
-  calory             Int     @default(0) @db.Integer
+  calory             Decimal @default(0.0) @db.Decimal(6, 1)
   protein            Decimal @default(0.0) @db.Decimal(6, 1)
   fat                Decimal @default(0.0) @db.Decimal(6, 1)
   carbohydrate       Decimal @default(0.0) @db.Decimal(6, 1)
@@ -300,16 +300,16 @@ model MasterBahan {
   type         String   @db.VarChar(50)
   // per 100g 
   bdd          Int      @default(100) @db.Integer
-  calory       Float
-  protein      Decimal  @default(0.0) @db.Decimal(6, 1)
-  fat          Decimal  @default(0.0) @db.Decimal(6, 1)
-  carbohydrate Decimal  @default(0.0) @db.Decimal(6, 1)
-  fiber        Decimal  @default(0.0) @db.Decimal(6, 1)
-  natrium      Decimal  @default(0.0) @db.Decimal(6, 2)
-  cholesterol  Decimal  @default(0.0) @db.Decimal(6, 2)
-  sfa          Decimal  @default(0.0) @db.Decimal(6, 1)
-  mufa         Decimal  @default(0.0) @db.Decimal(6, 1)
-  pufa         Decimal  @default(0.0) @db.Decimal(6, 1)
+  calory       Decimal  @default(0.0)
+  protein      Decimal  @default(0.0)
+  fat          Decimal  @default(0.0)
+  carbohydrate Decimal  @default(0.0)
+  fiber        Decimal  @default(0.0)
+  natrium      Decimal  @default(0.0)
+  cholesterol  Decimal  @default(0.0)
+  sfa          Decimal  @default(0.0)
+  mufa         Decimal  @default(0.0)
+  pufa         Decimal  @default(0.0)
   created_at   DateTime @default(now()) @db.Timestamp()
   updated_at   DateTime @default(now()) @updatedAt @db.Timestamp(0)
 
@@ -322,16 +322,16 @@ model MasterBumbu {
   cooking_type String?  @db.VarChar(50) // this willl be use enum in the future
   // per 100g
   bdd          Int      @default(100) @db.Integer
-  calory       Float
-  protein      Decimal  @default(0.0) @db.Decimal(6, 1)
-  fat          Decimal  @default(0.0) @db.Decimal(6, 1)
-  carbohydrate Decimal  @default(0.0) @db.Decimal(6, 1)
-  fiber        Decimal  @default(0.0) @db.Decimal(6, 1)
-  natrium      Decimal  @default(0.0) @db.Decimal(6, 2)
-  cholesterol  Decimal  @default(0.0) @db.Decimal(6, 2)
-  sfa          Decimal  @default(0.0) @db.Decimal(6, 1)
-  mufa         Decimal  @default(0.0) @db.Decimal(6, 1)
-  pufa         Decimal  @default(0.0) @db.Decimal(6, 1)
+  calory       Decimal  @default(0.0)
+  protein      Decimal  @default(0.0)
+  fat          Decimal  @default(0.0)
+  carbohydrate Decimal  @default(0.0)
+  fiber        Decimal  @default(0.0)
+  natrium      Decimal  @default(0.0)
+  cholesterol  Decimal  @default(0.0)
+  sfa          Decimal  @default(0.0)
+  mufa         Decimal  @default(0.0)
+  pufa         Decimal  @default(0.0)
   created_at   DateTime @default(now()) @db.Timestamp()
   updated_at   DateTime @default(now()) @updatedAt @db.Timestamp(0)
 
