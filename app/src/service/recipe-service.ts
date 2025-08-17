@@ -1,5 +1,4 @@
 import { prismaClient } from '../application/database';
-import { logger } from '../application/logging';
 import { ResponseError } from '../error/response-error';
 import { SetMenuRecipeRequest } from '../model/menu-model';
 import { RecipeValidation } from '../validation/recipe-validation';
@@ -36,9 +35,15 @@ export class RecipeService {
     prisma: Prisma.TransactionClient,
     menuId: number
   ): Promise<void> {
+    // Fetch recipes along with their related Menu
     const recipes = await prisma.recipe.findMany({
       where: { menu_id: menuId },
-      select: { item_id: true, item_type: true, quantity_grams: true },
+      select: {
+        item_id: true,
+        item_type: true,
+        quantity_grams: true,
+        Menu: true, // This will include the related Menu object
+      },
     });
 
     if (recipes.length === 0) {
@@ -115,10 +120,6 @@ export class RecipeService {
       sfa = sfa.plus(new Prisma.Decimal(m.sfa).times(factor));
       mufa = mufa.plus(new Prisma.Decimal(m.mufa).times(factor));
       pufa = pufa.plus(new Prisma.Decimal(m.pufa).times(factor));
-
-      logger.info(
-        `Adding ${quantity}g of ${m.name} to nutrition: calory=${calory}, protein=${protein}, fat=${fat}, carbohydrate=${carbohydrate}, fiber=${fiber}, natrium=${natrium}, cholesterol=${cholesterol}, sfa=${sfa}, mufa=${mufa}, pufa=${pufa}`
-      );
     };
 
     for (const r of recipes) {
@@ -149,9 +150,19 @@ export class RecipeService {
       pufa: new Prisma.Decimal(pufa.toNumber()),
     };
 
-    logger.info(
-      `Recalculated nutrition for menu_id ${menuId}: ${JSON.stringify(data)}`
-    );
+    console.log(`Recalculated nutrition for menu ${recipes[0].Menu.name}:`);
+    // console.log('weight_per_portion:', data.weight_per_portion);
+    // console.log('weight_with_bdd:', data.weight_with_bdd);
+    console.log('calory:', data.calory.toString());
+    console.log('protein:', data.protein.toString());
+    console.log('fat:', data.fat.toString());
+    console.log('carbohydrate:', data.carbohydrate.toString());
+    console.log('fiber:', data.fiber.toString());
+    console.log('natrium:', data.natrium.toString());
+    // console.log('cholesterol:', data.cholesterol.toString());
+    // console.log('sfa:', data.sfa.toString());
+    // console.log('mufa:', data.mufa.toString());
+    // console.log('pufa:', data.pufa.toString());
 
     const isNutritionExisting = await prisma.nutrition.findUnique({
       where: { menu_id: menuId },
