@@ -31,6 +31,7 @@ export class RecipeService {
     throw new ResponseError(400, `Unknown item type ${itemType}`);
   }
 
+  // TODO: how to cholesterol, sfa, mufa, pufa?
   static async recalculateNutritionInternal(
     prisma: Prisma.TransactionClient,
     menuId: number
@@ -84,10 +85,10 @@ export class RecipeService {
     let carbohydrate: Prisma.Decimal = new Prisma.Decimal(0);
     let fiber: Prisma.Decimal = new Prisma.Decimal(0);
     let natrium: Prisma.Decimal = new Prisma.Decimal(0);
-    let cholesterol: Prisma.Decimal = new Prisma.Decimal(0);
-    let sfa: Prisma.Decimal = new Prisma.Decimal(0);
-    let mufa: Prisma.Decimal = new Prisma.Decimal(0);
-    let pufa: Prisma.Decimal = new Prisma.Decimal(0);
+    // let cholesterol: Prisma.Decimal = new Prisma.Decimal(0);
+    // let sfa: Prisma.Decimal = new Prisma.Decimal(0);
+    //let mufa: Prisma.Decimal = new Prisma.Decimal(0);
+    // let pufa: Prisma.Decimal = new Prisma.Decimal(0);
 
     let totalWeightInGram = 0;
 
@@ -114,12 +115,12 @@ export class RecipeService {
       );
       fiber = fiber.plus(new Prisma.Decimal(m.fiber).times(factor));
       natrium = natrium.plus(new Prisma.Decimal(m.natrium).times(factor));
-      cholesterol = cholesterol.plus(
-        new Prisma.Decimal(m.cholesterol).times(factor)
-      );
-      sfa = sfa.plus(new Prisma.Decimal(m.sfa).times(factor));
-      mufa = mufa.plus(new Prisma.Decimal(m.mufa).times(factor));
-      pufa = pufa.plus(new Prisma.Decimal(m.pufa).times(factor));
+      // cholesterol = cholesterol.plus(
+      //  new Prisma.Decimal(m.cholesterol).times(factor)
+      // );
+      // sfa = sfa.plus(new Prisma.Decimal(m.sfa).times(factor));
+      // mufa = mufa.plus(new Prisma.Decimal(m.mufa).times(factor));
+      // pufa = pufa.plus(new Prisma.Decimal(m.pufa).times(factor));
     };
 
     for (const r of recipes) {
@@ -144,10 +145,10 @@ export class RecipeService {
       carbohydrate: new Prisma.Decimal(carbohydrate.toNumber()),
       fiber: new Prisma.Decimal(fiber.toNumber()),
       natrium: new Prisma.Decimal(natrium.toNumber()),
-      cholesterol: new Prisma.Decimal(cholesterol.toNumber()),
-      sfa: new Prisma.Decimal(sfa.toNumber()),
-      mufa: new Prisma.Decimal(mufa.toNumber()),
-      pufa: new Prisma.Decimal(pufa.toNumber()),
+      // cholesterol: new Prisma.Decimal(cholesterol.toNumber()),
+      // sfa: new Prisma.Decimal(sfa.toNumber()),
+      // mufa: new Prisma.Decimal(mufa.toNumber()),
+      // pufa: new Prisma.Decimal(pufa.toNumber()),
     };
 
     console.log(`Recalculated nutrition for menu ${recipes[0].Menu.name}:`);
