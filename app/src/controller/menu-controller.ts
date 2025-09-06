@@ -246,7 +246,9 @@ export class MenuController {
       } as SetMenuRecipeRequest;
 
       await RecipeService.setMenuRecipe(payload);
-      res.status(200).json({ message: 'Success!' });
+      res.status(200).json({
+        message: `Berhasil memperbaharui resep dari menu ${payload.menu_id}`,
+      });
     } catch (e) {
       next(e);
     }
