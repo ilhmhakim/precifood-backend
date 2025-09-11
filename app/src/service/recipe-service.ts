@@ -31,7 +31,6 @@ export class RecipeService {
     throw new ResponseError(400, `Unknown item type ${itemType}`);
   }
 
-  // TODO: how to cholesterol, sfa, mufa, pufa?
   static async recalculateNutritionInternal(
     prisma: Prisma.TransactionClient,
     menuId: number
@@ -85,10 +84,10 @@ export class RecipeService {
     let carbohydrate: Prisma.Decimal = new Prisma.Decimal(0);
     let fiber: Prisma.Decimal = new Prisma.Decimal(0);
     let natrium: Prisma.Decimal = new Prisma.Decimal(0);
-    // let cholesterol: Prisma.Decimal = new Prisma.Decimal(0);
-    // let sfa: Prisma.Decimal = new Prisma.Decimal(0);
-    //let mufa: Prisma.Decimal = new Prisma.Decimal(0);
-    // let pufa: Prisma.Decimal = new Prisma.Decimal(0);
+    let cholesterol: Prisma.Decimal = new Prisma.Decimal(0);
+    let sfa: Prisma.Decimal = new Prisma.Decimal(0);
+    let mufa: Prisma.Decimal = new Prisma.Decimal(0);
+    let pufa: Prisma.Decimal = new Prisma.Decimal(0);
 
     let totalWeightInGram = 0;
 
@@ -115,12 +114,12 @@ export class RecipeService {
       );
       fiber = fiber.plus(new Prisma.Decimal(m.fiber).times(factor));
       natrium = natrium.plus(new Prisma.Decimal(m.natrium).times(factor));
-      // cholesterol = cholesterol.plus(
-      //  new Prisma.Decimal(m.cholesterol).times(factor)
-      // );
-      // sfa = sfa.plus(new Prisma.Decimal(m.sfa).times(factor));
-      // mufa = mufa.plus(new Prisma.Decimal(m.mufa).times(factor));
-      // pufa = pufa.plus(new Prisma.Decimal(m.pufa).times(factor));
+      cholesterol = cholesterol.plus(
+        new Prisma.Decimal(m.cholesterol).times(factor)
+      );
+      sfa = sfa.plus(new Prisma.Decimal(m.sfa).times(factor));
+      mufa = mufa.plus(new Prisma.Decimal(m.mufa).times(factor));
+      pufa = pufa.plus(new Prisma.Decimal(m.pufa).times(factor));
     };
 
     for (const r of recipes) {
@@ -137,7 +136,9 @@ export class RecipeService {
     }
 
     const data = {
-      weight_per_portion: Math.round(totalWeightInGram),
+      weight_per_portion: new Prisma.Decimal(totalWeightInGram)
+        .div(recipes[0].Menu.portion)
+        .toNumber(),
       weight_with_bdd: Math.round(totalWeightInGram),
       calory: new Prisma.Decimal(calory.toNumber()),
       protein: new Prisma.Decimal(protein.toNumber()),
@@ -145,25 +146,25 @@ export class RecipeService {
       carbohydrate: new Prisma.Decimal(carbohydrate.toNumber()),
       fiber: new Prisma.Decimal(fiber.toNumber()),
       natrium: new Prisma.Decimal(natrium.toNumber()),
-      // cholesterol: new Prisma.Decimal(cholesterol.toNumber()),
-      // sfa: new Prisma.Decimal(sfa.toNumber()),
-      // mufa: new Prisma.Decimal(mufa.toNumber()),
-      // pufa: new Prisma.Decimal(pufa.toNumber()),
+      cholesterol: new Prisma.Decimal(cholesterol.toNumber()),
+      sfa: new Prisma.Decimal(sfa.toNumber()),
+      mufa: new Prisma.Decimal(mufa.toNumber()),
+      pufa: new Prisma.Decimal(pufa.toNumber()),
     };
 
     console.log(`Recalculated nutrition for menu ${recipes[0].Menu.name}:`);
-    // console.log('weight_per_portion:', data.weight_per_portion);
-    // console.log('weight_with_bdd:', data.weight_with_bdd);
+    console.log('weight_per_portion:', data.weight_per_portion);
+    console.log('weight_with_bdd:', data.weight_with_bdd);
     console.log('calory:', data.calory.toString());
     console.log('protein:', data.protein.toString());
     console.log('fat:', data.fat.toString());
     console.log('carbohydrate:', data.carbohydrate.toString());
     console.log('fiber:', data.fiber.toString());
     console.log('natrium:', data.natrium.toString());
-    // console.log('cholesterol:', data.cholesterol.toString());
-    // console.log('sfa:', data.sfa.toString());
-    // console.log('mufa:', data.mufa.toString());
-    // console.log('pufa:', data.pufa.toString());
+    console.log('cholesterol:', data.cholesterol.toString());
+    console.log('sfa:', data.sfa.toString());
+    console.log('mufa:', data.mufa.toString());
+    console.log('pufa:', data.pufa.toString());
 
     const isNutritionExisting = await prisma.nutrition.findUnique({
       where: { menu_id: menuId },

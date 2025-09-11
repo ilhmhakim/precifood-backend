@@ -8,6 +8,7 @@ import {
   GetAllMenuRequest,
   GetMenuDetailRequest,
   MenuDetailResponse,
+  NutritionPerPortion,
   SearchMenuRequest,
   toAllMenusResponse,
   toMenuDetailResponse,
@@ -17,6 +18,7 @@ import {
 } from '../model/menu-model';
 import { MenuValidation } from '../validation/menu-validation';
 import { Validation } from '../validation/validation';
+import { Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 export class MenuService {
@@ -266,10 +268,48 @@ export class MenuService {
       throw new ResponseError(403, 'Belum dapat mengakses menu');
     }
 
+    const nutrition = menu.Nutrition;
+    const nutritionPerPortion: NutritionPerPortion = {
+      weight_per_portion: nutrition?.weight_per_portion,
+      weight_with_bdd: nutrition?.weight_with_bdd,
+      calory:
+        nutrition?.calory &&
+        new Prisma.Decimal(nutrition.calory.toNumber()).div(menu.portion),
+      protein:
+        nutrition?.protein &&
+        new Prisma.Decimal(nutrition.protein.toNumber()).div(menu.portion),
+      fat:
+        nutrition?.fat &&
+        new Prisma.Decimal(nutrition.fat.toNumber()).div(menu.portion),
+      carbohydrate:
+        nutrition?.carbohydrate &&
+        new Prisma.Decimal(nutrition.carbohydrate.toNumber()).div(menu.portion),
+      fiber:
+        nutrition?.fiber &&
+        new Prisma.Decimal(nutrition.fiber.toNumber()).div(menu.portion),
+      natrium:
+        nutrition?.natrium &&
+        new Prisma.Decimal(nutrition.natrium.toNumber()).div(menu.portion),
+      cholesterol:
+        nutrition?.cholesterol &&
+        new Prisma.Decimal(nutrition.cholesterol.toNumber()).div(menu.portion),
+      sfa:
+        nutrition?.sfa &&
+        new Prisma.Decimal(nutrition.sfa.toNumber()).div(menu.portion),
+      mufa:
+        nutrition?.mufa &&
+        new Prisma.Decimal(nutrition.mufa.toNumber()).div(menu.portion),
+      pufa:
+        nutrition?.pufa &&
+        new Prisma.Decimal(nutrition.pufa.toNumber()).div(menu.portion),
+    };
+
     // Mengirimkan `null` untuk `nutrition` jika tidak ada data `Nutrition`
+    // Mengirimkan `null` untuk `nutritionPerPortion` jika tidak ada data `NutritionPerPortion`
     return toMenuDetailResponse(
       menu,
       menu.Nutrition || null,
+      nutritionPerPortion || null,
       requestMenuDetail.role
     );
   }
