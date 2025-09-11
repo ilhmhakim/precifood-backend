@@ -156,6 +156,25 @@ export type RecipeItemInput = {
   quantity_grams: number;
 };
 
+export type RecipeItemResponse = {
+  item_id: number;
+  item_name: string;
+  item_type: 'bahan' | 'bumbu';
+  quantity_grams: number;
+};
+
+export type GetMenuRecipeResponse = {
+  menu_id: number;
+  menu_name: string;
+  items: RecipeItemResponse[];
+};
+
+export type GetMenuRecipeRequest = {
+  restaurant_id: string;
+  menu_id: number;
+  role: string;
+};
+
 export type SetMenuRecipeRequest = {
   restaurant_id: string;
   menu_id: number;

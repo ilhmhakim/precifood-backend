@@ -1,10 +1,14 @@
 import { prismaClient } from '../application/database';
 import { ResponseError } from '../error/response-error';
-import { SetMenuRecipeRequest } from '../model/menu-model';
+import {
+  GetMenuRecipeRequest,
+  GetMenuRecipeResponse,
+  SetMenuRecipeRequest,
+} from '../model/menu-model';
 import { RecipeValidation } from '../validation/recipe-validation';
 import { Validation } from '../validation/validation';
 import { MenuService } from './menu-service';
-import { Prisma, RecipeItemType } from '@prisma/client';
+import { Menu, Prisma, Recipe, RecipeItemType } from '@prisma/client';
 
 export class RecipeService {
   static async checkIfItemExists(
@@ -250,5 +254,68 @@ export class RecipeService {
     } else {
       await prisma.nutrition.create({ data: { menu_id: menuId, ...zeros } });
     }
+  }
+
+  static async getMenuRecipe(
+    request: GetMenuRecipeRequest
+  ): Promise<GetMenuRecipeResponse> {
+    const menu: Menu = await MenuService.checkMenuExist(
+      request.menu_id,
+      request.restaurant_id
+    );
+
+    if (request.role === 'Restoran') {
+      if (menu.restaurant_id !== request.restaurant_id) {
+        throw new ResponseError(403, 'Menu bukan milik Restaurant Anda');
+      }
+    }
+
+    const recipeItems: Recipe[] = await prismaClient.recipe.findMany({
+      where: {
+        menu_id: request.menu_id,
+      },
+    });
+
+    const bahanIds = recipeItems
+      .filter((item) => item.item_type === RecipeItemType.bahan)
+      .map((item) => item.item_id);
+    const bumbuIds = recipeItems
+      .filter((item) => item.item_type === RecipeItemType.bumbu)
+      .map((item) => item.item_id);
+    const [bahanItems, bumbuItems] = await Promise.all([
+      bahanIds.length > 0
+        ? prismaClient.masterBahan.findMany({
+            where: { id: { in: bahanIds } },
+            select: { id: true, name: true },
+          })
+        : Promise.resolve([]),
+      bumbuIds.length > 0
+        ? prismaClient.masterBumbu.findMany({
+            where: { id: { in: bumbuIds } },
+            select: { id: true, name: true },
+          })
+        : Promise.resolve([]),
+    ]);
+
+    const bahanMap = new Map(bahanItems.map((item) => [item.id, item.name]));
+    const bumbuMap = new Map(bumbuItems.map((item) => [item.id, item.name]));
+
+    const items = recipeItems.map((item) => ({
+      item_id: item.item_id,
+      item_name:
+        item.item_type === RecipeItemType.bahan
+          ? bahanMap.get(item.item_id) || 'Unknown'
+          : bumbuMap.get(item.item_id) || 'Unknown',
+      item_type: (item.item_type === RecipeItemType.bahan
+        ? 'bahan'
+        : 'bumbu') as 'bahan' | 'bumbu',
+      quantity_grams: item.quantity_grams,
+    }));
+
+    return {
+      menu_id: menu.id,
+      menu_name: menu.name,
+      items: items,
+    };
   }
 }

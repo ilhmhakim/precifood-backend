@@ -4,6 +4,8 @@ import {
   DeleteMenuRequest,
   GetAllMenuRequest,
   GetMenuDetailRequest,
+  GetMenuRecipeRequest,
+  GetMenuRecipeResponse,
   SearchMenuRequest,
   SetMenuRecipeRequest,
   UpdateMenuApprovalRequest,
@@ -248,6 +250,37 @@ export class MenuController {
       await RecipeService.setMenuRecipe(payload);
       res.status(200).json({
         message: `Berhasil memperbaharui resep dari menu ${payload.menu_id}`,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async getMenuRecipe(
+    req: UserRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const requestRole = String(req.user.role);
+
+      const requestRestaurantId =
+        requestRole === 'Restoran'
+          ? String(req.user.id)
+          : String(req.params.restaurantId);
+
+      const request: GetMenuRecipeRequest = {
+        restaurant_id: requestRestaurantId,
+        menu_id: Number(req.params.menuId),
+        role: requestRole,
+      };
+
+      const response: GetMenuRecipeResponse =
+        await RecipeService.getMenuRecipe(request);
+
+      res.status(200).json({
+        message: 'Success!',
+        data: response,
       });
     } catch (e) {
       next(e);
