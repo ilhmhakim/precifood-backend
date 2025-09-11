@@ -1,5 +1,6 @@
 import { ResponseError } from '../error/response-error';
 import { Menu, Nutrition } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
 
 export type AllMenusResponse = {
   id: number;
@@ -12,6 +13,21 @@ export type AllMenusResponse = {
   image_url: string;
 };
 
+export type NutritionPerPortion = {
+  weight_per_portion?: number | string | null;
+  weight_with_bdd?: number | string | null;
+  calory?: Decimal | null;
+  protein?: Decimal | null;
+  fat?: Decimal | null;
+  carbohydrate?: Decimal | null;
+  fiber?: Decimal | null;
+  natrium?: Decimal | null;
+  cholesterol?: Decimal | null;
+  sfa?: Decimal | null;
+  mufa?: Decimal | null;
+  pufa?: Decimal | null;
+};
+
 export type MenuDetailResponse = {
   id: number;
   name: string;
@@ -22,6 +38,20 @@ export type MenuDetailResponse = {
   description: string;
   image_url: string;
   nutrition: {
+    weight_per_portion?: number | string | null;
+    weight_with_bdd?: number | string | null;
+    calory?: number | string | null;
+    protein?: number | string | null;
+    fat?: number | string | null;
+    carbohydrate?: number | string | null;
+    fiber?: number | string | null;
+    natrium?: number | string | null;
+    cholesterol?: number | string | null;
+    sfa?: number | string | null;
+    mufa?: number | string | null;
+    pufa?: number | string | null;
+  };
+  nutrition_per_portion?: {
     weight_per_portion?: number | string | null;
     weight_with_bdd?: number | string | null;
     calory?: number | string | null;
@@ -126,6 +156,25 @@ export type RecipeItemInput = {
   quantity_grams: number;
 };
 
+export type RecipeItemResponse = {
+  item_id: number;
+  item_name: string;
+  item_type: 'bahan' | 'bumbu';
+  quantity_grams: number;
+};
+
+export type GetMenuRecipeResponse = {
+  menu_id: number;
+  menu_name: string;
+  items: RecipeItemResponse[];
+};
+
+export type GetMenuRecipeRequest = {
+  restaurant_id: string;
+  menu_id: number;
+  role: string;
+};
+
 export type SetMenuRecipeRequest = {
   restaurant_id: string;
   menu_id: number;
@@ -148,6 +197,7 @@ export function toAllMenusResponse(menu: Menu): AllMenusResponse {
 export function toMenuDetailResponse(
   menu: Menu,
   nutrition: Nutrition | null,
+  nutritionPerPortion: NutritionPerPortion | null,
   role: string
 ): MenuDetailResponse {
   const noValueMessage = 'Nilai nutrisi belum dimasukkan';
@@ -164,15 +214,31 @@ export function toMenuDetailResponse(
       image_url: menu.image_url,
       nutrition: {
         calory: nutrition?.calory
-          ? nutrition.calory.toNumber()
+          ? nutrition.calory.toDecimalPlaces(1).toNumber()
           : noValueMessage,
         protein: nutrition?.protein
-          ? nutrition.protein.toNumber()
+          ? nutrition.protein.toDecimalPlaces(1).toNumber()
           : noValueMessage,
-        fat: nutrition?.fat ? nutrition.fat.toNumber() : noValueMessage,
+        fat: nutrition?.fat
+          ? nutrition.fat.toDecimalPlaces(1).toNumber()
+          : noValueMessage,
         carbohydrate: nutrition?.carbohydrate
-          ? nutrition.carbohydrate.toNumber()
+          ? nutrition.carbohydrate.toDecimalPlaces(1).toNumber()
           : noValueMessage,
+      },
+      nutrition_per_portion: {
+        calory:
+          nutritionPerPortion?.calory?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+        protein:
+          nutritionPerPortion?.protein?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+        fat:
+          nutritionPerPortion?.fat?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+        carbohydrate:
+          nutritionPerPortion?.carbohydrate?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
       },
     };
   } else if (role === 'Admin') {
@@ -189,25 +255,69 @@ export function toMenuDetailResponse(
         weight_per_portion: nutrition?.weight_per_portion ?? noValueMessage,
         weight_with_bdd: nutrition?.weight_with_bdd ?? noValueMessage,
         calory: nutrition?.calory
-          ? nutrition.calory.toNumber()
+          ? nutrition.calory.toDecimalPlaces(1).toNumber()
           : noValueMessage,
         protein: nutrition?.protein
-          ? nutrition.protein.toNumber()
+          ? nutrition.protein.toDecimalPlaces(1).toNumber()
           : noValueMessage,
-        fat: nutrition?.fat ? nutrition.fat.toNumber() : noValueMessage,
+        fat: nutrition?.fat
+          ? nutrition.fat.toDecimalPlaces(1).toNumber()
+          : noValueMessage,
         carbohydrate: nutrition?.carbohydrate
-          ? nutrition.carbohydrate.toNumber()
+          ? nutrition.carbohydrate.toDecimalPlaces(1).toNumber()
           : noValueMessage,
-        fiber: nutrition?.fiber ? nutrition.fiber.toNumber() : noValueMessage,
+        fiber: nutrition?.fiber
+          ? nutrition.fiber.toDecimalPlaces(1).toNumber()
+          : noValueMessage,
         natrium: nutrition?.natrium
-          ? nutrition.natrium.toNumber()
+          ? nutrition.natrium.toDecimalPlaces(1).toNumber()
           : noValueMessage,
         cholesterol: nutrition?.cholesterol
-          ? nutrition.cholesterol.toNumber()
+          ? nutrition.cholesterol.toDecimalPlaces(2).toNumber()
           : noValueMessage,
-        sfa: nutrition?.sfa ? nutrition.sfa.toNumber() : noValueMessage,
-        mufa: nutrition?.mufa ? nutrition.mufa.toNumber() : noValueMessage,
-        pufa: nutrition?.pufa ? nutrition.pufa.toNumber() : noValueMessage,
+        sfa: nutrition?.sfa
+          ? nutrition.sfa.toDecimalPlaces(2).toNumber()
+          : noValueMessage,
+        mufa: nutrition?.mufa
+          ? nutrition.mufa.toDecimalPlaces(2).toNumber()
+          : noValueMessage,
+        pufa: nutrition?.pufa
+          ? nutrition.pufa.toDecimalPlaces(2).toNumber()
+          : noValueMessage,
+      },
+      nutrition_per_portion: {
+        weight_per_portion: nutrition?.weight_per_portion ?? noValueMessage,
+        weight_with_bdd: nutrition?.weight_with_bdd ?? noValueMessage,
+        calory:
+          nutritionPerPortion?.calory?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+        protein:
+          nutritionPerPortion?.protein?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+        fat:
+          nutritionPerPortion?.fat?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+        carbohydrate:
+          nutritionPerPortion?.carbohydrate?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+        fiber:
+          nutritionPerPortion?.fiber?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+        natrium:
+          nutritionPerPortion?.natrium?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+        cholesterol:
+          nutritionPerPortion?.cholesterol?.toDecimalPlaces(2).toNumber() ??
+          noValueMessage,
+        sfa:
+          nutritionPerPortion?.sfa?.toDecimalPlaces(2).toNumber() ??
+          noValueMessage,
+        mufa:
+          nutritionPerPortion?.mufa?.toDecimalPlaces(2).toNumber() ??
+          noValueMessage,
+        pufa:
+          nutritionPerPortion?.pufa?.toDecimalPlaces(2).toNumber() ??
+          noValueMessage,
       },
     };
   } else {
