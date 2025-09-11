@@ -236,25 +236,35 @@ export function toMenuDetailResponse(
         weight_per_portion: nutrition?.weight_per_portion ?? noValueMessage,
         weight_with_bdd: nutrition?.weight_with_bdd ?? noValueMessage,
         calory: nutrition?.calory
-          ? nutrition.calory.toNumber()
+          ? nutrition.calory.toDecimalPlaces(1).toNumber()
           : noValueMessage,
         protein: nutrition?.protein
-          ? nutrition.protein.toNumber()
+          ? nutrition.protein.toDecimalPlaces(1).toNumber()
           : noValueMessage,
-        fat: nutrition?.fat ? nutrition.fat.toNumber() : noValueMessage,
+        fat: nutrition?.fat
+          ? nutrition.fat.toDecimalPlaces(1).toNumber()
+          : noValueMessage,
         carbohydrate: nutrition?.carbohydrate
-          ? nutrition.carbohydrate.toNumber()
+          ? nutrition.carbohydrate.toDecimalPlaces(1).toNumber()
           : noValueMessage,
-        fiber: nutrition?.fiber ? nutrition.fiber.toNumber() : noValueMessage,
+        fiber: nutrition?.fiber
+          ? nutrition.fiber.toDecimalPlaces(1).toNumber()
+          : noValueMessage,
         natrium: nutrition?.natrium
-          ? nutrition.natrium.toNumber()
+          ? nutrition.natrium.toDecimalPlaces(1).toNumber()
           : noValueMessage,
         cholesterol: nutrition?.cholesterol
-          ? nutrition.cholesterol.toNumber()
+          ? nutrition.cholesterol.toDecimalPlaces(2).toNumber()
           : noValueMessage,
-        sfa: nutrition?.sfa ? nutrition.sfa.toNumber() : noValueMessage,
-        mufa: nutrition?.mufa ? nutrition.mufa.toNumber() : noValueMessage,
-        pufa: nutrition?.pufa ? nutrition.pufa.toNumber() : noValueMessage,
+        sfa: nutrition?.sfa
+          ? nutrition.sfa.toDecimalPlaces(2).toNumber()
+          : noValueMessage,
+        mufa: nutrition?.mufa
+          ? nutrition.mufa.toDecimalPlaces(2).toNumber()
+          : noValueMessage,
+        pufa: nutrition?.pufa
+          ? nutrition.pufa.toDecimalPlaces(2).toNumber()
+          : noValueMessage,
       },
       nutrition_per_portion: {
         weight_per_portion: nutrition?.weight_per_portion ?? noValueMessage,
