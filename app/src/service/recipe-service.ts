@@ -316,6 +316,6 @@ export class RecipeService {
       menu_id: menu.id,
       menu_name: menu.name,
       items: items,
-    };
+    } as GetMenuRecipeResponse;
   }
 }
