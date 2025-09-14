@@ -9,6 +9,7 @@ import { MasterBahanService } from '../service/master-bahan-service';
 import { UserRequest } from '../type/user';
 import { NextFunction, Request, Response } from 'express';
 
+// TODO : stript nutrition-related fields from request
 export class MasterBahanController {
   static async create(req: UserRequest, res: Response, next: NextFunction) {
     try {
