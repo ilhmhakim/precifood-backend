@@ -75,54 +75,54 @@ privateRouter.get(
 // Master Bahan Module
 privateRouter.post(
   '/api/master-bahan',
-  authorizeMiddleware(Roles.Restaurant),
+  authorizeMiddleware(Roles.AdminAndRestaurant),
   MasterBahanController.create
 );
 privateRouter.get(
   '/api/master-bahan',
-  authorizeMiddleware(Roles.Restaurant),
+  authorizeMiddleware(Roles.AdminAndRestaurant),
   MasterBahanController.getAll
 );
 privateRouter.get(
   '/api/master-bahan/:id(\\d+)',
-  authorizeMiddleware(Roles.Restaurant),
+  authorizeMiddleware(Roles.AdminAndRestaurant),
   MasterBahanController.get
 );
 privateRouter.put(
   '/api/master-bahan/:id(\\d+)',
-  authorizeMiddleware(Roles.Restaurant),
+  authorizeMiddleware(Roles.AdminAndRestaurant),
   MasterBahanController.update
 );
 privateRouter.delete(
   '/api/master-bahan/:id(\\d+)',
-  authorizeMiddleware(Roles.Restaurant),
+  authorizeMiddleware(Roles.AdminAndRestaurant),
   MasterBahanController.delete
 );
 
 // Master Bumbu Module
 privateRouter.post(
   '/api/master-bumbu',
-  authorizeMiddleware(Roles.Restaurant),
+  authorizeMiddleware(Roles.AdminAndRestaurant),
   MasterBumbuController.create
 );
 privateRouter.get(
   '/api/master-bumbu',
-  authorizeMiddleware(Roles.Restaurant),
+  authorizeMiddleware(Roles.AdminAndRestaurant),
   MasterBumbuController.getAll
 );
 privateRouter.get(
   '/api/master-bumbu/:id(\\d+)',
-  authorizeMiddleware(Roles.Restaurant),
+  authorizeMiddleware(Roles.AdminAndRestaurant),
   MasterBumbuController.get
 );
 privateRouter.put(
   '/api/master-bumbu/:id(\\d+)',
-  authorizeMiddleware(Roles.Restaurant),
+  authorizeMiddleware(Roles.AdminAndRestaurant),
   MasterBumbuController.update
 );
 privateRouter.delete(
   '/api/master-bumbu/:id(\\d+)',
-  authorizeMiddleware(Roles.Restaurant),
+  authorizeMiddleware(Roles.AdminAndRestaurant),
   MasterBumbuController.delete
 );
 
