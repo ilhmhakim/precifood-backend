@@ -181,6 +181,11 @@ export type SetMenuRecipeRequest = {
   items: RecipeItemInput[];
 };
 
+export type RefreshMenuNutritionRequest = {
+  restaurant_id: string;
+  menu_id: number;
+};
+
 export function toAllMenusResponse(menu: Menu): AllMenusResponse {
   return {
     id: menu.id,

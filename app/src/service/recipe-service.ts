@@ -3,6 +3,7 @@ import { ResponseError } from '../error/response-error';
 import {
   GetMenuRecipeRequest,
   GetMenuRecipeResponse,
+  RefreshMenuNutritionRequest,
   SetMenuRecipeRequest,
 } from '../model/menu-model';
 import { RecipeValidation } from '../validation/recipe-validation';
@@ -317,5 +318,25 @@ export class RecipeService {
       menu_name: menu.name,
       items: items,
     } as GetMenuRecipeResponse;
+  }
+
+  static async refreshMenuNutrition(
+    request: RefreshMenuNutritionRequest
+  ): Promise<Menu> {
+    const payload: RefreshMenuNutritionRequest = Validation.validate(
+      RecipeValidation.REFRESHNUTRITION,
+      request
+    );
+
+    const menu: Menu = await MenuService.checkMenuExist(
+      payload.menu_id,
+      payload.restaurant_id
+    );
+
+    await prismaClient.$transaction(async (tx: Prisma.TransactionClient) => {
+      await this.recalculateNutritionInternal(tx, payload.menu_id);
+    });
+
+    return menu;
   }
 }

@@ -19,4 +19,13 @@ export class RecipeValidation {
       )
       .default([]),
   });
+
+  static readonly REFRESHNUTRITION: ZodType = z.object({
+    restaurant_id: z
+      .string()
+      .trim()
+      .min(38, 'ID restoran tidak valid')
+      .max(38, 'ID restoran tidak valid'),
+    menu_id: z.number().positive('Menu ID harus bernilai positif'),
+  });
 }
