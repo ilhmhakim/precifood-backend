@@ -20,7 +20,7 @@ export class RecipeValidation {
       .default([]),
   });
 
-  static readonly REFRESH: ZodType = z.object({
+  static readonly REFRESHNUTRITION: ZodType = z.object({
     restaurant_id: z
       .string()
       .trim()

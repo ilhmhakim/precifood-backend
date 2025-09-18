@@ -324,7 +324,7 @@ export class RecipeService {
     request: RefreshMenuNutritionRequest
   ): Promise<Menu> {
     const payload: RefreshMenuNutritionRequest = Validation.validate(
-      RecipeValidation.REFRESH,
+      RecipeValidation.REFRESHNUTRITION,
       request
     );
 
