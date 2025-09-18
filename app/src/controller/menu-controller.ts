@@ -6,6 +6,7 @@ import {
   GetMenuDetailRequest,
   GetMenuRecipeRequest,
   GetMenuRecipeResponse,
+  RefreshMenuNutritionRequest,
   SearchMenuRequest,
   SetMenuRecipeRequest,
   UpdateMenuApprovalRequest,
@@ -16,6 +17,7 @@ import { ImageUploaderService } from '../service/image-uploader-service';
 import { MenuService } from '../service/menu-service';
 import { RecipeService } from '../service/recipe-service';
 import { UserRequest } from '../type/user';
+import { Menu } from '@prisma/client';
 import { NextFunction, Response } from 'express';
 
 export class MenuController {
@@ -281,6 +283,34 @@ export class MenuController {
       res.status(200).json({
         message: 'Success!',
         data: response,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async refreshMenuNutrition(
+    req: UserRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const requestRole = String(req.user.role);
+
+      const requestRestaurantId =
+        requestRole === 'Restoran'
+          ? String(req.user.id)
+          : String(req.params.restaurantId);
+
+      const request: RefreshMenuNutritionRequest = {
+        restaurant_id: requestRestaurantId,
+        menu_id: Number(req.params.menuId),
+      };
+
+      const menu: Menu = await RecipeService.refreshMenuNutrition(request);
+
+      res.status(200).json({
+        message: `Berhasil memperbarui nutrisi dari menu ${menu.name}`,
       });
     } catch (e) {
       next(e);

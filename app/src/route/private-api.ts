@@ -199,6 +199,11 @@ privateRouter.get(
   authorizeMiddleware(Roles.AdminAndRestaurant),
   MenuController.getMenuRecipe
 );
+privateRouter.patch(
+  '/api/restaurants/:restaurantId([a-zA-Z0-9_-]+)/menus/:menuId(\\d+)/recipe',
+  authorizeMiddleware(Roles.AdminAndRestaurant),
+  MenuController.refreshMenuNutrition
+);
 
 // Order Module
 privateRouter.post(
