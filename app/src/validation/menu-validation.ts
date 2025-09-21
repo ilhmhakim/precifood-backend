@@ -61,7 +61,11 @@ export class MenuValidation {
         message: 'Porsi harus bernilai positif dan berupa angka',
       }),
     description: z.string().trim().min(1, 'Deskripsi tidak boleh kosong'),
-    image_url: z.string().trim().min(1, 'URL gambar tidak boleh kosong'),
+    image_url: z
+      .string()
+      .trim()
+      .min(1, 'URL gambar tidak boleh kosong')
+      .optional(),
   });
 
   static readonly UPDATEMENU: ZodType = z.object({
