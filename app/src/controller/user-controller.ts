@@ -1,5 +1,4 @@
 import {
-  CreateAdminRequest,
   CreateConsumerRequest,
   CreateRestaurantRequest,
   GetUserProfileRequest,
@@ -9,7 +8,7 @@ import {
 import { ImageUploaderService } from '../service/image-uploader-service';
 import { UserService } from '../service/user-service';
 import { UserRequest } from '../type/user';
-import { Request, Response, NextFunction, request } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 export class UserController {
   static async registerConsumer(
@@ -40,10 +39,13 @@ export class UserController {
       console.log('File received:', req.file);
       console.log('Request body:', req.body);
 
-      const imageUrl = await ImageUploaderService.uploadImage(
-        requestFile,
-        'restaurant-profiles-images'
-      );
+      let imageUrl = 'https://placehold.co/600x400/EEE/31343C';
+      if (requestFile) {
+        imageUrl = await ImageUploaderService.uploadImage(
+          requestFile,
+          'restaurant-profiles-images'
+        );
+      }
 
       const request: CreateRestaurantRequest = {
         ...req.body,

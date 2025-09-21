@@ -24,10 +24,10 @@ export class MenuController {
   static async createMenu(req: UserRequest, res: Response, next: NextFunction) {
     try {
       const file = req.file;
-      const imageUrl = await ImageUploaderService.uploadImage(
-        file,
-        'menu-images'
-      );
+      let imageUrl = 'https://placehold.co/600x400/EEE/31343C';
+      if (req.file) {
+        imageUrl = await ImageUploaderService.uploadImage(file, 'menu-images');
+      }
 
       const request: CreateMenuRequest = {
         ...req.body,
