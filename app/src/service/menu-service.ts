@@ -85,6 +85,7 @@ export class MenuService {
           portion: createMenuRequest.portion,
           description: createMenuRequest.description,
           image_url: createMenuRequest.image_url,
+          status: 'Approved',
         },
       });
 
