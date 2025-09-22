@@ -171,7 +171,7 @@ export class RecommendationService {
       const response = await fetch(
         `${process.env.MODEL_URL}/generate-recommendation`,
         {
-          method: 'GET',
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: recommendationRequest.token,
