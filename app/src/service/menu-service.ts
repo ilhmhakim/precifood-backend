@@ -236,6 +236,7 @@ export class MenuService {
       where: {
         restaurant_id: requestGetAllRestaurantMenu.restaurant_id,
       },
+      orderBy: { name: 'asc' },
     };
 
     if (requestGetAllRestaurantMenu.role === 'Konsumen') {
