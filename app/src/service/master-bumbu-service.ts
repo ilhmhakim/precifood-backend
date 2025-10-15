@@ -10,8 +10,10 @@ import {
 } from '../model/master-bumbu-model';
 import { MasterBumbuValidation } from '../validation/master-bumbu-validation';
 import { Validation } from '../validation/validation';
-import { MasterBumbu } from '@prisma/client';
+import { RecipeService } from './recipe-service';
+import { MasterBumbu, RecipeItemType } from '@prisma/client';
 
+// TODO: recalculate nutrition performance/appraoch at update and delete could be improved
 export class MasterBumbuService {
   static async checkIfBumbuExists(id: number): Promise<boolean> {
     const bumbu: MasterBumbu | null = await prismaClient.masterBumbu.findUnique(
@@ -164,6 +166,22 @@ export class MasterBumbuService {
       },
     });
 
+    // Recalculate nutrition for menus that use this bumbu
+    const affectedRecipes = await prismaClient.recipe.findMany({
+      where: {
+        item_id: updateMasterBumbuRequest.id,
+        item_type: RecipeItemType.bumbu,
+      },
+      select: { menu_id: true },
+    });
+    const affectedMenuIds: Array<number> = Array.from(
+      new Set(affectedRecipes.map((r) => r.menu_id))
+    );
+
+    for (const menuId of affectedMenuIds) {
+      await RecipeService.recalculateNutritionInternal(prismaClient, menuId);
+    }
+
     return toMasterBumbuResponse(updatedMasterBumbu);
   }
 
@@ -185,10 +203,36 @@ export class MasterBumbuService {
       );
     }
 
+    // Find all menus affected
+    const affectedRecipes = await prismaClient.recipe.findMany({
+      where: {
+        item_id: deleteMasterBumbuRequest.id,
+        item_type: RecipeItemType.bumbu,
+      },
+      select: { menu_id: true },
+    });
+    const affectedMenuIds: Array<number> = Array.from(
+      new Set(affectedRecipes.map((r) => r.menu_id))
+    );
+
+    // Delete recipes referencing this item
+    await prismaClient.recipe.deleteMany({
+      where: {
+        item_id: deleteMasterBumbuRequest.id,
+        item_type: RecipeItemType.bumbu,
+      },
+    });
+
+    // Delete the master item
     await prismaClient.masterBumbu.delete({
       where: {
         id: deleteMasterBumbuRequest.id,
       },
     });
+
+    // Recalculate nutrition for affected menus
+    for (const menuId of affectedMenuIds) {
+      await RecipeService.recalculateNutritionInternal(prismaClient, menuId);
+    }
   }
 }
