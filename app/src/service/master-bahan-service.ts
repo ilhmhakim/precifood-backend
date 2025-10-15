@@ -10,8 +10,10 @@ import {
 } from '../model/master-bahan-model';
 import { MasterBahanValidation } from '../validation/master-bahan-validation';
 import { Validation } from '../validation/validation';
-import { MasterBahan, Prisma } from '@prisma/client';
+import { RecipeService } from './recipe-service';
+import { MasterBahan, Prisma, RecipeItemType } from '@prisma/client';
 
+// TODO: recalculate nutrition performance/appraoch at update and delete could be improved
 export class MasterBahanService {
   static async checkIfBahanExists(id: number): Promise<boolean> {
     const bahan: MasterBahan | null = await prismaClient.masterBahan.findUnique(
@@ -197,6 +199,22 @@ export class MasterBahanService {
       },
     });
 
+    // Recalculate nutrition for menus that use this bahan
+    const affectedRecipes = await prismaClient.recipe.findMany({
+      where: {
+        item_id: updateMasterBahanRequest.id,
+        item_type: RecipeItemType.bahan,
+      },
+      select: { menu_id: true },
+    });
+    const affectedMenuIds: Array<number> = Array.from(
+      new Set(affectedRecipes.map((r) => r.menu_id))
+    );
+
+    for (const menuId of affectedMenuIds) {
+      await RecipeService.recalculateNutritionInternal(prismaClient, menuId);
+    }
+
     return toMasterBahanResponse(updatedMasterBahan);
   }
 
@@ -218,10 +236,36 @@ export class MasterBahanService {
       );
     }
 
+    // Find all menus affected by this item's deletion
+    const affectedRecipes = await prismaClient.recipe.findMany({
+      where: {
+        item_id: deleteMasterBahanRequest.id,
+        item_type: RecipeItemType.bahan,
+      },
+      select: { menu_id: true },
+    });
+    const affectedMenuIds: Array<number> = Array.from(
+      new Set(affectedRecipes.map((r) => r.menu_id))
+    );
+
+    // Delete recipes referencing this item
+    await prismaClient.recipe.deleteMany({
+      where: {
+        item_id: deleteMasterBahanRequest.id,
+        item_type: RecipeItemType.bahan,
+      },
+    });
+
+    // Delete the master item
     await prismaClient.masterBahan.delete({
       where: {
         id: deleteMasterBahanRequest.id,
       },
     });
+
+    // Recalculate nutrition for affected menus
+    for (const menuId of affectedMenuIds) {
+      await RecipeService.recalculateNutritionInternal(prismaClient, menuId);
+    }
   }
 }
