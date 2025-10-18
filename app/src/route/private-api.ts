@@ -68,7 +68,7 @@ privateRouter.get(
 // Master Bahan Type Module
 privateRouter.get(
   '/api/master-bahan-types',
-  authorizeMiddleware(Roles.Restaurant),
+  authorizeMiddleware(Roles.AdminAndRestaurant),
   MasterBahanTypeController.getAll
 );
 
