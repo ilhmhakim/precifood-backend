@@ -63,6 +63,9 @@ export class NotificationController {
     res: Response,
     next: NextFunction
   ) {
+    return res.status(501).json({
+      message: 'Not Implemented',
+    });
     try {
       const restaurantId = String(req.user.id);
       const request: UpdateNotificationReadRequest = {
