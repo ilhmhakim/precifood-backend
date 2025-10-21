@@ -10,12 +10,31 @@ import { MasterBahanService } from '../service/master-bahan-service';
 import { UserRequest } from '../type/user';
 import { NextFunction, Request, Response } from 'express';
 
-// TODO : stript nutrition-related fields from request
 export class MasterBahanController {
   static async create(req: UserRequest, res: Response, next: NextFunction) {
     try {
-      const request: CreateMasterBahanRequest =
+      let request: CreateMasterBahanRequest =
         req.body as CreateMasterBahanRequest;
+
+      // For Restoran role, only allow name and type_id
+      if (req.user.role === 'Restoran') {
+        request = {
+          name: request.name,
+          type_id: request.type_id,
+          bdd: 100, // default values
+          calory: 0,
+          protein: 0,
+          fat: 0,
+          carbohydrate: 0,
+          fiber: 0,
+          natrium: 0,
+          cholesterol: 0,
+          sfa: 0,
+          mufa: 0,
+          pufa: 0,
+        };
+      }
+
       const response: MasterBahanResponse =
         await MasterBahanService.createNewBahan(
           request,
@@ -66,10 +85,20 @@ export class MasterBahanController {
 
   static async update(req: UserRequest, res: Response, next: NextFunction) {
     try {
-      const request: UpdateMasterBahanRequest = {
+      let request: UpdateMasterBahanRequest = {
         id: parseInt(req.params.id),
         ...req.body,
       };
+
+      // For Restoran role, only allow name and type_id updates
+      if (req.user.role === 'Restoran') {
+        request = {
+          id: request.id,
+          name: request.name,
+          type_id: request.type_id,
+          // Strip out nutrition fields
+        };
+      }
 
       const response: MasterBahanResponse =
         await MasterBahanService.updateMasterBahan(
