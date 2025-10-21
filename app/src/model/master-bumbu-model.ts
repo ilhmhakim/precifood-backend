@@ -1,4 +1,8 @@
-import { MasterBumbu } from '@prisma/client';
+import {
+  MasterBumbu,
+  MasterBumbuApprovalLog,
+  MasterItemStatus,
+} from '@prisma/client';
 
 export type CreateMasterBumbuRequest = {
   name: string;
@@ -56,12 +60,14 @@ export type MasterBumbuResponse = {
   sfa: number;
   mufa: number;
   pufa: number;
+  status: MasterItemStatus;
   created_at: Date;
   updated_at: Date;
+  approval_logs?: MasterBumbuApprovalLog[];
 };
 
 export function toMasterBumbuResponse(
-  masterBumbu: MasterBumbu
+  masterBumbu: MasterBumbu & { approval_logs?: MasterBumbuApprovalLog[] }
 ): MasterBumbuResponse {
   return {
     id: masterBumbu.id,
@@ -78,6 +84,8 @@ export function toMasterBumbuResponse(
     sfa: Number(masterBumbu.sfa),
     mufa: Number(masterBumbu.mufa),
     pufa: Number(masterBumbu.pufa),
+    status: masterBumbu.status,
+    approval_logs: masterBumbu.approval_logs,
     created_at: masterBumbu.created_at,
     updated_at: masterBumbu.updated_at,
   };

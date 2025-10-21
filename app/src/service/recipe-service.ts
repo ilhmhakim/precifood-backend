@@ -10,6 +10,7 @@ import { RecipeValidation } from '../validation/recipe-validation';
 import { Validation } from '../validation/validation';
 import { MenuService } from './menu-service';
 import {
+  MasterItemStatus,
   Menu,
   MenuStatus,
   Prisma,
@@ -18,7 +19,7 @@ import {
 } from '@prisma/client';
 
 export class RecipeService {
-  static async checkIfItemExists(
+  static async checkIfItemExistsAndApproved(
     itemId: number,
     itemType: RecipeItemType
   ): Promise<boolean> {
@@ -27,6 +28,12 @@ export class RecipeService {
         where: { id: itemId },
       });
       if (item) {
+        if (item.status !== MasterItemStatus.Approved) {
+          throw new ResponseError(
+            400,
+            `Bahan ${item.name} belum disetujui (status: ${item.status}) dan belum bisa digunakan`
+          );
+        }
         return true;
       }
       throw new ResponseError(404, `ID ${itemId} not found in Master Bahan`);
@@ -35,6 +42,12 @@ export class RecipeService {
         where: { id: itemId },
       });
       if (item) {
+        if (item.status !== MasterItemStatus.Approved) {
+          throw new ResponseError(
+            400,
+            `Bumbu ${item.name} belum disetujui (status: ${item.status}) dan belum bisa digunakan`
+          );
+        }
         return true;
       }
       throw new ResponseError(404, `ID ${itemId} not found in Master Bumbu`);
@@ -201,7 +214,7 @@ export class RecipeService {
     try {
       await Promise.all(
         payload.items.map((item) =>
-          this.checkIfItemExists(item.item_id, item.item_type)
+          this.checkIfItemExistsAndApproved(item.item_id, item.item_type)
         )
       );
     } catch (error) {

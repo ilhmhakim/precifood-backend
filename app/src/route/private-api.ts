@@ -99,6 +99,12 @@ privateRouter.delete(
   MasterBahanController.delete
 );
 
+privateRouter.post(
+  '/api/master-bahan/:id(\\d+)/status',
+  authorizeMiddleware(Roles.Admin),
+  MasterBahanController.updateBahanApproval
+);
+
 // Master Bumbu Module
 privateRouter.post(
   '/api/master-bumbu',
@@ -124,6 +130,13 @@ privateRouter.delete(
   '/api/master-bumbu/:id(\\d+)',
   authorizeMiddleware(Roles.AdminAndRestaurant),
   MasterBumbuController.delete
+);
+
+// Master Bumbu Approval
+privateRouter.post(
+  '/api/master-bumbu/:id(\\d+)/status',
+  authorizeMiddleware(Roles.Admin),
+  MasterBumbuController.updateBumbuApproval
 );
 
 // Menu Module
