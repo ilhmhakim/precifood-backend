@@ -236,23 +236,24 @@ model Address {
 
 // Model Menu dan turunannya
 model Menu {
-  id            Int        @id @default(autoincrement())
-  name          String     @db.VarChar(255)
-  category      String     @db.VarChar(50)
-  price         Int        @db.Integer
-  portion       Int        @db.Integer
-  description   String     @db.Text
-  image_url     String     @db.Text
-  status        String     @default("Waiting") @db.VarChar(50)
-  updated_at    DateTime   @updatedAt @db.Timestamp(0)
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(255)
+  category        String            @db.VarChar(50)
+  price           Int               @db.Integer
+  portion         Int               @db.Integer
+  description     String            @db.Text
+  image_url       String            @db.Text
+  status          String            @default("Waiting") @db.VarChar(50)
+  updated_at      DateTime          @updatedAt @db.Timestamp(0)
   // Setiap menu dimiliki 1 Restoran spesifik
-  restaurant_id String     @db.VarChar(38)
-  restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: Cascade)
+  restaurant_id   String            @db.VarChar(38)
+  restaurant      Restaurant        @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: Cascade)
   // 1 Menu memiliki 1 detail Nutrition (1 to 1)
-  Nutrition     Nutrition?
+  Nutrition       Nutrition?
   // 1 Menu memiliki Many Recipe (1 to Many)
   // Recipe adalah bahan atau bumbu yang digunakan untuk membuat menu tersebut
-  Recipe        Recipe[]
+  Recipe          Recipe[]
+  MenuApprovalLog MenuApprovalLog[]
 
   @@map("Menu")
 }
@@ -361,4 +362,18 @@ model Recipe {
 
   @@index([menu_id])
   @@map("Recipe")
+}
+
+model MenuApprovalLog {
+  id          Int         @id @default(autoincrement())
+  menu_id     Int
+  from_status MenuStatus?
+  to_status   MenuStatus
+  changed_at  DateTime    @default(now()) @db.Timestamp()
+  reason      String?     @db.Text
+  Menu        Menu        @relation(fields: [menu_id], references: [id], onDelete: Cascade)
+  created_at  DateTime    @default(now()) @db.Timestamp()
+  updated_at  DateTime    @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("MenuApprovalLog")
 }

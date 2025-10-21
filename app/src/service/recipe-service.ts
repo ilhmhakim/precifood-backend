@@ -9,7 +9,13 @@ import {
 import { RecipeValidation } from '../validation/recipe-validation';
 import { Validation } from '../validation/validation';
 import { MenuService } from './menu-service';
-import { Menu, Prisma, Recipe, RecipeItemType } from '@prisma/client';
+import {
+  Menu,
+  MenuStatus,
+  Prisma,
+  Recipe,
+  RecipeItemType,
+} from '@prisma/client';
 
 export class RecipeService {
   static async checkIfItemExists(
@@ -187,7 +193,10 @@ export class RecipeService {
       request
     );
 
-    await MenuService.checkMenuExist(payload.menu_id, payload.restaurant_id);
+    const menu = await MenuService.checkMenuExist(
+      payload.menu_id,
+      payload.restaurant_id
+    );
 
     try {
       await Promise.all(
@@ -223,6 +232,32 @@ export class RecipeService {
       }
 
       await this.recalculateNutritionInternal(tx, payload.menu_id);
+
+      await tx.menuApprovalLog.create({
+        data: {
+          menu_id: menu.id,
+          reason: 'SYSTEM | Resep diperbarui',
+          from_status: menu.status as MenuStatus,
+          to_status: 'Waiting',
+        },
+      });
+
+      await tx.menu.update({
+        where: { id: menu.id },
+        data: {
+          status: 'Waiting',
+        },
+      });
+
+      await tx.notification.create({
+        data: {
+          title: `Resep untuk menu ${menu.name} | ${menu.restaurant.Contact!.name} telah diperbarui dan menunggu persetujuan ulang`,
+          restaurant_name: menu.restaurant.Contact!.name,
+          restaurant_id: payload.restaurant_id,
+          menu_id: payload.menu_id,
+          menu_name: menu.name,
+        },
+      });
     });
   }
 

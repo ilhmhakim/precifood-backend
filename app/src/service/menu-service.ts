@@ -18,7 +18,7 @@ import {
 } from '../model/menu-model';
 import { MenuValidation } from '../validation/menu-validation';
 import { Validation } from '../validation/validation';
-import { Prisma } from '@prisma/client';
+import { MenuApprovalLog, MenuStatus, Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 export class MenuService {
@@ -51,7 +51,11 @@ export class MenuService {
         restaurant_id: restaurantId,
       },
       include: {
-        restaurant: true,
+        restaurant: {
+          include: {
+            Contact: true,
+          },
+        },
         Nutrition: true,
       },
     });
@@ -85,18 +89,27 @@ export class MenuService {
           portion: createMenuRequest.portion,
           description: createMenuRequest.description,
           image_url: createMenuRequest.image_url,
-          status: 'Approved',
+          status: 'Waiting',
         },
       });
 
       // Buat notifikasi menu baru
       await prisma.notification.create({
         data: {
-          title: 'Menu baru ditambahkan!',
+          title: `Menu baru ${menu.name} oleh ${restaurant.Contact!.name} ditambahkan!`,
           restaurant_name: restaurant.Contact!.name,
           restaurant_id: createMenuRequest.restaurant_id,
           menu_id: menu.id,
           menu_name: createMenuRequest.name,
+        },
+      });
+
+      await prisma.menuApprovalLog.create({
+        data: {
+          menu_id: menu.id,
+          reason: 'Menu baru dibuat dan menunggu persetujuan',
+          from_status: null,
+          to_status: 'Waiting',
         },
       });
     });
@@ -212,13 +225,59 @@ export class MenuService {
       request
     );
 
-    await prismaClient.menu.update({
-      where: {
-        id: updateMenuApprovalRequest.menu_id,
-      },
-      data: {
-        status: updateMenuApprovalRequest.status,
-      },
+    const menu = await this.checkMenuExist(
+      updateMenuApprovalRequest.menu_id,
+      updateMenuApprovalRequest.restaurant_id
+    );
+
+    if (
+      updateMenuApprovalRequest.status === 'Rejected' &&
+      !updateMenuApprovalRequest.reason
+    ) {
+      throw new ResponseError(
+        400,
+        'Alasan harus disertakan untuk perbaikan menu'
+      );
+    }
+
+    if (
+      updateMenuApprovalRequest.status !== 'Rejected' &&
+      updateMenuApprovalRequest.reason
+    ) {
+      throw new ResponseError(
+        400,
+        'Alasan hanya dapat disertakan jika status menu adalah Rejected'
+      );
+    }
+
+    await prismaClient.$transaction(async (tx) => {
+      await tx.menuApprovalLog.create({
+        data: {
+          menu_id: updateMenuApprovalRequest.menu_id,
+          reason: updateMenuApprovalRequest.reason ?? null,
+          from_status: menu.status as MenuStatus,
+          to_status: updateMenuApprovalRequest.status as MenuStatus,
+        },
+      });
+
+      await tx.menu.update({
+        where: {
+          id: updateMenuApprovalRequest.menu_id,
+        },
+        data: {
+          status: updateMenuApprovalRequest.status,
+        },
+      });
+
+      await tx.notification.create({
+        data: {
+          title: `Status Menu ${menu.name} telah menjadi ${updateMenuApprovalRequest.status}`,
+          restaurant_name: menu.restaurant.Contact!.name,
+          restaurant_id: updateMenuApprovalRequest.restaurant_id,
+          menu_id: updateMenuApprovalRequest.menu_id,
+          menu_name: menu.name,
+        },
+      });
     });
   }
 
@@ -306,13 +365,24 @@ export class MenuService {
         new Prisma.Decimal(nutrition.pufa.toNumber()).div(menu.portion),
     };
 
+    const menuApprovalLogs: MenuApprovalLog[] =
+      await prismaClient.menuApprovalLog.findMany({
+        where: {
+          menu_id: requestMenuDetail.menu_id,
+        },
+        orderBy: {
+          changed_at: 'desc',
+        },
+      });
+
     // Mengirimkan `null` untuk `nutrition` jika tidak ada data `Nutrition`
     // Mengirimkan `null` untuk `nutritionPerPortion` jika tidak ada data `NutritionPerPortion`
     return toMenuDetailResponse(
       menu,
       menu.Nutrition || null,
       nutritionPerPortion || null,
-      requestMenuDetail.role
+      requestMenuDetail.role,
+      menuApprovalLogs
     );
   }
 

@@ -1,5 +1,5 @@
 import { ResponseError } from '../error/response-error';
-import { Menu, Nutrition } from '@prisma/client';
+import { Menu, MenuApprovalLog, Nutrition } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 export type AllMenusResponse = {
@@ -65,6 +65,7 @@ export type MenuDetailResponse = {
     mufa?: number | string | null;
     pufa?: number | string | null;
   };
+  menu_approval_logs: MenuApprovalLog[];
 };
 
 export type CreateMenuRequest = {
@@ -148,6 +149,7 @@ export type UpdateMenuApprovalRequest = {
   restaurant_id: string;
   menu_id: number;
   status: string;
+  reason?: string;
 };
 
 export type RecipeItemInput = {
@@ -203,7 +205,8 @@ export function toMenuDetailResponse(
   menu: Menu,
   nutrition: Nutrition | null,
   nutritionPerPortion: NutritionPerPortion | null,
-  role: string
+  role: string,
+  menuApprovalLogs: MenuApprovalLog[]
 ): MenuDetailResponse {
   const noValueMessage = 'Nilai nutrisi belum dimasukkan';
 
@@ -245,6 +248,7 @@ export function toMenuDetailResponse(
           nutritionPerPortion?.carbohydrate?.toDecimalPlaces(1).toNumber() ??
           noValueMessage,
       },
+      menu_approval_logs: menuApprovalLogs,
     };
   } else if (role === 'Admin') {
     return {
@@ -324,6 +328,7 @@ export function toMenuDetailResponse(
           nutritionPerPortion?.pufa?.toDecimalPlaces(2).toNumber() ??
           noValueMessage,
       },
+      menu_approval_logs: menuApprovalLogs,
     };
   } else {
     throw new ResponseError(400, 'Invalid request');
