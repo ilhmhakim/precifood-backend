@@ -365,7 +365,7 @@ export class MenuService {
         new Prisma.Decimal(nutrition.pufa.toNumber()).div(menu.portion),
     };
 
-    let menuApprovalLogs: MenuApprovalLog[] = [];
+    let menuApprovalLogs: MenuApprovalLog[] | null = null;
     if (requestMenuDetail.role !== 'Konsumen') {
       menuApprovalLogs = await prismaClient.menuApprovalLog.findMany({
         where: {

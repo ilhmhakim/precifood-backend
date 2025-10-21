@@ -65,7 +65,7 @@ export type MenuDetailResponse = {
     mufa?: number | string | null;
     pufa?: number | string | null;
   };
-  menu_approval_logs: MenuApprovalLog[];
+  menu_approval_logs?: MenuApprovalLog[] | null;
 };
 
 export type CreateMenuRequest = {
@@ -206,11 +206,11 @@ export function toMenuDetailResponse(
   nutrition: Nutrition | null,
   nutritionPerPortion: NutritionPerPortion | null,
   role: string,
-  menuApprovalLogs: MenuApprovalLog[]
+  menuApprovalLogs: MenuApprovalLog[] | null
 ): MenuDetailResponse {
   const noValueMessage = 'Nilai nutrisi belum dimasukkan';
 
-  if (role === 'Konsumen' || role === 'Restoran') {
+  if (role === 'Restoran') {
     return {
       id: menu.id,
       name: menu.name,
@@ -249,6 +249,45 @@ export function toMenuDetailResponse(
           noValueMessage,
       },
       menu_approval_logs: menuApprovalLogs,
+    };
+  } else if (role === 'Konsumen') {
+    return {
+      id: menu.id,
+      name: menu.name,
+      status: menu.status,
+      price: menu.price,
+      portion: menu.portion,
+      category: menu.category,
+      description: menu.description,
+      image_url: menu.image_url,
+      nutrition: {
+        calory: nutrition?.calory
+          ? nutrition.calory.toDecimalPlaces(1).toNumber()
+          : noValueMessage,
+        protein: nutrition?.protein
+          ? nutrition.protein.toDecimalPlaces(1).toNumber()
+          : noValueMessage,
+        fat: nutrition?.fat
+          ? nutrition.fat.toDecimalPlaces(1).toNumber()
+          : noValueMessage,
+        carbohydrate: nutrition?.carbohydrate
+          ? nutrition.carbohydrate.toDecimalPlaces(1).toNumber()
+          : noValueMessage,
+      },
+      nutrition_per_portion: {
+        calory:
+          nutritionPerPortion?.calory?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+        protein:
+          nutritionPerPortion?.protein?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+        fat:
+          nutritionPerPortion?.fat?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+        carbohydrate:
+          nutritionPerPortion?.carbohydrate?.toDecimalPlaces(1).toNumber() ??
+          noValueMessage,
+      },
     };
   } else if (role === 'Admin') {
     return {
