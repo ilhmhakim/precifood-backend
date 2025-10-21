@@ -248,6 +248,11 @@ privateRouter.get(
   authorizeMiddleware(Roles.Restaurant),
   NotificationController.getRestaurantNotifications
 );
+privateRouter.put(
+  '/api/restaurants/notifications/:notificationId(\\d+)',
+  authorizeMiddleware(Roles.Restaurant),
+  NotificationController.updateRestaurantNotificationRead
+);
 
 // Recommendation Module
 privateRouter.post(

@@ -63,4 +63,39 @@ export class NotificationService {
       toNotificationResponse(notification)
     );
   }
+
+  static async updateRestaurantNotificationRead(
+    restaurantId: string,
+    request: UpdateNotificationReadRequest
+  ): Promise<void> {
+    const updateNotificationReadRequest = Validation.validate(
+      NotificationValidation.UPDATENOTIFICATIONREAD,
+      request
+    );
+
+    if (updateNotificationReadRequest.is_read !== true) {
+      throw new ResponseError(400, 'is_read harus bernilai true');
+    }
+
+    // Check if notification exists and belongs to the restaurant
+    const notification = await prismaClient.notification.findFirst({
+      where: {
+        id: updateNotificationReadRequest.id,
+        restaurant_id: restaurantId,
+      },
+    });
+
+    if (!notification) {
+      throw new ResponseError(404, 'Notifikasi tidak ditemukan');
+    }
+
+    await prismaClient.notification.update({
+      where: {
+        id: updateNotificationReadRequest.id,
+      },
+      data: {
+        is_read: updateNotificationReadRequest.is_read,
+      },
+    });
+  }
 }
