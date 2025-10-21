@@ -278,6 +278,13 @@ export class MenuValidation {
         message: "Status harus bernilai 'Approved', 'Waiting', atau 'Rejected'",
       }),
     }),
+    menu_id: z.number().positive('Menu ID harus bernilai positif'),
+    reason: z
+      .string()
+      .trim()
+      .min(1, 'Alasan tidak boleh kosong')
+      .max(255, 'Alasan tidak boleh lebih dari 255 kata')
+      .optional(),
   });
 
   static readonly SEARCHMENU = z.object({
