@@ -1,6 +1,7 @@
 import { prismaClient } from '../application/database';
 import { ResponseError } from '../error/response-error';
 import {
+  NotificationEnum,
   NotificationResponse,
   toNotificationResponse,
   UpdateNotificationReadRequest,
@@ -48,7 +49,10 @@ export class NotificationService {
   ): Promise<Array<NotificationResponse>> {
     const notifications = await prismaClient.notification.findMany({
       where: {
-        restaurant_id: restaurantId,
+        OR: [
+          { restaurant_id: restaurantId },
+          { restaurant_id: NotificationEnum.ALL },
+        ],
       },
       orderBy: {
         id: 'desc',

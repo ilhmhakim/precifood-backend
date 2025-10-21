@@ -99,6 +99,12 @@ privateRouter.delete(
   MasterBahanController.delete
 );
 
+privateRouter.post(
+  '/api/master-bahan/:id(\\d+)/status',
+  authorizeMiddleware(Roles.Admin),
+  MasterBahanController.updateBahanApproval
+);
+
 // Master Bumbu Module
 privateRouter.post(
   '/api/master-bumbu',

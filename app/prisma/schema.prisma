@@ -39,6 +39,12 @@ enum MenuStatus {
   Rejected
 }
 
+enum MasterItemStatus {
+  Approved
+  Waiting
+  Rejected
+}
+
 enum RecipeItemType {
   bahan
   bumbu
@@ -290,8 +296,12 @@ model Notification {
   title           String   @db.VarChar(255)
   restaurant_name String   @db.VarChar(255)
   restaurant_id   String   @db.VarChar(38)
-  menu_id         Int      @db.Integer
-  menu_name       String   @db.VarChar(255)
+  menu_id         Int?     @db.Integer
+  menu_name       String?  @db.VarChar(255)
+  bahan_id        Int?     @db.Integer
+  bahan_name      String?  @db.VarChar(255)
+  bumbu_id        Int?     @db.Integer
+  bumbu_name      String?  @db.VarChar(255)
   is_read         Boolean  @default(false)
   created_at      DateTime @default(now()) @db.Timestamp()
   updated_at      DateTime @default(now()) @updatedAt @db.Timestamp(0)
@@ -306,48 +316,80 @@ model MasterBahanType {
 }
 
 model MasterBahan {
-  id           Int             @id @default(autoincrement())
-  name         String          @unique @db.VarChar(255)
-  type_id      Int
-  type         MasterBahanType @relation(fields: [type_id], references: [id])
+  id            Int                      @id @default(autoincrement())
+  name          String                   @unique @db.VarChar(255)
+  type_id       Int
+  type          MasterBahanType          @relation(fields: [type_id], references: [id])
+  status        MasterItemStatus         @default(Waiting)
   // per 100g 
-  bdd          Int             @default(100) @db.Integer
-  calory       Decimal         @default(0.0)
-  protein      Decimal         @default(0.0)
-  fat          Decimal         @default(0.0)
-  carbohydrate Decimal         @default(0.0)
-  fiber        Decimal         @default(0.0)
-  natrium      Decimal         @default(0.0)
-  cholesterol  Decimal         @default(0.0)
-  sfa          Decimal         @default(0.0)
-  mufa         Decimal         @default(0.0)
-  pufa         Decimal         @default(0.0)
-  created_at   DateTime        @default(now()) @db.Timestamp()
-  updated_at   DateTime        @default(now()) @updatedAt @db.Timestamp(0)
+  bdd           Int                      @default(100) @db.Integer
+  calory        Decimal                  @default(0.0)
+  protein       Decimal                  @default(0.0)
+  fat           Decimal                  @default(0.0)
+  carbohydrate  Decimal                  @default(0.0)
+  fiber         Decimal                  @default(0.0)
+  natrium       Decimal                  @default(0.0)
+  cholesterol   Decimal                  @default(0.0)
+  sfa           Decimal                  @default(0.0)
+  mufa          Decimal                  @default(0.0)
+  pufa          Decimal                  @default(0.0)
+  created_at    DateTime                 @default(now()) @db.Timestamp()
+  updated_at    DateTime                 @default(now()) @updatedAt @db.Timestamp(0)
+  approval_logs MasterBahanApprovalLog[]
 
   @@map("MasterBahan")
 }
 
+model MasterBahanApprovalLog {
+  id          Int               @id @default(autoincrement())
+  bahan_id    Int
+  bahan       MasterBahan       @relation(fields: [bahan_id], references: [id], onDelete: Cascade)
+  from_status MasterItemStatus?
+  to_status   MasterItemStatus
+  changed_at  DateTime          @default(now()) @db.Timestamp()
+  reason      String?           @db.Text
+  created_at  DateTime          @default(now()) @db.Timestamp()
+  updated_at  DateTime          @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("MasterBahanApprovalLog")
+}
+
 model MasterBumbu {
-  id           Int      @id @default(autoincrement())
-  name         String   @unique @db.VarChar(255)
-  cooking_type String?  @db.VarChar(50) // this willl be use enum in the future
+  id            Int                      @id @default(autoincrement())
+  name          String                   @unique @db.VarChar(255)
+  cooking_type  String?                  @db.VarChar(50) // this willl be use enum in the future
+  status        MasterItemStatus         @default(Waiting)
   // per 100g
-  bdd          Int      @default(100) @db.Integer
-  calory       Decimal  @default(0.0)
-  protein      Decimal  @default(0.0)
-  fat          Decimal  @default(0.0)
-  carbohydrate Decimal  @default(0.0)
-  fiber        Decimal  @default(0.0)
-  natrium      Decimal  @default(0.0)
-  cholesterol  Decimal  @default(0.0)
-  sfa          Decimal  @default(0.0)
-  mufa         Decimal  @default(0.0)
-  pufa         Decimal  @default(0.0)
-  created_at   DateTime @default(now()) @db.Timestamp()
-  updated_at   DateTime @default(now()) @updatedAt @db.Timestamp(0)
+  bdd           Int                      @default(100) @db.Integer
+  calory        Decimal                  @default(0.0)
+  protein       Decimal                  @default(0.0)
+  fat           Decimal                  @default(0.0)
+  carbohydrate  Decimal                  @default(0.0)
+  fiber         Decimal                  @default(0.0)
+  natrium       Decimal                  @default(0.0)
+  cholesterol   Decimal                  @default(0.0)
+  sfa           Decimal                  @default(0.0)
+  mufa          Decimal                  @default(0.0)
+  pufa          Decimal                  @default(0.0)
+  created_at    DateTime                 @default(now()) @db.Timestamp()
+  updated_at    DateTime                 @default(now()) @updatedAt @db.Timestamp(0)
+  approval_logs MasterBumbuApprovalLog[]
 
   @@map("MasterBumbu")
+}
+
+model MasterBumbuApprovalLog {
+  id          Int               @id @default(autoincrement())
+  bumbu_id    Int
+  bumbu       MasterBumbu       @relation(fields: [bumbu_id], references: [id], onDelete: Cascade)
+  from_status MasterItemStatus?
+  to_status   MasterItemStatus
+  changed_at  DateTime          @default(now()) @db.Timestamp()
+  reason      String?           @db.Text
+  created_at  DateTime          @default(now()) @db.Timestamp()
+  updated_at  DateTime          @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("MasterBumbuApprovalLog")
 }
 
 model Recipe {

@@ -1,12 +1,20 @@
 import { Notification } from '@prisma/client';
 
+export enum NotificationEnum {
+  ALL = 'ALL',
+}
+
 export type NotificationResponse = {
   id: number;
   title: string;
   restaurant_name: string;
   restaurant_id: string;
-  menu_id: number;
-  menu_name: string;
+  menu_id?: number | null;
+  menu_name?: string | null;
+  bahan_id?: number | null;
+  bahan_name?: string | null;
+  bumbu_id?: number | null;
+  bumbu_name?: string | null;
   is_read: boolean;
   created_at: Date;
   updated_at: Date;
@@ -36,6 +44,10 @@ export function toNotificationResponse(
     restaurant_id: notification.restaurant_id,
     menu_id: notification.menu_id,
     menu_name: notification.menu_name,
+    bahan_id: notification.bahan_id,
+    bahan_name: notification.bahan_name,
+    bumbu_id: notification.bumbu_id,
+    bumbu_name: notification.bumbu_name,
     is_read: notification.is_read,
     created_at: notification.created_at,
     updated_at: notification.updated_at,

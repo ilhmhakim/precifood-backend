@@ -172,6 +172,21 @@ export class MasterBahanValidation {
       .optional(),
   });
 
+  static readonly UPDATEBAHANAPPROVAL = z.object({
+    status: z.enum(['Approved', 'Waiting', 'Rejected'], {
+      errorMap: () => ({
+        message: "Status harus bernilai 'Approved', 'Waiting', atau 'Rejected'",
+      }),
+    }),
+    bahan_id: z.number().positive('Menu ID harus bernilai positif'),
+    reason: z
+      .string()
+      .trim()
+      .min(1, 'Alasan tidak boleh kosong')
+      .max(255, 'Alasan tidak boleh lebih dari 255 kata')
+      .optional(),
+  });
+
   static readonly GET: ZodType = z.object({
     id: z.number().int().positive('ID bahan harus bernilai positif'),
   });

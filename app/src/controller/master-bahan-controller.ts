@@ -3,6 +3,7 @@ import {
   DeleteMasterBahanRequest,
   GetMasterBahanRequest,
   MasterBahanResponse,
+  UpdateBahanApprovalRequest,
   UpdateMasterBahanRequest,
 } from '../model/master-bahan-model';
 import { MasterBahanService } from '../service/master-bahan-service';
@@ -16,7 +17,11 @@ export class MasterBahanController {
       const request: CreateMasterBahanRequest =
         req.body as CreateMasterBahanRequest;
       const response: MasterBahanResponse =
-        await MasterBahanService.createNewBahan(request);
+        await MasterBahanService.createNewBahan(
+          request,
+          req.user.id,
+          req.user.role
+        );
 
       res.status(201).json({
         message: 'Bahan berhasil dibuat',
@@ -67,7 +72,11 @@ export class MasterBahanController {
       };
 
       const response: MasterBahanResponse =
-        await MasterBahanService.updateMasterBahan(request);
+        await MasterBahanService.updateMasterBahan(
+          request,
+          req.user.id,
+          req.user.role
+        );
 
       res.status(200).json({
         message: `Bahan ${response.name} berhasil diperbarui`,
@@ -92,6 +101,26 @@ export class MasterBahanController {
       });
     } catch (error) {
       next(error);
+    }
+  }
+
+  static async updateBahanApproval(
+    req: UserRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const request: UpdateBahanApprovalRequest =
+        req.body as UpdateBahanApprovalRequest;
+      request.bahan_id = Number(req.params.id);
+
+      await MasterBahanService.updateBahanApproval(request);
+
+      res.status(200).json({
+        message: 'Success!',
+      });
+    } catch (e) {
+      next(e);
     }
   }
 }

@@ -1,4 +1,9 @@
-import { MasterBahan, MasterBahanType } from '@prisma/client';
+import {
+  MasterBahan,
+  MasterBahanApprovalLog,
+  MasterBahanType,
+  MasterItemStatus,
+} from '@prisma/client';
 
 export type CreateMasterBahanRequest = {
   name: string;
@@ -57,12 +62,23 @@ export type MasterBahanResponse = {
   sfa: number;
   mufa: number;
   pufa: number;
+  status: MasterItemStatus;
   created_at: Date;
   updated_at: Date;
+  appproval_logs?: MasterBahanApprovalLog[];
+};
+
+export type UpdateBahanApprovalRequest = {
+  bahan_id: number;
+  status: string;
+  reason?: string;
 };
 
 export function toMasterBahanResponse(
-  masterBahan: MasterBahan & { type: MasterBahanType }
+  masterBahan: MasterBahan & {
+    type: MasterBahanType;
+    approval_logs?: MasterBahanApprovalLog[];
+  }
 ): MasterBahanResponse {
   return {
     id: masterBahan.id,
@@ -80,6 +96,8 @@ export function toMasterBahanResponse(
     sfa: Number(masterBahan.sfa),
     mufa: Number(masterBahan.mufa),
     pufa: Number(masterBahan.pufa),
+    status: masterBahan.status,
+    appproval_logs: masterBahan.approval_logs,
     created_at: masterBahan.created_at,
     updated_at: masterBahan.updated_at,
   };
