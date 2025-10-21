@@ -8,6 +8,8 @@ export type NotificationResponse = {
   menu_id: number;
   menu_name: string;
   is_read: boolean;
+  created_at: Date;
+  updated_at: Date;
 };
 
 export type CreateNotificationRequest = {
@@ -35,5 +37,7 @@ export function toNotificationResponse(
     menu_id: notification.menu_id,
     menu_name: notification.menu_name,
     is_read: notification.is_read,
+    created_at: notification.created_at,
+    updated_at: notification.updated_at,
   };
 }

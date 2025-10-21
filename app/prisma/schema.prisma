@@ -286,13 +286,15 @@ model Admin {
 }
 
 model Notification {
-  id              Int     @id @default(autoincrement())
-  title           String  @db.VarChar(255)
-  restaurant_name String  @db.VarChar(255)
-  restaurant_id   String  @db.VarChar(38)
-  menu_id         Int     @db.Integer
-  menu_name       String  @db.VarChar(255)
-  is_read         Boolean @default(false)
+  id              Int      @id @default(autoincrement())
+  title           String   @db.VarChar(255)
+  restaurant_name String   @db.VarChar(255)
+  restaurant_id   String   @db.VarChar(38)
+  menu_id         Int      @db.Integer
+  menu_name       String   @db.VarChar(255)
+  is_read         Boolean  @default(false)
+  created_at      DateTime @default(now()) @db.Timestamp()
+  updated_at      DateTime @default(now()) @updatedAt @db.Timestamp(0)
 }
 
 model MasterBahanType {
