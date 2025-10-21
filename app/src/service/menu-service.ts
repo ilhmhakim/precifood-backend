@@ -365,8 +365,9 @@ export class MenuService {
         new Prisma.Decimal(nutrition.pufa.toNumber()).div(menu.portion),
     };
 
-    const menuApprovalLogs: MenuApprovalLog[] =
-      await prismaClient.menuApprovalLog.findMany({
+    let menuApprovalLogs: MenuApprovalLog[] = [];
+    if (requestMenuDetail.role !== 'Konsumen') {
+      menuApprovalLogs = await prismaClient.menuApprovalLog.findMany({
         where: {
           menu_id: requestMenuDetail.menu_id,
         },
@@ -374,6 +375,7 @@ export class MenuService {
           changed_at: 'desc',
         },
       });
+    }
 
     // Mengirimkan `null` untuk `nutrition` jika tidak ada data `Nutrition`
     // Mengirimkan `null` untuk `nutritionPerPortion` jika tidak ada data `NutritionPerPortion`
