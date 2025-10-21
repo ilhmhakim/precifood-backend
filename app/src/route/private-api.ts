@@ -243,6 +243,11 @@ privateRouter.put(
   authorizeMiddleware(Roles.Admin),
   NotificationController.updateNotificationRead
 );
+privateRouter.get(
+  '/api/restaurants/notifications',
+  authorizeMiddleware(Roles.Restaurant),
+  NotificationController.getRestaurantNotifications
+);
 
 // Recommendation Module
 privateRouter.post(

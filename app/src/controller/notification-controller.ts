@@ -1,5 +1,6 @@
 import { UpdateNotificationReadRequest } from '../model/notification-model';
 import { NotificationService } from '../service/notification-service';
+import { UserRequest } from '../type/user';
 import { NextFunction, Request, Response } from 'express';
 
 export class NotificationController {
@@ -33,6 +34,24 @@ export class NotificationController {
 
       return res.status(200).json({
         message: 'Success!',
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async getRestaurantNotifications(
+    req: UserRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const restaurantId = String(req.user.id);
+      const response =
+        await NotificationService.getRestaurantNotifications(restaurantId);
+      res.status(200).json({
+        message: 'Success!',
+        data: response,
       });
     } catch (e) {
       next(e);

@@ -42,4 +42,25 @@ export class NotificationService {
       },
     });
   }
+
+  static async getRestaurantNotifications(
+    restaurantId: string
+  ): Promise<Array<NotificationResponse>> {
+    const notifications = await prismaClient.notification.findMany({
+      where: {
+        restaurant_id: restaurantId,
+      },
+      orderBy: {
+        id: 'desc',
+      },
+    });
+
+    if (!notifications || notifications.length === 0) {
+      throw new ResponseError(404, 'Belum ada notifikasi untuk restoran anda');
+    }
+
+    return notifications.map((notification) =>
+      toNotificationResponse(notification)
+    );
+  }
 }
