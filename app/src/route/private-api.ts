@@ -132,6 +132,13 @@ privateRouter.delete(
   MasterBumbuController.delete
 );
 
+// Master Bumbu Approval
+privateRouter.post(
+  '/api/master-bumbu/:id(\\d+)/status',
+  authorizeMiddleware(Roles.Admin),
+  MasterBumbuController.updateBumbuApproval
+);
+
 // Menu Module
 privateRouter.post(
   '/api/restaurants/menu',
