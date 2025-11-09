@@ -1,5 +1,5 @@
 # Stage 1: Build Stage
-FROM node:20-alpine AS build
+FROM node:20-bullseye-slim AS build
 
 # Set working directory di dalam container
 WORKDIR /app
@@ -20,7 +20,7 @@ RUN npx prisma generate
 RUN npm run build
 
 # Stage 2: Production Stage
-FROM node:20-alpine AS production
+FROM node:20-bullseye-slim AS production
 
 # Set working directory di dalam container
 WORKDIR /app
