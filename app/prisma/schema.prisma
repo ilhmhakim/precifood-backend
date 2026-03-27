@@ -39,6 +39,17 @@ enum MenuStatus {
   Rejected
 }
 
+enum MasterItemStatus {
+  Approved
+  Waiting
+  Rejected
+}
+
+enum RecipeItemType {
+  bahan
+  bumbu
+}
+
 // Model User
 model User {
   id            String      @id @db.VarChar(38)
@@ -169,7 +180,7 @@ model RecommendationList {
 model NutritionSummary {
   recommendation_list_id Int                @id @db.Integer
   recommendation_list    RecommendationList @relation(fields: [recommendation_list_id], references: [id])
-  calory                 Int                @default(0) @db.Integer
+  calory                 Decimal            @default(0.0) @db.Decimal(6, 1)
   protein                Decimal            @default(0.0) @db.Decimal(6, 1)
   fat                    Decimal            @default(0.0) @db.Decimal(6, 1)
   carbohydrate           Decimal            @default(0.0) @db.Decimal(6, 1)
@@ -231,20 +242,24 @@ model Address {
 
 // Model Menu dan turunannya
 model Menu {
-  id            Int        @id @default(autoincrement())
-  name          String     @db.VarChar(255)
-  category      String     @db.VarChar(50)
-  price         Int        @db.Integer
-  portion       Int        @db.Integer
-  description   String     @db.Text
-  image_url     String     @db.Text
-  status        String     @default("Waiting") @db.VarChar(50)
-  updated_at    DateTime   @updatedAt @db.Timestamp(0)
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(255)
+  category        String            @db.VarChar(50)
+  price           Int               @db.Integer
+  portion         Int               @db.Integer
+  description     String            @db.Text
+  image_url       String            @db.Text
+  status          String            @default("Waiting") @db.VarChar(50)
+  updated_at      DateTime          @updatedAt @db.Timestamp(0)
   // Setiap menu dimiliki 1 Restoran spesifik
-  restaurant_id String     @db.VarChar(38)
-  restaurant    Restaurant @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: Cascade)
+  restaurant_id   String            @db.VarChar(38)
+  restaurant      Restaurant        @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: Cascade)
   // 1 Menu memiliki 1 detail Nutrition (1 to 1)
-  Nutrition     Nutrition?
+  Nutrition       Nutrition?
+  // 1 Menu memiliki Many Recipe (1 to Many)
+  // Recipe adalah bahan atau bumbu yang digunakan untuk membuat menu tersebut
+  Recipe          Recipe[]
+  MenuApprovalLog MenuApprovalLog[]
 
   @@map("Menu")
 }
@@ -255,16 +270,16 @@ model Nutrition {
   menu               Menu    @relation(fields: [menu_id], references: [id], onDelete: Cascade)
   weight_per_portion Int     @default(0) @db.Integer
   weight_with_bdd    Int     @default(0) @db.Integer
-  calory             Int     @default(0) @db.Integer
-  protein            Decimal @default(0.0) @db.Decimal(6, 1)
-  fat                Decimal @default(0.0) @db.Decimal(6, 1)
-  carbohydrate       Decimal @default(0.0) @db.Decimal(6, 1)
-  fiber              Decimal @default(0.0) @db.Decimal(6, 1)
-  natrium            Decimal @default(0.00) @db.Decimal(6, 2)
-  cholesterol        Decimal @default(0.00) @db.Decimal(6, 2)
-  sfa                Decimal @default(0.0) @db.Decimal(6, 1)
-  mufa               Decimal @default(0.0) @db.Decimal(6, 1)
-  pufa               Decimal @default(0.0) @db.Decimal(6, 1)
+  calory             Decimal @default(0.0)
+  protein            Decimal @default(0.0)
+  fat                Decimal @default(0.0)
+  carbohydrate       Decimal @default(0.0)
+  fiber              Decimal @default(0.0)
+  natrium            Decimal @default(0.00)
+  cholesterol        Decimal @default(0.00)
+  sfa                Decimal @default(0.0)
+  mufa               Decimal @default(0.0)
+  pufa               Decimal @default(0.0)
 
   @@map("Nutrition")
 }
@@ -277,11 +292,132 @@ model Admin {
 }
 
 model Notification {
-  id              Int     @id @default(autoincrement())
-  title           String  @db.VarChar(255)
-  restaurant_name String  @db.VarChar(255)
-  restaurant_id   String  @db.VarChar(38)
-  menu_id         Int     @db.Integer
-  menu_name       String  @db.VarChar(255)
-  is_read         Boolean @default(false)
+  id              Int      @id @default(autoincrement())
+  title           String   @db.VarChar(255)
+  restaurant_name String   @db.VarChar(255)
+  restaurant_id   String   @db.VarChar(38)
+  menu_id         Int?     @db.Integer
+  menu_name       String?  @db.VarChar(255)
+  bahan_id        Int?     @db.Integer
+  bahan_name      String?  @db.VarChar(255)
+  bumbu_id        Int?     @db.Integer
+  bumbu_name      String?  @db.VarChar(255)
+  is_read         Boolean  @default(false)
+  created_at      DateTime @default(now()) @db.Timestamp()
+  updated_at      DateTime @default(now()) @updatedAt @db.Timestamp(0)
+}
+
+model MasterBahanType {
+  id     Int           @id @default(autoincrement())
+  name   String        @unique @db.VarChar(50)
+  bahans MasterBahan[]
+
+  @@map("MasterBahanType")
+}
+
+model MasterBahan {
+  id            Int                      @id @default(autoincrement())
+  name          String                   @unique @db.VarChar(255)
+  type_id       Int
+  type          MasterBahanType          @relation(fields: [type_id], references: [id])
+  status        MasterItemStatus         @default(Waiting)
+  // per 100g 
+  bdd           Int                      @default(100) @db.Integer
+  calory        Decimal                  @default(0.0)
+  protein       Decimal                  @default(0.0)
+  fat           Decimal                  @default(0.0)
+  carbohydrate  Decimal                  @default(0.0)
+  fiber         Decimal                  @default(0.0)
+  natrium       Decimal                  @default(0.0)
+  cholesterol   Decimal                  @default(0.0)
+  sfa           Decimal                  @default(0.0)
+  mufa          Decimal                  @default(0.0)
+  pufa          Decimal                  @default(0.0)
+  created_at    DateTime                 @default(now()) @db.Timestamp()
+  updated_at    DateTime                 @default(now()) @updatedAt @db.Timestamp(0)
+  approval_logs MasterBahanApprovalLog[]
+
+  @@map("MasterBahan")
+}
+
+model MasterBahanApprovalLog {
+  id          Int               @id @default(autoincrement())
+  bahan_id    Int
+  bahan       MasterBahan       @relation(fields: [bahan_id], references: [id], onDelete: Cascade)
+  from_status MasterItemStatus?
+  to_status   MasterItemStatus
+  changed_at  DateTime          @default(now()) @db.Timestamp()
+  reason      String?           @db.Text
+  created_at  DateTime          @default(now()) @db.Timestamp()
+  updated_at  DateTime          @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("MasterBahanApprovalLog")
+}
+
+model MasterBumbu {
+  id            Int                      @id @default(autoincrement())
+  name          String                   @unique @db.VarChar(255)
+  cooking_type  String?                  @db.VarChar(50) // this willl be use enum in the future
+  status        MasterItemStatus         @default(Waiting)
+  // per 100g
+  bdd           Int                      @default(100) @db.Integer
+  calory        Decimal                  @default(0.0)
+  protein       Decimal                  @default(0.0)
+  fat           Decimal                  @default(0.0)
+  carbohydrate  Decimal                  @default(0.0)
+  fiber         Decimal                  @default(0.0)
+  natrium       Decimal                  @default(0.0)
+  cholesterol   Decimal                  @default(0.0)
+  sfa           Decimal                  @default(0.0)
+  mufa          Decimal                  @default(0.0)
+  pufa          Decimal                  @default(0.0)
+  created_at    DateTime                 @default(now()) @db.Timestamp()
+  updated_at    DateTime                 @default(now()) @updatedAt @db.Timestamp(0)
+  approval_logs MasterBumbuApprovalLog[]
+
+  @@map("MasterBumbu")
+}
+
+model MasterBumbuApprovalLog {
+  id          Int               @id @default(autoincrement())
+  bumbu_id    Int
+  bumbu       MasterBumbu       @relation(fields: [bumbu_id], references: [id], onDelete: Cascade)
+  from_status MasterItemStatus?
+  to_status   MasterItemStatus
+  changed_at  DateTime          @default(now()) @db.Timestamp()
+  reason      String?           @db.Text
+  created_at  DateTime          @default(now()) @db.Timestamp()
+  updated_at  DateTime          @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("MasterBumbuApprovalLog")
+}
+
+model Recipe {
+  id        Int            @id @default(autoincrement())
+  menu_id   Int
+  item_id   Int // either from MasterBahan or MasterBumbu
+  item_type RecipeItemType
+
+  quantity_grams Float
+
+  created_at DateTime @default(now()) @db.Timestamp()
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(0)
+  Menu       Menu     @relation(fields: [menu_id], references: [id])
+
+  @@index([menu_id])
+  @@map("Recipe")
+}
+
+model MenuApprovalLog {
+  id          Int         @id @default(autoincrement())
+  menu_id     Int
+  from_status MenuStatus?
+  to_status   MenuStatus
+  changed_at  DateTime    @default(now()) @db.Timestamp()
+  reason      String?     @db.Text
+  Menu        Menu        @relation(fields: [menu_id], references: [id], onDelete: Cascade)
+  created_at  DateTime    @default(now()) @db.Timestamp()
+  updated_at  DateTime    @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@map("MenuApprovalLog")
 }

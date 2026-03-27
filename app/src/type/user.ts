@@ -1,19 +1,19 @@
 // User Payload
-import {JwtPayload} from "jsonwebtoken";
-import {Request} from "express";
+import { Request } from 'express';
+import { JwtPayload } from 'jsonwebtoken';
 
 export interface UserRequest extends Request {
-    user: {
-        id: string;
-        role: string;
-    }
+  user: {
+    id: string;
+    role: string;
+  };
 }
 
 export interface UserPayload extends JwtPayload {
-    id: string;
-    email: string;
-    role: string;
-    iss?: string;
+  id: string;
+  email: string;
+  role: string;
+  iss?: string;
 }
 
 // // Enum Type
