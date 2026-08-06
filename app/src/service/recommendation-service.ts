@@ -166,6 +166,7 @@ export class RecommendationService {
 
       const payload = {
         restaurant_id: recommendationRequest.restaurant_id,
+        consumer_id: recommendationRequest.consumer_id,
       };
 
       const response = await fetch(
