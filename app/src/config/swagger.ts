@@ -216,7 +216,10 @@ const swaggerDefinition = {
 
 const options: swaggerJsdoc.Options = {
   swaggerDefinition,
-  apis: ['./src/route/*.ts'],
+  apis:
+    process.env.NODE_ENV === 'production'
+      ? ['./dist/route/*.js']
+      : ['./src/route/*.ts'],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);
