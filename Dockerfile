@@ -38,7 +38,7 @@ COPY --from=build /app/node_modules /app/node_modules
 COPY --from=build /app/dist /app/dist
 
 # Salin file .env dari folder app ke dalam container
-COPY app/.env .env
+# COPY app/.env .env
 
 # Expose port aplikasi
 EXPOSE 8000
