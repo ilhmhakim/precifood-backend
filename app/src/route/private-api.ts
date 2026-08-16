@@ -33,7 +33,14 @@ export const privateRouter = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/UserSummary'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -73,7 +80,14 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/UserSummary'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -113,7 +127,12 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/ConsumerProfile'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -152,24 +171,19 @@ privateRouter.get(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               nama:
- *                 type: string
- *                 description: Nama konsumen
- *               alamat:
- *                 type: string
- *                 description: Alamat konsumen
- *               noTelp:
- *                 type: string
- *                 description: Nomor telepon konsumen
+ *             $ref: '#/components/schemas/UpdateConsumerRequest'
  *     responses:
  *       200:
  *         description: Profil konsumen berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/ConsumerProfile'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -214,28 +228,19 @@ privateRouter.patch(
  *       content:
  *         multipart/form-data:
  *           schema:
- *             type: object
- *             properties:
- *               nama:
- *                 type: string
- *                 description: Nama restoran
- *               alamat:
- *                 type: string
- *                 description: Alamat restoran
- *               noTelp:
- *                 type: string
- *                 description: Nomor telepon restoran
- *               profileImage:
- *                 type: string
- *                 format: binary
- *                 description: Foto profil restoran
+ *             $ref: '#/components/schemas/UpdateRestaurantRequest'
  *     responses:
  *       200:
  *         description: Profil restoran berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/RestaurantProfile'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -282,7 +287,12 @@ privateRouter.patch(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/RestaurantProfile'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -322,7 +332,12 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/ConsumerInfo'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -369,7 +384,12 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/ConsumerProfile'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -422,7 +442,12 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/RestaurantProfile'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -470,7 +495,14 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MasterBahanType'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -511,21 +543,19 @@ privateRouter.get(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               nama:
- *                 type: string
- *                 description: Nama master bahan
- *               masterBahanTypeId:
- *                 type: integer
- *                 description: ID tipe master bahan
+ *             $ref: '#/components/schemas/MasterBahanCreateRequest'
  *     responses:
  *       201:
  *         description: Master bahan berhasil dibuat
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/MasterBahan'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -571,7 +601,14 @@ privateRouter.post(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MasterBahan'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -618,7 +655,12 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/MasterBahan'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -670,21 +712,19 @@ privateRouter.get(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               nama:
- *                 type: string
- *                 description: Nama master bahan
- *               masterBahanTypeId:
- *                 type: integer
- *                 description: ID tipe master bahan
+ *             $ref: '#/components/schemas/MasterBahanUpdateRequest'
  *     responses:
  *       200:
  *         description: Master bahan berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/MasterBahan'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -743,7 +783,7 @@ privateRouter.put(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Success'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -795,18 +835,14 @@ privateRouter.delete(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 description: Status persetujuan (APPROVED / REJECTED)
+ *             $ref: '#/components/schemas/ApprovalStatusRequest'
  *     responses:
  *       200:
  *         description: Status master bahan berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -859,18 +895,19 @@ privateRouter.post(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               nama:
- *                 type: string
- *                 description: Nama master bumbu
+ *             $ref: '#/components/schemas/MasterBumbuCreateRequest'
  *     responses:
  *       201:
  *         description: Master bumbu berhasil dibuat
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/MasterBumbu'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -916,7 +953,14 @@ privateRouter.post(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MasterBumbu'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -963,7 +1007,12 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/MasterBumbu'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -1015,18 +1064,19 @@ privateRouter.get(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               nama:
- *                 type: string
- *                 description: Nama master bumbu
+ *             $ref: '#/components/schemas/MasterBumbuUpdateRequest'
  *     responses:
  *       200:
  *         description: Master bumbu berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/MasterBumbu'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -1085,7 +1135,7 @@ privateRouter.put(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Success'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -1139,18 +1189,14 @@ privateRouter.delete(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 description: Status persetujuan (APPROVED / REJECTED)
+ *             $ref: '#/components/schemas/ApprovalStatusRequest'
  *     responses:
  *       200:
  *         description: Status master bumbu berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -1203,28 +1249,14 @@ privateRouter.post(
  *       content:
  *         multipart/form-data:
  *           schema:
- *             type: object
- *             properties:
- *               nama:
- *                 type: string
- *                 description: Nama menu
- *               harga:
- *                 type: number
- *                 description: Harga menu
- *               deskripsi:
- *                 type: string
- *                 description: Deskripsi menu
- *               image:
- *                 type: string
- *                 format: binary
- *                 description: Gambar menu
+ *             $ref: '#/components/schemas/CreateMenuRequest'
  *     responses:
  *       201:
  *         description: Menu berhasil dibuat
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -1271,7 +1303,14 @@ privateRouter.post(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MenuSummary'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -1317,7 +1356,14 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MenuSummary'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -1364,7 +1410,12 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/MenuDetail'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -1416,28 +1467,14 @@ privateRouter.get(
  *       content:
  *         multipart/form-data:
  *           schema:
- *             type: object
- *             properties:
- *               nama:
- *                 type: string
- *                 description: Nama menu
- *               harga:
- *                 type: number
- *                 description: Harga menu
- *               deskripsi:
- *                 type: string
- *                 description: Deskripsi menu
- *               image:
- *                 type: string
- *                 format: binary
- *                 description: Gambar menu
+ *             $ref: '#/components/schemas/UpdateMenuRequest'
  *     responses:
  *       200:
  *         description: Menu berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -1497,7 +1534,7 @@ privateRouter.patch(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Success'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -1550,7 +1587,14 @@ privateRouter.delete(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MenuSummary'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -1608,7 +1652,14 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MenuSummary'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -1667,7 +1718,12 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/MenuDetail'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -1725,27 +1781,14 @@ privateRouter.get(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               kalori:
- *                 type: number
- *                 description: Jumlah kalori
- *               protein:
- *                 type: number
- *                 description: Jumlah protein (gram)
- *               lemak:
- *                 type: number
- *                 description: Jumlah lemak (gram)
- *               karbohidrat:
- *                 type: number
- *                 description: Jumlah karbohidrat (gram)
+ *             $ref: '#/components/schemas/MenuNutritionRequest'
  *     responses:
  *       201:
  *         description: Data nutrisi menu berhasil dibuat
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -1809,27 +1852,14 @@ privateRouter.post(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               kalori:
- *                 type: number
- *                 description: Jumlah kalori
- *               protein:
- *                 type: number
- *                 description: Jumlah protein (gram)
- *               lemak:
- *                 type: number
- *                 description: Jumlah lemak (gram)
- *               karbohidrat:
- *                 type: number
- *                 description: Jumlah karbohidrat (gram)
+ *             $ref: '#/components/schemas/MenuNutritionUpdateRequest'
  *     responses:
  *       200:
  *         description: Data nutrisi menu berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -1893,18 +1923,14 @@ privateRouter.patch(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 description: Status persetujuan (APPROVED / REJECTED)
+ *             $ref: '#/components/schemas/ApprovalStatusRequest'
  *     responses:
  *       200:
  *         description: Status menu berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -1968,25 +1994,14 @@ privateRouter.put(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               bahanIds:
- *                 type: array
- *                 items:
- *                   type: integer
- *                 description: Daftar ID master bahan untuk resep
- *               bumbuIds:
- *                 type: array
- *                 items:
- *                   type: integer
- *                 description: Daftar ID master bumbu untuk resep
+ *             $ref: '#/components/schemas/SetMenuRecipeRequest'
  *     responses:
  *       200:
  *         description: Resep menu berhasil ditetapkan
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -2051,7 +2066,12 @@ privateRouter.put(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/MenuRecipe'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -2109,25 +2129,14 @@ privateRouter.get(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               bahanIds:
- *                 type: array
- *                 items:
- *                   type: integer
- *                 description: Daftar ID master bahan untuk resep
- *               bumbuIds:
- *                 type: array
- *                 items:
- *                   type: integer
- *                 description: Daftar ID master bumbu untuk resep
+ *             $ref: '#/components/schemas/SetMenuRecipeRequest'
  *     responses:
  *       200:
  *         description: Nutrisi menu berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -2182,26 +2191,18 @@ privateRouter.patch(
  *         schema:
  *           type: integer
  *         description: ID rekomendasi
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               catatan:
- *                 type: string
- *                 description: Catatan untuk pesanan
- *               jumlah:
- *                 type: integer
- *                 description: Jumlah pesanan
  *     responses:
  *       201:
  *         description: Pesanan berhasil dibuat
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/CreateOrderData'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -2253,7 +2254,14 @@ privateRouter.post(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Order'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -2300,7 +2308,12 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Order'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -2347,23 +2360,13 @@ privateRouter.get(
  *         schema:
  *           type: integer
  *         description: ID pesanan
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 description: Status pesanan baru
  *     responses:
  *       200:
  *         description: Status pesanan berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -2422,7 +2425,7 @@ privateRouter.put(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Success'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -2470,7 +2473,14 @@ privateRouter.delete(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Notification'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -2511,13 +2521,19 @@ privateRouter.get(
  *         schema:
  *           type: integer
  *         description: ID notifikasi
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateNotificationReadRequest'
  *     responses:
  *       200:
  *         description: Notifikasi berhasil ditandai
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Success'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -2563,7 +2579,14 @@ privateRouter.put(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Notification'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -2604,13 +2627,19 @@ privateRouter.get(
  *         schema:
  *           type: integer
  *         description: ID notifikasi
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateNotificationReadRequest'
  *     responses:
  *       200:
  *         description: Notifikasi berhasil ditandai
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Success'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -2659,23 +2688,13 @@ privateRouter.put(
  *         schema:
  *           type: string
  *         description: ID restoran (UUID)
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               preferensi:
- *                 type: string
- *                 description: Preferensi menu konsumen
  *     responses:
  *       201:
  *         description: Rekomendasi berhasil dibuat oleh model AI
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -2734,7 +2753,12 @@ privateRouter.post(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Recommendation'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -2793,7 +2817,12 @@ privateRouter.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/RecommendationDetail'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:
@@ -2840,19 +2869,14 @@ privateRouter.get(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 description: Alamat email baru
+ *             $ref: '#/components/schemas/UpdateEmailRequest'
  *     responses:
  *       200:
  *         description: Email berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Success'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -2897,23 +2921,14 @@ privateRouter.put(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               passwordLama:
- *                 type: string
- *                 format: password
- *                 description: Kata sandi lama
- *               passwordBaru:
- *                 type: string
- *                 format: password
- *                 description: Kata sandi baru
+ *             $ref: '#/components/schemas/UpdatePasswordRequest'
  *     responses:
  *       200:
  *         description: Kata sandi berhasil diperbarui
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Success'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Data yang dikirim tidak valid
  *         content:
@@ -2959,7 +2974,7 @@ privateRouter.put(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Success'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       401:
  *         description: Token tidak valid atau kadaluarsa
  *         content:

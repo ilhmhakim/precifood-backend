@@ -69,7 +69,7 @@ publicRouter.post('/api/seeds/master-bahan-bumbu', SeedMasterBahanBumbu);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Validasi input gagal
  *         content:
@@ -140,7 +140,7 @@ publicRouter.post('/api/signup/consumer', UserController.registerConsumer);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Validasi input atau file gagal
  *         content:
@@ -172,7 +172,14 @@ publicRouter.post(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SuccessWithData'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/RestaurantPublic'
  *       500:
  *         description: Internal server error
  *         content:
