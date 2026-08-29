@@ -198,6 +198,7 @@ export class RecommendationService {
       }
 
       const data = await response.json();
+      console.log(data);
       await this.createRecommendations(
         data,
         recommendationRequest.restaurant_id,
