@@ -197,33 +197,7 @@ export class RecommendationService {
         return;
       }
 
-      const rawBody = await response.text();
-      let data: any;
-      try {
-        data = JSON.parse(rawBody);
-      } catch (error) {
-        console.error(
-          `Respons model bukan JSON yang valid (consumer=${recommendationRequest.consumer_id}, restaurant=${recommendationRequest.restaurant_id}):`,
-          error,
-          'Raw body:',
-          rawBody.slice(0, 200)
-        );
-
-        const parseError = new Error(
-          `Respons model bukan JSON yang valid: ${rawBody.slice(0, 200)}`
-        );
-        parseError.name = 'ModelInvalidJsonError';
-
-        await prismaClient.consumer.update({
-          where: { consumer_id: recommendationRequest.consumer_id },
-          data: {
-            generator_error: String(parseError),
-            is_generating: false,
-          },
-        });
-        return;
-      }
-
+      const data = await response.json();
       await this.createRecommendations(
         data,
         recommendationRequest.restaurant_id,
