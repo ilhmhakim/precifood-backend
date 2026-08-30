@@ -244,7 +244,7 @@ export class MenuController {
   static async setMenuRecipe(req: any, res: any, next: any) {
     try {
       const payload: SetMenuRecipeRequest = {
-        restaurant_id: String(req.params.restaurantId),
+        restaurant_id: String(req.user.id),
         menu_id: Number(req.params.menuId),
         items: req.body.items ?? [],
       } as SetMenuRecipeRequest;

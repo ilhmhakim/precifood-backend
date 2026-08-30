@@ -4,6 +4,8 @@ export type UserLoginResponse = {
   role: string;
   access_token: string;
   refresh_token: string | null;
+  // restaurant_id asli akun login (role Restoran) - mencegah FE memakai dropdown id yang keliru
+  restaurant_id?: string | null;
 };
 
 export type UserRefreshAccessTokenResponse = {
@@ -30,12 +32,14 @@ export type UpdatePasswordRequest = {
 export function toUserLoginResponse(
   accessToken: string,
   user: User,
-  userRole: string
+  userRole: string,
+  restaurantId?: string | null
 ): UserLoginResponse {
   return {
     role: userRole,
     access_token: accessToken,
     refresh_token: user.token,
+    restaurant_id: userRole === 'Restoran' ? restaurantId : null,
   };
 }
 

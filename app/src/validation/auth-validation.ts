@@ -7,6 +7,8 @@ export class AuthValidation {
       .string()
       .trim()
       .min(8, 'Password minimal 8 karakter tanpa spasi'),
+    // Dikirim frontend dari dropdown "Pilih Restoran"; diverifikasi di service
+    restaurant_id: z.string().trim().optional(),
   });
 
   static readonly REFRESH: ZodType = z.object({

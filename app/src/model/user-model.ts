@@ -46,6 +46,8 @@ export type CreateAdminRequest = {
 export type LoginUserRequest = {
   email: string;
   password: string;
+  // Dari dropdown "Pilih Restoran" di FE; diverifikasi terhadap akun di service
+  restaurant_id?: string;
 };
 
 // Get

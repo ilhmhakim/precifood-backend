@@ -49,12 +49,36 @@ export class AuthService {
     const accessToken = issueAccessToken(userPayload);
     const refreshToken = issueRefreshToken(userPayload);
 
+    let restaurantId: string | null = null;
+    if (user.role === 'Restoran') {
+      if (
+        loginRequest.restaurant_id &&
+        loginRequest.restaurant_id !== user.id
+      ) {
+        throw new ResponseError(
+          400,
+          'Restoran yang dipilih tidak sesuai dengan akun yang login'
+        );
+      }
+      const restaurant = await prismaClient.restaurant.findUnique({
+        where: { restaurant_id: user.id },
+        select: { restaurant_id: true },
+      });
+      if (!restaurant) {
+        throw new ResponseError(
+          404,
+          'Data restoran tidak ditemukan untuk akun ini'
+        );
+      }
+      restaurantId = restaurant.restaurant_id;
+    }
+
     const userToken = await prismaClient.user.update({
       where: { id: user.id },
       data: { token: refreshToken },
     });
 
-    return toUserLoginResponse(accessToken, userToken, user.role);
+    return toUserLoginResponse(accessToken, userToken, user.role, restaurantId);
   }
 
   static async refreshToken(
