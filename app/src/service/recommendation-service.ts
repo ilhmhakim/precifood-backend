@@ -82,6 +82,27 @@ export class RecommendationService {
       throw new ResponseError(404, 'Recommendation tidak ditemukan');
     }
 
+    // tolak rekomendasi yang sudah digantikan hasil generate
+    // terbaru, agar order/detail hanya bisa memakai rekomendasi terkini.
+    const latestRecommendation = await prismaClient.recommendation.findFirst({
+      where: {
+        restaurant_id: recommendationList.recommendation.restaurant_id,
+        consumer_id: consumerId,
+      },
+      orderBy: [{ recommended_at: 'desc' }, { id: 'desc' }],
+      select: { id: true },
+    });
+
+    if (
+      latestRecommendation &&
+      latestRecommendation.id !== recommendationList.recommendation_id
+    ) {
+      throw new ResponseError(
+        409,
+        `Rekomendasi ${recommendationList.id} sudah tidak berlaku, silahkan gunakan rekomendasi terakhir atau silakan generate rekomendasi untuk mendapatkan rekomendasi terbaru`
+      );
+    }
+
     return recommendationList;
   }
 
