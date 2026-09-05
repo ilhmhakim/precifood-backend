@@ -16,7 +16,11 @@ export class UserValidation {
     birth: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Format tanggal lahir harus yyyy-mm-dd')
-      .refine((date) => !isNaN(Date.parse(date)), 'Tanggal lahir tidak valid'),
+      .refine((date) => !isNaN(Date.parse(date)), 'Tanggal lahir tidak valid')
+      .refine((date) => {
+        const today = new Date().toISOString().slice(0, 10); // yyyy-mm-dd in UTC
+        return date <= today;
+      }, 'Tanggal lahir tidak valid (lebih dari tanggal hari ini)'),
     phone: z
       .string()
       .trim()

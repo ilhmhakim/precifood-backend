@@ -102,7 +102,9 @@ export class UserService {
       age--; // Birthday has not occurred yet this year, adjust the age
     }
 
-    return age;
+    // age can never be negative even if a
+    // future birth date slips through elsewhere.
+    return Math.max(0, age);
   }
 
   static async registerConsumer(request: CreateConsumerRequest) {
