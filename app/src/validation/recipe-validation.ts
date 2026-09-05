@@ -14,7 +14,10 @@ export class RecipeValidation {
         z.object({
           item_id: z.number().int().positive(),
           item_type: z.nativeEnum(RecipeItemType),
-          quantity_grams: z.number().positive(),
+          quantity_grams: z
+            .number()
+            .positive('Jumlah bahan harus bernilai positif')
+            .max(10000, 'Jumlah bahan maksimal 10000 gram per item'),
         })
       )
       .default([]),

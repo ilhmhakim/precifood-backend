@@ -26,8 +26,14 @@ export class UserValidation {
         /^\+?\d{10,20}$/,
         "Nomor telepon harus berupa angka dan boleh diawali dengan '+'"
       ),
-    height: z.number().positive('Tinggi badan harus bernilai positif'),
-    weight: z.number().positive('Berat badan harus bernilai positif'),
+    height: z
+      .number()
+      .min(50, 'Tinggi badan minimal 50 cm')
+      .max(250, 'Tinggi badan maksimal 250 cm'),
+    weight: z
+      .number()
+      .min(10, 'Berat badan minimal 10 kg')
+      .max(500, 'Berat badan maksimal 500 kg'),
     medical_history: z.enum(
       ['no_history', 'diabetes', 'cardiovascular', 'hypertension'],
       {
@@ -105,13 +111,13 @@ export class UserValidation {
         .optional(),
       height: z
         .number()
-        .positive('Tinggi badan harus bernilai positif')
-        .max(300)
+        .min(50, 'Tinggi badan minimal 50 cm')
+        .max(250, 'Tinggi badan maksimal 250 cm')
         .optional(),
       weight: z
         .number()
-        .positive('Berat badan harus bernilai positif')
-        .max(200)
+        .min(10, 'Berat badan minimal 10 kg')
+        .max(500, 'Berat badan maksimal 500 kg')
         .optional(),
       medical_history: z
         .enum(['no_history', 'diabetes', 'cardiovascular', 'hypertension'], {
