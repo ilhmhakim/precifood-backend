@@ -86,7 +86,8 @@ export class UserValidation {
     address_detail: z
       .string()
       .trim()
-      .min(1, 'Detail alamat minimal 1 karakter'),
+      .min(1, 'Detail alamat minimal 1 karakter')
+      .max(500, 'Detail alamat maksimal 500 karakter'),
     image_url: z.string().trim().min(1, 'URL gambar tidak boleh kosong'),
     password: z.string().trim().min(8, 'Password minimal 8 karakter'),
     password_confirmation: z
@@ -169,6 +170,7 @@ export class UserValidation {
         .string()
         .trim()
         .min(1, 'Detail alamat minimal 1 karakter')
+        .max(500, 'Detail alamat maksimal 500 karakter')
         .optional(),
       image_url: z
         .string()

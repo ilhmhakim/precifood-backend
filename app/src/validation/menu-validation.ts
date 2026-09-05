@@ -60,7 +60,11 @@ export class MenuValidation {
       .refine((val) => !isNaN(val) && val > 0, {
         message: 'Porsi harus bernilai positif dan berupa angka',
       }),
-    description: z.string().trim().min(1, 'Deskripsi tidak boleh kosong'),
+    description: z
+      .string()
+      .trim()
+      .min(1, 'Deskripsi tidak boleh kosong')
+      .max(500, 'Deskripsi maksimal 500 karakter'),
     image_url: z
       .string()
       .trim()
@@ -98,7 +102,12 @@ export class MenuValidation {
         message: 'Porsi harus bernilai positif dan berupa angka',
       })
       .optional(),
-    description: z.string().trim().min(1).optional(),
+    description: z
+      .string()
+      .trim()
+      .min(1, 'Deskripsi tidak boleh kosong')
+      .max(500, 'Deskripsi maksimal 500 karakter')
+      .optional(),
     image_url: z.string().trim().min(1).optional(),
   });
 
