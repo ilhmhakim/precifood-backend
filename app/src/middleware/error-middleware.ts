@@ -1,5 +1,6 @@
+import { logger } from '../application/logging';
 import { ResponseError } from '../error/response-error';
-import { Response, Request, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import multer from 'multer';
 import { ZodError } from 'zod';
 
@@ -28,8 +29,15 @@ export const errorMiddleware = async (
       errors: error.message,
     });
   } else {
+    // full error stays server-side only; client gets generic 500
+    // so stack traces / DB identity can never leak in responses.
+    logger.error({
+      method: req.method,
+      path: req.path,
+      error: error instanceof Error ? (error.stack ?? error.message) : error,
+    });
     res.status(500).json({
-      errors: error.message,
+      errors: 'Terjadi kesalahan pada server',
     });
   }
 };
