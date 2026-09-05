@@ -3,3 +3,7 @@ node_modules
 dist
 .env
 .env.production
+
+# docs for pentesting results
+remediation-handoff.md
+Summary_Finding.md

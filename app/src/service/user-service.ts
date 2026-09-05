@@ -430,14 +430,6 @@ export class UserService {
       requestUpdateConsumer.cardiovascular = false;
     }
 
-    // Hitung age jika birth diperbarui
-    let age: number | undefined;
-    let birth: Date | undefined;
-    if (requestUpdateConsumer.birth) {
-      birth = new Date(requestUpdateConsumer.birth);
-      age = Number(await this.calculateAge(birth));
-    }
-
     await prismaClient.user.update({
       where: {
         id: requestUpdateConsumer.id,
@@ -447,13 +439,9 @@ export class UserService {
           update: {
             PersonalInformation: {
               update: {
-                name: requestUpdateConsumer.name,
-                sex: requestUpdateConsumer.sex,
-                birth: birth,
                 phone: requestUpdateConsumer.phone,
                 height: requestUpdateConsumer.height,
                 weight: requestUpdateConsumer.weight,
-                ...(age !== undefined && { age }), // Hanya update age jika birth diperbarui
               },
             },
             MedicalHistory: {
@@ -493,9 +481,6 @@ export class UserService {
               update: {
                 ...(validatedRequest.name && {
                   name: validatedRequest.name,
-                }),
-                ...(validatedRequest.email && {
-                  email: validatedRequest.email,
                 }),
                 ...(validatedRequest.phone && {
                   phone: validatedRequest.phone,

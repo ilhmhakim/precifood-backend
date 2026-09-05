@@ -708,14 +708,7 @@ const swaggerDefinition = {
       UpdateConsumerRequest: {
         type: 'object',
         properties: {
-          name: { type: 'string', minLength: 1, maxLength: 255 },
           email: { type: 'string', format: 'email' },
-          sex: { type: 'string', enum: ['Laki-laki', 'Perempuan'] },
-          birth: {
-            type: 'string',
-            pattern: '^\\d{4}-\\d{2}-\\d{2}$',
-            example: '2000-01-01',
-          },
           phone: { type: 'string', pattern: '^\\+?\\d{10,20}$' },
           height: { type: 'number' },
           weight: { type: 'number' },
@@ -729,7 +722,6 @@ const swaggerDefinition = {
         type: 'object',
         properties: {
           name: { type: 'string', minLength: 1, maxLength: 255 },
-          email: { type: 'string', format: 'email' },
           phone: { type: 'string', pattern: '^\\+?\\d{10,20}$' },
           province: { type: 'string', maxLength: 100 },
           city: { type: 'string', maxLength: 100 },

@@ -85,8 +85,8 @@ export class MasterBumbuController {
   static async update(req: UserRequest, res: Response, next: NextFunction) {
     try {
       let request: UpdateMasterBumbuRequest = {
-        id: parseInt(req.params.id),
         ...req.body,
+        id: parseInt(req.params.id),
       };
 
       // For Restoran role, only allow name and cooking_type updates

@@ -103,9 +103,7 @@ export type ConsumerInfoResponse = {
 // Update
 export type UpdateConsumerRequest = {
   id: string;
-  name?: string;
-  sex?: string;
-  birth?: Date;
+  email?: string;
   phone?: string;
   height?: number;
   weight?: number;
@@ -119,7 +117,6 @@ export type UpdateConsumerRequest = {
 export type UpdateRestaurantRequest = {
   id: string;
   name?: string;
-  email?: string;
   phone?: string;
   province?: string;
   city?: string;

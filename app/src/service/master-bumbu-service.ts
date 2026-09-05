@@ -66,7 +66,21 @@ export class MasterBumbuService {
     let masterBumbu;
     await prismaClient.$transaction(async (tx) => {
       masterBumbu = await tx.masterBumbu.create({
-        data: createBumbuRequest,
+        data: {
+          name: createBumbuRequest.name,
+          cooking_type: createBumbuRequest.cooking_type,
+          bdd: createBumbuRequest.bdd,
+          calory: createBumbuRequest.calory,
+          protein: createBumbuRequest.protein,
+          fat: createBumbuRequest.fat,
+          carbohydrate: createBumbuRequest.carbohydrate,
+          fiber: createBumbuRequest.fiber,
+          natrium: createBumbuRequest.natrium,
+          cholesterol: createBumbuRequest.cholesterol,
+          sfa: createBumbuRequest.sfa,
+          mufa: createBumbuRequest.mufa,
+          pufa: createBumbuRequest.pufa,
+        },
       });
 
       if (userRole === 'Admin') {
