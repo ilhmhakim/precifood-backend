@@ -53,13 +53,13 @@ export class MasterBumbuService {
     const existingBumbu: boolean =
       await this.checkIfBumbuExistsByNameAndCookingType(
         createBumbuRequest.name,
-        createBumbuRequest.cooking_type ?? undefined
+        undefined
       );
 
     if (existingBumbu) {
       throw new ResponseError(
         409,
-        `Bumbu dengan nama "${createBumbuRequest.name}" dan tipe masak "${createBumbuRequest.cooking_type}" sudah ada`
+        `Bumbu dengan nama "${createBumbuRequest.name}" sudah ada`
       );
     }
 
@@ -68,7 +68,7 @@ export class MasterBumbuService {
       masterBumbu = await tx.masterBumbu.create({
         data: {
           name: createBumbuRequest.name,
-          cooking_type: createBumbuRequest.cooking_type,
+          cooking_type: null,
           bdd: createBumbuRequest.bdd,
           calory: createBumbuRequest.calory,
           protein: createBumbuRequest.protein,
@@ -201,10 +201,7 @@ export class MasterBumbuService {
       );
     }
 
-    if (
-      updateMasterBumbuRequest.name ||
-      updateMasterBumbuRequest.cooking_type
-    ) {
+    if (updateMasterBumbuRequest.name) {
       const existingBumbu = await prismaClient.masterBumbu.findFirst({
         where: {
           AND: [
@@ -213,7 +210,6 @@ export class MasterBumbuService {
               OR: [
                 {
                   name: updateMasterBumbuRequest.name,
-                  cooking_type: updateMasterBumbuRequest.cooking_type,
                 },
               ],
             },
@@ -224,7 +220,7 @@ export class MasterBumbuService {
       if (existingBumbu) {
         throw new ResponseError(
           409,
-          `Bumbu dengan nama "${updateMasterBumbuRequest.name}" dan tipe masak "${updateMasterBumbuRequest.cooking_type}" sudah ada`
+          `Bumbu dengan nama "${updateMasterBumbuRequest.name}" sudah ada`
         );
       }
     }
@@ -237,7 +233,6 @@ export class MasterBumbuService {
         },
         data: {
           name: updateMasterBumbuRequest.name,
-          cooking_type: updateMasterBumbuRequest.cooking_type,
           bdd: updateMasterBumbuRequest.bdd,
           calory: updateMasterBumbuRequest.calory,
           protein: updateMasterBumbuRequest.protein,

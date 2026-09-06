@@ -8,13 +8,6 @@ export class MasterBumbuValidation {
         .trim()
         .min(1, 'Nama bumbu minimal 1 karakter')
         .max(255, 'Nama bumbu maksimal 255 karakter'),
-      cooking_type: z
-        .string()
-        .trim()
-        .min(1, 'Tipe masak minimal 1 karakter')
-        .max(50, 'Tipe masak maksimal 50 karakter')
-        .optional()
-        .nullable(),
       bdd: z
         .number({ required_error: 'BDD harus diisi' })
         .int()
@@ -95,13 +88,6 @@ export class MasterBumbuValidation {
         .min(1, 'Nama bumbu minimal 1 karakter')
         .max(255, 'Nama bumbu maksimal 255 karakter')
         .optional(),
-      cooking_type: z
-        .string()
-        .trim()
-        .min(1, 'Tipe masak minimal 1 karakter')
-        .max(50, 'Tipe masak maksimal 50 karakter')
-        .optional()
-        .nullable(),
       bdd: z
         .number()
         .int()

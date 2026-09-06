@@ -6,7 +6,6 @@ import {
 
 export type CreateMasterBumbuRequest = {
   name: string;
-  cooking_type?: string | null;
   bdd: number;
   calory: number;
   protein: number;
@@ -23,7 +22,6 @@ export type CreateMasterBumbuRequest = {
 export type UpdateMasterBumbuRequest = {
   id: number;
   name?: string;
-  cooking_type?: string | null;
   bdd?: number;
   calory?: number;
   protein?: number;

@@ -307,9 +307,10 @@ const swaggerDefinition = {
           },
           cooking_type: {
             type: 'string',
-            maxLength: 50,
             nullable: true,
-            description: 'Tipe masak (opsional)',
+            readOnly: true,
+            description:
+              'Tipe masak (diatur sistem, tidak dapat diubah via API)',
             example: 'Tumis',
           },
           bdd: {
@@ -336,11 +337,6 @@ const swaggerDefinition = {
         type: 'object',
         properties: {
           name: { type: 'string', minLength: 1, maxLength: 255 },
-          cooking_type: {
-            type: 'string',
-            maxLength: 50,
-            nullable: true,
-          },
           bdd: { type: 'integer', minimum: 1, maximum: 100 },
           calory: { type: 'number', minimum: 0 },
           protein: { type: 'number', minimum: 0 },

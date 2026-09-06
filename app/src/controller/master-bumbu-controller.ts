@@ -16,11 +16,10 @@ export class MasterBumbuController {
       let request: CreateMasterBumbuRequest =
         req.body as CreateMasterBumbuRequest;
 
-      // For Restoran role, only allow name and cooking_type
+      // For Restoran role, only allow name; other fields get defaults
       if (req.user.role === 'Restoran') {
         request = {
           name: request.name,
-          cooking_type: request.cooking_type,
           bdd: 100, // default values
           calory: 0,
           protein: 0,
@@ -89,12 +88,11 @@ export class MasterBumbuController {
         id: parseInt(req.params.id),
       };
 
-      // For Restoran role, only allow name and cooking_type updates
+      // For Restoran role, only allow name updates
       if (req.user.role === 'Restoran') {
         request = {
           id: request.id,
           name: request.name,
-          cooking_type: request.cooking_type,
           // Strip out nutrition fields
         };
       }
