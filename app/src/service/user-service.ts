@@ -120,7 +120,10 @@ export class UserService {
     });
 
     if (totalUserWithSameEmail !== 0) {
-      throw new ResponseError(409, 'Email telah digunakan pengguna lain');
+      // same 201 success shape as a new registration (no account
+      // created); dummy hash keeps timing comparable to the success path.
+      await bcrypt.hash(registerConsumerRequest.password, 10);
+      return;
     }
 
     if (

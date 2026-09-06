@@ -1,6 +1,6 @@
 // src/service/auth-service.ts
 import { prismaClient } from '../application/database';
-import { jwtRefresh, jwtSecret } from '../config/jwt';
+import { jwtRefresh } from '../config/jwt';
 import { ResponseError } from '../error/response-error';
 import {
   issueAccessToken,
@@ -31,7 +31,13 @@ export class AuthService {
     });
 
     if (!user?.email) {
-      throw new ResponseError(404, 'Registrasi terlebih dahulu');
+      // dummy compare so unknown emails are
+      // indistinguishable (status/body/timing) from wrong passwords.
+      await bcrypt.compare(
+        loginRequest.password,
+        '$2b$10$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+      );
+      throw new ResponseError(401, 'Email atau password salah');
     }
 
     if (
