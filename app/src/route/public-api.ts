@@ -3,7 +3,11 @@ import { SeedMasterBahanBumbu } from '../application/seed-master-bahan-bumbu';
 import { AuthController } from '../controller/auth-controller';
 import { UserController } from '../controller/user-controller';
 import { multerMiddleware } from '../middleware/multer-middleware';
-import { authLimiter, writeLimiter } from '../middleware/rate-limit-middleware';
+import {
+  authLimiter,
+  authRefreshTokenLimiter,
+  writeLimiter,
+} from '../middleware/rate-limit-middleware';
 import express from 'express';
 
 export const publicRouter = express.Router();
@@ -275,6 +279,6 @@ publicRouter.post('/api/auth/login', authLimiter, AuthController.login);
  */
 publicRouter.post(
   '/api/auth/refreshtoken',
-  authLimiter,
+  authRefreshTokenLimiter,
   AuthController.refreshToken
 );

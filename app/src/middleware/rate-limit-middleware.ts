@@ -14,6 +14,13 @@ export const authLimiter = rateLimit({
   message: { errors: RATE_LIMIT_ERROR_MESSAGE },
 });
 
+export const authRefreshTokenLimiter = rateLimit({
+  ...baseOptions,
+  windowMs: 2 * 60 * 1000,
+  limit: 40,
+  message: { errors: RATE_LIMIT_ERROR_MESSAGE },
+});
+
 export const writeLimiter = rateLimit({
   ...baseOptions,
   windowMs: 10 * 60 * 1000,
