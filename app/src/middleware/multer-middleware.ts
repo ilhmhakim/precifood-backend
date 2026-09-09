@@ -1,6 +1,14 @@
 import { ResponseError } from '../error/response-error';
 import multer from 'multer';
 
+const JPEG_MAGIC = [0xff, 0xd8, 0xff];
+const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+
+function hasMagicBytes(buffer: Buffer, magic: number[]): boolean {
+  if (buffer.length < magic.length) return false;
+  return magic.every((byte, i) => buffer[i] === byte);
+}
+
 export const multerMiddleware = multer({
   storage: multer.memoryStorage(), // Menyimpan file di memori
   limits: {
@@ -11,17 +19,17 @@ export const multerMiddleware = multer({
     file: Express.Multer.File,
     callback: multer.FileFilterCallback
   ) {
-    console.log('File received in multer middleware:', file.originalname);
-    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    // verify the file content (magic bytes)
+    const isJpeg = hasMagicBytes(file.buffer, JPEG_MAGIC);
+    const isPng = hasMagicBytes(file.buffer, PNG_MAGIC);
 
-    // Validasi tipe MIME file
-    if (allowedMimeTypes.includes(file.mimetype)) {
-      callback(null, true); // Lanjutkan proses upload jika tipe file sesuai
+    if (isJpeg || isPng) {
+      callback(null, true);
     } else {
       callback(
         new ResponseError(
           400,
-          'Hanya file dengan format .jpg, .jpeg, dan .png yang diperbolehkan!'
+          'File bukan gambar yang valid. Hanya file .jpg/.jpeg/.png yang diperbolehkan'
         )
       );
     }

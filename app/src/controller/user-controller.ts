@@ -8,6 +8,8 @@ import {
 import { ImageUploaderService } from '../service/image-uploader-service';
 import { UserService } from '../service/user-service';
 import { UserRequest } from '../type/user';
+import { UserValidation } from '../validation/user-validation';
+import { Validation } from '../validation/validation';
 import { NextFunction, Request, Response } from 'express';
 
 export class UserController {
@@ -192,20 +194,22 @@ export class UserController {
     next: NextFunction
   ) {
     try {
-      let imageUrl;
+      const request: UpdateRestaurantRequest = {
+        ...req.body,
+        id: String(req.user.id),
+      } as UpdateRestaurantRequest;
+
+      // PF-SEC-11: validate body before persisting the uploaded file, so a
+      // rejected request never leaves an orphaned object in storage.
+      Validation.validate(UserValidation.UPDATERESTAURANT, request);
+
       if (req.file) {
-        // Hanya update image jika ada file yang diunggah
-        imageUrl = await ImageUploaderService.uploadImage(
+        const imageUrl = await ImageUploaderService.uploadImage(
           req.file,
           'restaurant-profiles-images'
         );
+        request.image_url = imageUrl;
       }
-
-      const request: UpdateRestaurantRequest = {
-        ...req.body, // Mengambil hanya field yang diubah dari req.body
-        id: String(req.user.id),
-        image_url: imageUrl || req.body.image_url, // Hanya update jika imageUrl ada
-      };
 
       const response = await UserService.updateRestaurant(request);
 

@@ -12,6 +12,7 @@ import { RecommendationController } from '../controller/recommendation-controlle
 import { UserController } from '../controller/user-controller';
 import { authorizeMiddleware } from '../middleware/auth-middleware';
 import { multerMiddleware } from '../middleware/multer-middleware';
+import { writeLimiter } from '../middleware/rate-limit-middleware';
 import { Roles } from '../type/role';
 import express from 'express';
 
@@ -269,6 +270,7 @@ privateRouter.patch(
 privateRouter.patch(
   '/api/users/restaurants/profile',
   authorizeMiddleware(Roles.Restaurant),
+  writeLimiter,
   multerMiddleware,
   UserController.updateRestaurant
 );
@@ -584,6 +586,7 @@ privateRouter.get(
 privateRouter.post(
   '/api/master-bahan',
   authorizeMiddleware(Roles.AdminAndRestaurant),
+  writeLimiter,
   MasterBahanController.create
 );
 
@@ -936,6 +939,7 @@ privateRouter.post(
 privateRouter.post(
   '/api/master-bumbu',
   authorizeMiddleware(Roles.AdminAndRestaurant),
+  writeLimiter,
   MasterBumbuController.create
 );
 
@@ -1285,6 +1289,7 @@ privateRouter.post(
 privateRouter.post(
   '/api/restaurants/menu',
   authorizeMiddleware(Roles.Restaurant),
+  writeLimiter,
   multerMiddleware,
   MenuController.createMenu
 );
@@ -1509,6 +1514,7 @@ privateRouter.get(
 privateRouter.patch(
   '/api/restaurants/menus/:menuId(\\d+)',
   authorizeMiddleware(Roles.Restaurant),
+  writeLimiter,
   multerMiddleware,
   MenuController.updateMenu
 );

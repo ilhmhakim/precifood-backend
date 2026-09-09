@@ -17,23 +17,30 @@ import { ImageUploaderService } from '../service/image-uploader-service';
 import { MenuService } from '../service/menu-service';
 import { RecipeService } from '../service/recipe-service';
 import { UserRequest } from '../type/user';
+import { MenuValidation } from '../validation/menu-validation';
+import { Validation } from '../validation/validation';
 import { Menu } from '@prisma/client';
 import { NextFunction, Response } from 'express';
 
 export class MenuController {
   static async createMenu(req: UserRequest, res: Response, next: NextFunction) {
     try {
-      const file = req.file;
-      let imageUrl = 'https://placehold.co/600x400/EEE/31343C';
-      if (req.file) {
-        imageUrl = await ImageUploaderService.uploadImage(file, 'menu-images');
-      }
-
       const request: CreateMenuRequest = {
         ...req.body,
         restaurant_id: req.user.id,
-        image_url: imageUrl,
+        image_url: 'https://placehold.co/600x400/EEE/31343C',
       } as CreateMenuRequest;
+
+      // validate body before persisting the uploaded file, so a
+      // rejected request never leaves an orphaned object in storage.
+      Validation.validate(MenuValidation.CREATEMENU, request);
+
+      if (req.file) {
+        request.image_url = await ImageUploaderService.uploadImage(
+          req.file,
+          'menu-images'
+        );
+      }
 
       await MenuService.createMenu(request);
 
@@ -47,20 +54,22 @@ export class MenuController {
 
   static async updateMenu(req: UserRequest, res: Response, next: NextFunction) {
     try {
-      let imageUrl;
-      if (req.file) {
-        imageUrl = await ImageUploaderService.uploadImage(
-          req.file,
-          'menu-images'
-        );
-      }
-
       const request: UpdateMenuRequest = {
         ...req.body,
         restaurant_id: String(req.user.id),
         menu_id: Number(req.params.menuId),
-        image_url: imageUrl || req.body.image_url,
-      };
+      } as UpdateMenuRequest;
+
+      // Validate body before persisting the uploaded file, so a
+      // rejected request never leaves an orphaned object in storage.
+      Validation.validate(MenuValidation.UPDATEMENU, request);
+
+      if (req.file) {
+        request.image_url = await ImageUploaderService.uploadImage(
+          req.file,
+          'menu-images'
+        );
+      }
 
       await MenuService.updateMenu(request);
 
