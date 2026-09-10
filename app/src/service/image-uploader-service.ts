@@ -4,6 +4,14 @@ import { format } from 'util';
 
 const bucket = gc.bucket('precifood-image'); // Sesuaikan dengan nama bucket Anda
 
+const JPEG_MAGIC = [0xff, 0xd8, 0xff];
+const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+
+function hasMagicBytes(buffer: Buffer, magic: number[]): boolean {
+  if (!buffer || buffer.length < magic.length) return false;
+  return magic.every((byte, i) => buffer[i] === byte);
+}
+
 export class ImageUploaderService {
   static async uploadImage(
     image: Express.Multer.File | undefined,
@@ -12,6 +20,17 @@ export class ImageUploaderService {
     // Check if a file is provided
     if (!image) {
       throw new ResponseError(400, 'Tidak ada file yang diupload');
+    }
+
+    // verify file content (magic bytes), not the
+    // client-supplied mimetype/extension. Rejects .exe renamed to .png.
+    const isJpeg = hasMagicBytes(image.buffer, JPEG_MAGIC);
+    const isPng = hasMagicBytes(image.buffer, PNG_MAGIC);
+    if (!isJpeg && !isPng) {
+      throw new ResponseError(
+        400,
+        'File bukan gambar yang valid. Hanya file .jpg/.jpeg/.png yang diperbolehkan'
+      );
     }
 
     return new Promise((resolve, reject) => {
