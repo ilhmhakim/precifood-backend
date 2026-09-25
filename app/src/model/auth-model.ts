@@ -10,6 +10,7 @@ export type UserLoginResponse = {
 
 export type UserRefreshAccessTokenResponse = {
   access_token: string;
+  refresh_token: string;
 };
 
 export type RefreshTokenRequest = {
@@ -44,9 +45,11 @@ export function toUserLoginResponse(
 }
 
 export function toUserRefreshToken(
-  accessToken: string
+  accessToken: string,
+  refreshToken: string
 ): UserRefreshAccessTokenResponse {
   return {
     access_token: accessToken,
+    refresh_token: refreshToken,
   };
 }

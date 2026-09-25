@@ -117,7 +117,13 @@ export class AuthService {
     };
     const accessToken = issueAccessToken(userPayload);
 
-    return toUserRefreshToken(accessToken);
+    const newRefreshToken = issueRefreshToken(userPayload);
+    await prismaClient.user.update({
+      where: { id: user.id },
+      data: { token: newRefreshToken },
+    });
+
+    return toUserRefreshToken(accessToken, newRefreshToken);
   }
 
   static async updateEmail(request: UpdateEmailRequest) {

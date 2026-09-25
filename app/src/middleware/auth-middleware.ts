@@ -1,7 +1,8 @@
 // src/middleware/auth-middleware.ts
+import { prismaClient } from '../application/database';
 import { jwtRefresh, jwtSecret } from '../config/jwt';
 import { UserPayload, UserRequest } from '../type/user';
-import { Response, NextFunction } from 'express';
+import { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 export const issueAccessToken = (user: UserPayload): string => {
@@ -28,17 +29,25 @@ export const authorizeMiddleware = function (roles: string[] = []) {
         return sendError('Token format invalid');
 
       const tokenString = token.split(' ')[1];
-      jwt.verify(tokenString, jwtSecret.secret!, (err, decodedToken) => {
-        if (err || !decodedToken)
-          return sendError('Token invalid atau kadaluarsa', 401);
+      let decoded: UserPayload;
+      try {
+        decoded = jwt.verify(tokenString, jwtSecret.secret!) as UserPayload;
+      } catch {
+        return sendError('Token invalid atau kadaluarsa', 401);
+      }
 
-        const decoded: UserPayload = decodedToken as UserPayload;
-        if (!roles.includes(decoded.role))
-          return sendError('User tidak memiliki akses');
+      if (!decoded || !roles.includes(decoded.role))
+        return sendError('User tidak memiliki akses');
 
-        req.user = { id: decoded.id, role: decoded.role };
-        next();
+      const session = await prismaClient.user.findUnique({
+        where: { id: decoded.id },
+        select: { token: true },
       });
+      if (!session || !session.token)
+        return sendError('Sesi telah berakhir, silakan login kembali', 401);
+
+      req.user = { id: decoded.id, role: decoded.role };
+      next();
     } catch (err) {
       return res.status(500).json({ message: 'Server error' });
     }
