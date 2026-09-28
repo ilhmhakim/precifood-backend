@@ -13,6 +13,7 @@ export interface UserPayload extends JwtPayload {
   id: string;
   email: string;
   role: string;
+  tv: number;
   iss?: string;
 }
 

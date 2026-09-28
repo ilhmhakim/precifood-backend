@@ -51,6 +51,7 @@ export class AuthService {
       id: user.id,
       email: user.email,
       role: user.role,
+      tv: user.tokenVersion + 1,
     };
     const accessToken = issueAccessToken(userPayload);
     const refreshToken = issueRefreshToken(userPayload);
@@ -81,7 +82,7 @@ export class AuthService {
 
     const userToken = await prismaClient.user.update({
       where: { id: user.id },
-      data: { token: refreshToken },
+      data: { token: refreshToken, tokenVersion: userPayload.tv },
     });
 
     return toUserLoginResponse(accessToken, userToken, user.role, restaurantId);
@@ -114,13 +115,14 @@ export class AuthService {
       id: user.id,
       email: user.email,
       role: user.role,
+      tv: user.tokenVersion + 1,
     };
     const accessToken = issueAccessToken(userPayload);
 
     const newRefreshToken = issueRefreshToken(userPayload);
     await prismaClient.user.update({
       where: { id: user.id },
-      data: { token: newRefreshToken },
+      data: { token: newRefreshToken, tokenVersion: userPayload.tv },
     });
 
     return toUserRefreshToken(accessToken, newRefreshToken);
@@ -218,6 +220,7 @@ export class AuthService {
       },
       data: {
         token: null,
+        tokenVersion: { increment: 1 },
       },
     });
   }

@@ -41,9 +41,9 @@ export const authorizeMiddleware = function (roles: string[] = []) {
 
       const session = await prismaClient.user.findUnique({
         where: { id: decoded.id },
-        select: { token: true },
+        select: { token: true, tokenVersion: true },
       });
-      if (!session || !session.token)
+      if (!session || !session.token || decoded.tv !== session.tokenVersion)
         return sendError('Sesi telah berakhir, silakan login kembali', 401);
 
       req.user = { id: decoded.id, role: decoded.role };
